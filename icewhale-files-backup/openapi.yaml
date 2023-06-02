@@ -1,0 +1,379 @@
+openapi: 3.0.3
+
+info:
+  title: IceWhale Files Backup API
+  version: v0.0.1
+  description: |
+    This is the API for IceWhale Files Backup.
+
+servers:
+  - url: /v2/files
+security:
+  - access_token: []
+
+paths:
+  /client/{client_id}/heartbeat:
+    get:
+      summary: Get heartbeat
+      operationId: getHeartbeat
+      parameters:
+        - $ref: "#/components/parameters/ClientIDParam"
+      responses:
+        "200":
+          $ref: "#/components/responses/HeartbeatOK"
+        "404":
+          $ref: "#/components/responses/ResponseNotFound"
+
+    post:
+      summary: Send heartbeat
+      operationId: sendHeartbeat
+      parameters:
+        - $ref: "#/components/parameters/ClientIDParam"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseOK"
+
+  /backup:
+    get:
+      summary: Get all folder backups
+      operationId: getAllFolderBackups
+      parameters:
+        - $ref: "#/components/parameters/FullParam"
+      responses:
+        "200":
+          $ref: "#/components/responses/AllFolderBackupsOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+  /backup/{client_id}:
+    get:
+      summary: Get folder backups by client ID
+      operationId: getFolderBackupsByClientID
+      parameters:
+        - $ref: "#/components/parameters/ClientIDParam"
+        - $ref: "#/components/parameters/ClientFolderPathParam"
+        - $ref: "#/components/parameters/FullParam"
+      responses:
+        "200":
+          $ref: "#/components/responses/FolderBackupsOK"
+        "404":
+          $ref: "#/components/responses/ResponseNotFound"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+    post:
+      summary: Run a folder backup
+      operationId: runFolderBackup
+      parameters:
+        - $ref: "#/components/parameters/ClientIDParam"
+      requestBody:
+        $ref: "#/components/requestBodies/FolderBackupRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/FolderBackupOK"
+        "400":
+          $ref: "#/components/responses/ResponseBadRequest"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+    put:
+      summary: Update status of a folder backup
+      operationId: updateFolderBackupStatus
+      parameters:
+        - $ref: "#/components/parameters/ClientIDParam"
+        - $ref: "#/components/parameters/ClientFolderPathParam"
+        - $ref: "#/components/parameters/SuccessParam"
+      responses:
+        "200":
+          $ref: "#/components/responses/FolderBackupOK"
+        "404":
+          $ref: "#/components/responses/ResponseNotFound"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+    delete:
+      summary: Delete a folder backup
+      operationId: deleteFolderBackup
+      parameters:
+        - $ref: "#/components/parameters/ClientIDParam"
+        - $ref: "#/components/parameters/ClientFolderPathParam"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseOK"
+        "404":
+          $ref: "#/components/responses/ResponseNotFound"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+components:
+  securitySchemes:
+    access_token:
+      type: apiKey
+      in: header
+      name: Authorization
+
+  parameters:
+    ClientIDParam:
+      name: client_id
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/ClientID"
+      x-go-name: ClientIDParam
+
+    ClientFolderPathParam:
+      name: client_folder_path
+      in: query
+      description: path of the folder from client side to be backed up
+      schema:
+        type: string
+        example: C:\Users\icewhale\Downloads
+
+    FullParam:
+      name: full
+      in: query
+      description: get full information, e.g. file count and total size
+      schema:
+        type: boolean
+        default: false
+
+    SuccessParam:
+      name: success
+      in: query
+      description: get only successful backups
+      schema:
+        type: boolean
+        default: false
+
+  requestBodies:
+    FolderBackupRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/FolderBackup"
+
+  responses:
+    ResponseOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+
+    ResponseInternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "Internal Server Error"
+
+    ResponseNotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "Not Found"
+
+    ResponseBadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "Bad Request"
+
+    HeartbeatOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    properties:
+                      last_heartbeat:
+                        type: string
+                        format: date-time
+                        example: "2021-01-01T00:00:00Z"
+
+    FolderBackupOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/FolderBackup"
+
+    AllFolderBackupsOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    type: object
+                    additionalProperties:
+                      type: array
+                      items:
+                        $ref: "#/components/schemas/FolderBackup"
+
+    FolderBackupsOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/FolderBackup"
+
+  schemas:
+    BaseResponse:
+      properties:
+        message:
+          description: message returned by server side if there is any
+          type: string
+          example: ""
+
+    ClientID:
+      type: string
+      readOnly: true
+      example: "client123"
+      x-go-name: ClientID
+
+    FolderBackup:
+      properties:
+        client_id:
+          $ref: "#/components/schemas/ClientID"
+
+        client_name:
+          description: name of the client
+          type: string
+          example: "John's Computer"
+
+        client_type:
+          description: type of the client
+          type: string
+          example: "Windows"
+
+        client_folder_path:
+          description: |
+            path of the folder from client side to be backed up
+
+            > This path is case sensitive. Make sure the value is consistent when client runs on Windows.
+
+          type: string
+          example: C:\Users\icewhale\Downloads
+
+        client_folder_file_sizes:
+          description: |
+            sizes of files under the folder from client side to be backed up
+
+            > - This key is case sensitive. Make sure the value is consistent when client runs on Windows.
+            > - The size is in bytes.
+
+          writeOnly: true
+          type: object
+          additionalProperties:
+            type: integer
+            format: int64
+          example:
+            'C:\Users\icewhale\Downloads\1.txt': 123
+            'C:\Users\icewhale\Downloads\Movies\2.mp4': 4567890
+
+        client_folder_file_hashes:
+          description: |
+            hashes of files under the folder from client side to be backed up
+
+            > - The hash algorithm is xxHash (https://cyan4973.github.io/xxHash)
+            > - This key is case sensitive. Make sure the value is consistent when client runs on Windows.
+
+          writeOnly: true
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            'C:\Users\icewhale\Downloads\1.txt': "d41d8cd98f00b204e9800998ecf8427e"
+            'C:\Users\icewhale\Downloads\Movies\2.mp4': "d41d8cd98f00b204e9800998ecf8427e"
+
+        client_folder_file_transfer_list:
+          description: |
+            list of files to be transferred from client side to server side
+
+            > This list should be provided by the server side in the response. It is read only to client side.
+          readOnly: true
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            'C:\Users\icewhale\Downloads\1.txt': "Backup/SomeClientID/C/Users/icewhale/Downloads/1.txt"
+            'C:\Users\icewhale\Downloads\Movies\2.mp4': "Backup/SomeClientID/C/Users/icewhale/Downloads/Movies/2.mp4"
+        keep_history_copy:
+          description: |
+            whether to keep history copy of files in the folder backup
+
+            > - If set to `true`, will keep history copy of files in the folder backup.
+            > - If set to `false`, will only keep the latest version of files in the folder backup.
+          type: boolean
+          default: true
+
+        data_root_path:
+          description: |
+            root path of the DATA folder, which is also the root path for WebDAV.
+          readOnly: true
+          type: string
+          example: /DATA
+
+        backup_folder_path:
+          description: |
+            relative path of the folder from server side to store backup files
+
+            > It is relative to the data folder. If data folder is `/DATA` and the full backup path
+            > is `/DATA/Backup/SomeClientID/C/Users/icewhale/Downloads`, then the value of this field
+            > is `Backup/SomeClientID/C/Users/icewhale/Downloads`.
+          readOnly: true
+          type: string
+          example: /DATA/Backup/SomeClientID/C/Users/icewhale/Downloads
+
+        backup_folder_count:
+          description: number of files in the folder backup
+          readOnly: true
+          type: integer
+          example: 2
+
+        backup_folder_size:
+          description: size of the folder backup in bytes
+          readOnly: true
+          type: integer
+          format: int64
+          example: 1024
+
+        last_backup_time:
+          description: last backup time in milliseconds
+          readOnly: true
+          type: integer
+          format: int64
+          example: 1681159361000
+
+        last_backup_succeeded:
+          readOnly: true
+          type: boolean
+
+        in_progress:
+          readOnly: true
+          type: boolean
