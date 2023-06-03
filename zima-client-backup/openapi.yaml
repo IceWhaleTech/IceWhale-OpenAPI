@@ -1,0 +1,280 @@
+openapi: 3.0.3
+
+info:
+  title: Zima Client Backup API
+  version: v0.0.1
+  description: |
+    This is the API for the Zima Client Backup.
+
+servers:
+  - url: /
+
+security:
+  - access_token: []
+
+paths:
+  /backup:
+    get:
+      summary: Get all folder backups
+      description: |
+        Get all folder backups.
+      operationId: getBackups
+      parameters:
+        - $ref: "#/components/parameters/FullParam"
+      responses:
+        "200":
+          $ref: "#/components/responses/FolderBackupsOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+    post:
+      summary: Add a folder to backup
+      description: |
+        Add a folder backup.
+      operationId: startBackup
+      requestBody:
+        $ref: "#/components/requestBodies/FolderBackupRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseOK"
+        "400":
+          $ref: "#/components/responses/ResponseBadRequest"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+    delete:
+      summary: Stop a folder backup
+      parameters:
+        - $ref: "#/components/parameters/ClientFolderPathParam"
+      operationId: stopBackup
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseOK"
+        "404":
+          $ref: "#/components/responses/ResponseNotFound"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+  /device/auth:
+    put:
+      summary: update access token for calling APIs on the device
+      operationId: updateAccessToken
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - token
+              properties:
+                token:
+                  type: string
+                  description: access token
+                  example: "eyJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNhc2FvcyIsImlkIjoxLCJpc3MiOiJjYXNhb3MiLCJleHAiOjE2ODI2NTI5MDcsIm5iZiI6MTY4MjY0MjEwNywiaWF0IjoxNjgyNjQyMTA3fQ.rdMyLMLTsl5jCeakC8lm3CnKEAcJDZyUD4lbl1p19pcYtt8_Hm8pxPX-bC3hhvH6OleJ0Bf1YDRk1bHO9-SMxw"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+components:
+  securitySchemes:
+    access_token:
+      type: apiKey
+      in: header
+      name: Authorization
+
+  parameters:
+    FullParam:
+      name: full
+      in: query
+      description: get full information, e.g. file count and total size
+      schema:
+        type: boolean
+        default: true
+
+    ClientFolderPathParam:
+      name: client_folder_path
+      in: query
+      description: path of the folder from client side to be backed up
+      required: true
+      schema:
+        type: string
+        example: 'C:\Users\John\Documents'
+
+  requestBodies:
+    FolderBackupRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/FolderBackup"
+
+  responses:
+    ResponseOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+
+    ResponseInternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "Internal Server Error"
+
+    ResponseNotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "Not Found"
+
+    ResponseBadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "Bad Request"
+
+    FolderBackupOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/FolderBackup"
+
+    FolderBackupsOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/FolderBackup"
+
+  schemas:
+    BaseResponse:
+      properties:
+        message:
+          description: message returned by server side if there is any
+          type: string
+          example: ""
+
+    FolderBackupSession:
+      properties:
+        stage:
+          readOnly: true
+          type: string
+          enum:
+            - scan
+            - server_check
+            - transfer
+        remaining_count:
+          readOnly: true
+          description: remaining number of files to be processed at current stage
+          type: integer
+          example: 2
+        speed:
+          readOnly: true
+          description: speed of current stage in bytes per second
+          type: number
+          example: 123.456
+
+    FolderBackup:
+      required:
+        - client_folder_path
+      properties:
+        paused:
+          type: boolean
+          default: false
+
+        client_folder_path:
+          description: |
+            path of the folder from client side to be backed up
+
+            > This path is case sensitive. Make sure the value is consistent when client runs on Windows.
+
+          type: string
+          example: C:\Users\John\Downloads
+
+        client_folder_count:
+          description: number of files in the client folder
+          readOnly: true
+          type: integer
+          example: 2
+
+        client_folder_size:
+          description: size of the client folder in bytes
+          readOnly: true
+          type: integer
+          format: int64
+          example: 1024
+
+        keep_history_copy:
+          description: |
+            whether to keep history copy of files in the folder backup
+
+            > - If set to `true`, will keep history copy of files in the folder backup.
+            > - If set to `false`, will only keep the latest version of files in the folder backup.
+          type: boolean
+
+        data_root_path:
+          description: |
+            root path of the DATA folder from server side, which is also the root path for WebDAV.
+          readOnly: true
+          type: string
+          example: /DATA
+
+        backup_folder_path:
+          description: path of the folder from server side to store backup files
+          readOnly: true
+          type: string
+          example: /DATA/Backup/SomeClientID/C/Users/John/Downloads
+
+        backup_folder_count:
+          description: number of files in the folder backup
+          readOnly: true
+          type: integer
+          example: 2
+
+        backup_folder_size:
+          description: size of the folder backup in bytes
+          readOnly: true
+          type: integer
+          format: int64
+          example: 1024
+
+        last_backup_time:
+          description: last backup time in milliseconds
+          readOnly: true
+          type: integer
+          format: int64
+          example: 1681159361000
+
+        last_backup_succeeded:
+          readOnly: true
+          type: boolean
+
+        in_progress:
+          readOnly: true
+          type: boolean
+
+        session:
+          readOnly: true
+          $ref: "#/components/schemas/FolderBackupSession"
