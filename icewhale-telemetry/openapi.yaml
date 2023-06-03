@@ -1,0 +1,199 @@
+openapi: 3.0.3
+
+info:
+  title: IceWhale Telemetry Hub API
+  version: v2
+  description: |-
+    Telemetry Hub receives and stores telemetry data from devices running Telemetry Agent.
+
+servers:
+  - url: /v2/telemetry
+
+tags:
+  - name: Event methods
+    description: Methods for collecting events from agents
+
+x-tagGroups:
+  - name: Methods
+    tags:
+      - Event methods
+
+security:
+  - access_token: []
+
+paths:
+  /events:
+    post:
+      summary: Collect events
+      description: Collect a batch of events from an agent
+      operationId: collectEvents
+      tags:
+        - Event methods
+      requestBody:
+        $ref: "#/components/requestBodies/Events"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseOK"
+        "400":
+          $ref: "#/components/responses/ResponseBadRequest"
+  /blog:
+    post:
+      summary: Blog events
+      description: Blog a batch of events from an agent
+      operationId: blogEvents
+      tags:
+        - Blog methods
+      requestBody:
+        $ref: "#/components/requestBodies/BlogEvents"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseOK"
+        "400":
+          $ref: "#/components/responses/ResponseBadRequest"
+
+components:
+  securitySchemes:
+    access_token:
+      type: apiKey
+      in: header
+      name: Authorization
+
+  requestBodies:
+    Events:
+      description: A batch of events
+      required: true
+      content:
+        application/json:
+          schema:
+            type: array
+            minItems: 1
+            items:
+              $ref: "#/components/schemas/Event"
+    BlogEvents:
+      description: A batch of events
+      required: true
+      content:
+        application/json:
+          schema:
+            type: array
+            minItems: 1
+            items:
+              $ref: "#/components/schemas/BlogEvent"
+
+  responses:
+    ResponseOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "OK"
+
+    ResponseInternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+
+    ResponseNotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "Not Found"
+
+    ResponseBadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "Bad Request"
+
+    ResponseConflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "Conflict"
+
+  schemas:
+    BaseResponse:
+      properties:
+        message:
+          readOnly: true
+          description: message returned by server side if there is any
+          type: string
+          example: ""
+
+    Event:
+      type: object
+      required:
+        - "sourceID"
+        - "name"
+        - "properties"
+      properties:
+        sourceID:
+          type: string
+          description: associated source id
+          example: "casaos-ui"
+        name:
+          type: string
+          description: event name
+          example: "casaos-ui:user:logged-out"
+        uuid:
+          type: string
+          description: event uuid
+          example: "442e0e5b-9d3e-4fe8-b46f-9c4141fdecd7"
+        properties:
+          type: object
+          description: event properties
+          additionalProperties:
+            type: string
+          example:
+            device:id: "a hash of first physical MAC address"
+            device:ip: "IP address of the device"
+        timestamp:
+          type: string
+          description: timestamp this event took place
+          format: date-time
+    BlogEvent:
+      type: object
+      required:
+        - "uuid"
+      properties:
+        uuid:
+          type: string
+          description: event uuid
+          example: "442e0e5b-9d3e-4fe8-b46f-9c4141fdecd7"
+        mac_hash:
+          type: string
+          description: mac hash
+          example: "sdfsdf93ufj83jd"
+        version:
+          type: string
+          description: casaos version
+          example: "0.3.8"
+        lang:
+          type: string
+          description: client language
+          example: "en"
+        useragent:
+          type: string
+          description: ua
+          example: "Mozilla"
+        date:
+          type: string
+          description: time string
+          example: "2022-11-28"
+        time:
+          type: string
+          description: timestamp this event took place
+          format: date-time
