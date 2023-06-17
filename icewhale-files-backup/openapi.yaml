@@ -37,8 +37,6 @@ paths:
     get:
       summary: Get all folder backups
       operationId: getAllFolderBackups
-      parameters:
-        - $ref: "#/components/parameters/FullParam"
       responses:
         "200":
           $ref: "#/components/responses/AllFolderBackupsOK"
@@ -52,7 +50,6 @@ paths:
       parameters:
         - $ref: "#/components/parameters/ClientIDParam"
         - $ref: "#/components/parameters/ClientFolderPathParam"
-        - $ref: "#/components/parameters/FullParam"
       responses:
         "200":
           $ref: "#/components/responses/FolderBackupsOK"
@@ -128,14 +125,6 @@ components:
       schema:
         type: string
         example: C:\Users\icewhale\Downloads
-
-    FullParam:
-      name: full
-      in: query
-      description: get full information, e.g. file count and total size
-      schema:
-        type: boolean
-        default: false
 
     SuccessParam:
       name: success
