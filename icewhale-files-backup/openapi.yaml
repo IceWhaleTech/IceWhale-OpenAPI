@@ -63,6 +63,7 @@ paths:
       operationId: runFolderBackup
       parameters:
         - $ref: "#/components/parameters/ClientIDParam"
+        - $ref: "#/components/parameters/PrepareOnlyParam"
       requestBody:
         $ref: "#/components/requestBodies/FolderBackupRequest"
       responses:
@@ -130,6 +131,14 @@ components:
       name: success
       in: query
       description: get only successful backups
+      schema:
+        type: boolean
+        default: false
+
+    PrepareOnlyParam:
+      name: prepare_only
+      in: query
+      description: prepare only
       schema:
         type: boolean
         default: false
