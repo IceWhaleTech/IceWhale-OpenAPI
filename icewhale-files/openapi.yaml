@@ -44,13 +44,13 @@ tags:
       Driver
   - name: Image
     description: |-
-      Image
+      Image 
 
 security:
   - access_token: []
 
 paths:
-  /health/dependencies:
+  /health/dependencies:  
     get:
       tags:
         - Health methods
@@ -109,7 +109,17 @@ paths:
               - "date"
               - "name"
               - "size"
-
+              - "format"
+        - name: direction
+          in: query
+          description: send folder size by socket
+          example: "true"
+          schema:
+            type: string
+            enum:
+              - "desc"
+              - "asc"
+          
       responses:
         "200":
           $ref: "#/components/responses/GetFilesOK"
@@ -214,8 +224,57 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+      
+  /file/compression:
+    post:
+      tags:
+        - File
+      summary: file decompress
+      description: decompress zip 7z rar file
+      operationId: postDecompress
+      requestBody:
+         $ref: "#/components/requestBodies/PostDecompress"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "404":
+          $ref: "#/components/responses/ResponseNotFoundError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+    get:
+      tags:
+        - File
+      summary: preview a compression file
+      description: preview a compression file
+      operationId: getCompression
+      parameters:
+        - name: path
+          in: query
+          description: file path
+          example: "/DATA.zip"
+          required: true
+          schema:
+            type: string
+        - name: in_path
+          in: query
+          description: path in the compressed package
+          example: "data"
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/GetFilesOKByCompression"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "404":
+          $ref: "#/components/responses/ResponseNotFoundError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"       
 
-  /file/download:
+
+  /file/download: 
     # 改为 /file/download，和下面 /file/upload 对应
     #
     # 如果 HTTP 请求头包含 Accept: application/json:
@@ -384,6 +443,16 @@ paths:
           example: 22
           schema:
             type: integer
+        - name: type
+          in: query
+          description: type of history
+          example: "all"
+          schema:
+            type: string
+            enum:
+              - "file"
+              - "folder"
+              - "all"
       responses:
         "200":
           $ref: "#/components/responses/ResponseHistoryOK"
@@ -425,7 +494,7 @@ paths:
           $ref: "#/components/responses/ResponseClientError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-
+        
   /file/history/{id}/:
     delete:
       tags:
@@ -764,7 +833,7 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-  /cloud:
+  /cloud: 
     get:
       tags:
         - Cloud
@@ -801,7 +870,7 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-  /driver:
+  /driver: 
     get:
       tags:
         - Driver
@@ -855,6 +924,13 @@ components:
             $ref: "#/components/schemas/PutFileModel"
             required:
               - path
+    PostDecompress:
+      description: create decompress
+      content:
+        application/json:
+          schema: 
+            type: object
+            $ref: "#/components/schemas/DecompressModel"
     PostShare:
       description: Create share
       content:
@@ -907,15 +983,15 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/SuccessResponseInterface"
+            $ref: "#/components/schemas/SuccessResponseInterface"   
     ResponseConnectListOK:
       description: OK
       content:
         application/json:
           schema:
             type: array
-            items:
-              $ref: "#/components/schemas/ConnectModel"
+            items: 
+              $ref: "#/components/schemas/ConnectModel"     
     ResponseInternalServerError:
       description: Internal Server Error
       content:
@@ -942,14 +1018,14 @@ components:
             type: array
             items:
               $ref: "#/components/schemas/FolderModel"
-
+            
     ResponseShareListOK:
       description: OK
       content:
         application/json:
           schema:
             type: array
-            items:
+            items: 
               $ref: "#/components/schemas/ShareModel"
     ResponsePeersOK:
       description: OK
@@ -957,7 +1033,7 @@ components:
         application/json:
           schema:
             type: array
-            items:
+            items: 
               $ref: "#/components/schemas/PeerModel"
     ResponseHistoryOK:
       description: OK
@@ -965,7 +1041,7 @@ components:
         application/json:
           schema:
             type: array
-            items:
+            items: 
               $ref: "#/components/schemas/HistoryModel"
     GetCloudListOK:
       description: OK
@@ -973,7 +1049,7 @@ components:
         application/json:
           schema:
             type: array
-            items:
+            items: 
               $ref: "#/components/schemas/CloudModel"
     GetDriverListOK:
       description: OK
@@ -981,7 +1057,7 @@ components:
         application/json:
           schema:
             type: array
-            items:
+            items: 
               $ref: "#/components/schemas/DriverModel"
     GetHealthServicesOK:
       description: OK
@@ -1003,6 +1079,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/FileList"
+    GetFilesOKByCompression:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/FileListByCompression"
   schemas:
     SuccessResponse:
       allOf:
@@ -1039,7 +1121,7 @@ components:
                   items: {}
                 - type: object
                   description: When the interface returns success, this field is the specific success information
-
+    
     SuccessResponseInteger:
       allOf:
         - $ref: "#/components/schemas/BaseResponse"
@@ -1054,7 +1136,7 @@ components:
             data:
               type: array
               description: When the interface returns success, this field is the specific success information
-              items:
+              items: 
                 type: string
                 example: "/test"
     BaseResponse:
@@ -1111,6 +1193,21 @@ components:
             - type: object
           description: file extensions
           example: "mounted"
+    FileListByCompression:
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/FileModelByCompression"
+        total:
+          type: integer
+          description: total number of files
+          example: 100
+        size:
+          type: integer
+          description: total size of files
+          example: 1024
+
     FileList:
       properties:
         content:
@@ -1149,7 +1246,7 @@ components:
           description: processed size
           format: int64
           example: 1024
-
+    
     FileTaskModel:
       properties:
         item:
@@ -1297,7 +1394,7 @@ components:
           example: "292839"
         used:
           type: string
-          example: "292839"
+          example: "292839"  
     DriverModel:
       properties:
         auth_url:
@@ -1348,3 +1445,34 @@ components:
           type: integer
           example: 1682403656
           format: int64
+    DecompressModel:
+      properties:
+        file_path:
+          type: string
+          example: /DATA.zip
+        target_path:
+          type: string
+          example: /DATA
+    FileModelByCompression:
+      properties:
+        name:
+          type: string
+          description: file / folder name
+          example: "DATA"
+        size:
+          type: integer
+          description: file size
+          example: 1024
+        is_dir:
+          type: boolean
+          description: is directory
+          example: true
+        modified:
+          type: integer
+          description: last modified time
+          example: 2323232323
+          format: int64
+        path:
+          type: string
+          description: file path
+          example: "/DATA"
