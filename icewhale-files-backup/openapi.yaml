@@ -75,8 +75,8 @@ paths:
           $ref: "#/components/responses/ResponseInternalServerError"
 
     put:
-      summary: Update status of a folder backup
-      operationId: updateFolderBackupStatus
+      summary: Complete a folder backup
+      operationId: completeFolderBackup
       parameters:
         - $ref: "#/components/parameters/ClientIDParam"
         - $ref: "#/components/parameters/ClientFolderPathParam"
