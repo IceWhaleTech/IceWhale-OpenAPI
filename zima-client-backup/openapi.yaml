@@ -234,16 +234,8 @@ components:
             > - If set to `false`, will only keep the latest version of files in the folder backup.
           type: boolean
 
-        data_root_path:
-          description: |
-            root path of the DATA folder from server side, which is also the root path for WebDAV.
-          readOnly: true
-          type: string
-          example: /DATA
-
         backup_folder_path:
           description: path of the folder from server side to store backup files
-          readOnly: true
           type: string
           example: /DATA/Backup/SomeClientID/C/Users/John/Downloads
 
