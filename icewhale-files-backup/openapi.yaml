@@ -363,3 +363,13 @@ components:
         in_progress:
           readOnly: true
           type: boolean
+
+        transfer_type:
+          readOnly: true
+          type: string
+          example: webdav
+
+        transfer_address:
+          readOnly: true
+          type: string
+          example: 127.0.0.1:45212
