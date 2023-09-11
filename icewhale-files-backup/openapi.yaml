@@ -255,6 +255,10 @@ components:
       x-go-name: ClientID
 
     FolderBackup:
+      required:
+        - client_id
+        - client_folder_path
+        - backup_folder_path
       properties:
         client_id:
           $ref: "#/components/schemas/ClientID"
