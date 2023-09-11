@@ -199,6 +199,7 @@ components:
     FolderBackup:
       required:
         - client_folder_path
+        - backup_folder_path
       properties:
         paused:
           type: boolean
