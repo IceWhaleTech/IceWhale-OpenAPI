@@ -75,8 +75,8 @@ paths:
           $ref: "#/components/responses/ResponseInternalServerError"
 
     put:
-      summary: Update status of a folder backup
-      operationId: updateFolderBackupStatus
+      summary: Complete a folder backup
+      operationId: completeFolderBackup
       parameters:
         - $ref: "#/components/parameters/ClientIDParam"
         - $ref: "#/components/parameters/ClientFolderPathParam"
@@ -255,6 +255,10 @@ components:
       x-go-name: ClientID
 
     FolderBackup:
+      required:
+        - client_id
+        - client_folder_path
+        - backup_folder_path
       properties:
         client_id:
           $ref: "#/components/schemas/ClientID"
@@ -330,21 +334,9 @@ components:
           type: boolean
           default: true
 
-        data_root_path:
-          description: |
-            root path of the DATA folder, which is also the root path for WebDAV.
-          readOnly: true
-          type: string
-          example: /DATA
-
         backup_folder_path:
           description: |
-            relative path of the folder from server side to store backup files
-
-            > It is relative to the data folder. If data folder is `/DATA` and the full backup path
-            > is `/DATA/Backup/SomeClientID/C/Users/icewhale/Downloads`, then the value of this field
-            > is `Backup/SomeClientID/C/Users/icewhale/Downloads`.
-          readOnly: true
+            full path of the folder from server side to store backup files
           type: string
           example: /DATA/Backup/SomeClientID/C/Users/icewhale/Downloads
 
@@ -375,3 +367,13 @@ components:
         in_progress:
           readOnly: true
           type: boolean
+
+        transfer_type:
+          readOnly: true
+          type: string
+          example: webdav
+
+        transfer_port:
+          readOnly: true
+          type: string
+          example: "45212"
