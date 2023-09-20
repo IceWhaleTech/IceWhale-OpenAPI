@@ -200,7 +200,6 @@ components:
       required:
         - client_folder_path
         - backup_folder_path
-        - last_created_time
       properties:
         paused:
           type: boolean
