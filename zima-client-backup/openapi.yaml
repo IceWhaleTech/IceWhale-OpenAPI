@@ -200,6 +200,7 @@ components:
       required:
         - client_folder_path
         - backup_folder_path
+        - last_created_time
       properties:
         paused:
           type: boolean
@@ -252,6 +253,13 @@ components:
           type: integer
           format: int64
           example: 1024
+
+        last_created_time:
+          description: last created time in milliseconds
+          readOnly: true
+          type: integer
+          format: int64
+          example: 1681159361000
 
         last_backup_time:
           description: last backup time in milliseconds
