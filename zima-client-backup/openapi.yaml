@@ -253,6 +253,13 @@ components:
           format: int64
           example: 1024
 
+        last_created_time:
+          description: last created time in milliseconds
+          readOnly: true
+          type: integer
+          format: int64
+          example: 1681159361000
+
         last_backup_time:
           description: last backup time in milliseconds
           readOnly: true
