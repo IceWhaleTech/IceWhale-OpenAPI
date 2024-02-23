@@ -26,11 +26,6 @@ jobs:
           sudo apt install jq
           jq '.version="${{ steps.get_version.outputs.VERSION }}"' package.json > package.json.new
           mv package.json.new package.json
-      - name: Generate SDK
-        run: |
-          npm cache clean --force
-          npm install @openapitools/openapi-generator-cli -g
-          make build
       - run: bash generate-npm.sh
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
