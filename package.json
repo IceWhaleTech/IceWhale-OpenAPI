@@ -1,6 +1,6 @@
 {
   "name": "@icewhale/icewhale-openapi",
-  "version": "v0.0.1",
+  "version": "v0.0.1-alpha2",
   "scripts": {
     "clean": "rm -rf generate",
     "build": "rm -rf dist && tsc && yarn clean",
@@ -18,7 +18,7 @@
     "icewhale",
     "openapi"
   ],
-  "main": "generate",
+  "main": "generate/*",
   "files": [
     "LICENSE",
     "README.md",

@@ -6,9 +6,13 @@ if [ -z "$LATEST_TAG" ]; then
 fi
 openapi-generator-cli generate -g typescript-axios -i ./icewhale-drive/openapi.yaml -o ./generate/icewhale-drive
 
+# 检查生成是否成功
+if [ $? -ne 0 ]; then
+  echo "Code generation failed!"
+  exit 1
+fi
+
 # 使用 jq 设置新的版本号
 jq --arg version "$LATEST_TAG" '.version |= $version' package.json > tmp.json && mv tmp.json package.json
 
 npm publish --access public
-
-rm -rf generate
