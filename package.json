@@ -1,0 +1,40 @@
+{
+  "name": "@icewhale/icewhale-openapi",
+  "version": "v0.0.1",
+  "scripts": {
+    "clean": "rm -rf generate",
+    "build": "rm -rf dist && tsc && yarn clean",
+    "generate:local": "openapi-generator-cli generate -g typescript-axios -i ./icewhale-files/openapi.yaml -o ./generate",
+    "generate:npx": "npx @openapitools/openapi-generator-cli generate -g typescript-axios -i ./api/zimaos/openapi.yaml -o ./generate",
+    "generate:ts": "npx openapi-typescript-codegen --input ./api/zimaos/openapi.yaml --output ./generate",
+    "start": "yarn generate:local && yarn build"
+  },
+  "homepage": "https://github.com/IceWhaleTech/icewhale-openapi#readme",
+  "description": "ZimaOS Typescript+Axios SDK",
+  "keywords": [
+    "ZimaOS",
+    "SDK",
+    "ZimaOS Axios",
+    "icewhale",
+    "openapi"
+  ],
+  "main": "generate",
+  "files": [
+    "LICENSE",
+    "README.md",
+    "dist",
+    "generate"
+  ],
+  "dependencies": {
+    "axios": "^1.1.0"
+  },
+  "devDependencies": {
+    "all-contributors-cli": "^6.24.0",
+    "@openapitools/openapi-generator-cli": "2.5.2",
+    "@types/node": "^18.8.3",
+    "openapi-typescript-codegen": "^0.23.0",
+    "typescript": "^4.9.5"
+  },
+  "author": "zimaos",
+  "license": "Apache-2.0"
+}
