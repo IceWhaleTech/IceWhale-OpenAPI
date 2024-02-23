@@ -88,9 +88,21 @@ paths:
           $ref: "#/components/responses/GetDriveInfoOK"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+    put:
+      tags:
+        - drive methods
+      summary: put drive info methods
+      description: |-
+        put drive info methods.
+      operationId: putDriveInfo
+      requestBody:
+        $ref: "#/components/requestBodies/DriveInfoBody"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
 components:
-  securitySchemes:
-
   responses:
     ResponseOK:
       description: OK
@@ -134,7 +146,13 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/DriveInfo"
-
+  requestBodies:
+    DriveInfoBody:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DriveInfo"
   schemas:
     BaseResponse:
       properties:
@@ -172,6 +190,8 @@ components:
             example: 53
           x-go-name: UDP
     DriveInfo:
+      required:
+        - device_name
       properties:
         lan_ipv4:
           type: array
