@@ -215,3 +215,6 @@ components:
         hash:
           type: string
           example: "sidnfnik39djv9wije9ijovij"
+        gpu_number:
+          type: integer
+          example: 0
