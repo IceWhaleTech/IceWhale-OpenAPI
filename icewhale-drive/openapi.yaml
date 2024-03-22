@@ -231,3 +231,6 @@ components:
             type: object
             additionalProperties:
               type: string
+        device_model:
+          type: string
+          example: "box"
