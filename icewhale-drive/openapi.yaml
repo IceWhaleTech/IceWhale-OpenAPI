@@ -218,3 +218,6 @@ components:
         gpu_number:
           type: integer
           example: 0
+        min_client_version:
+          type: string
+          example: "0.4.3"
