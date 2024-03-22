@@ -221,3 +221,13 @@ components:
         min_client_version:
           type: string
           example: "0.4.3"
+        tb_ipv4:
+          type: array
+          items:
+            type: string
+        ip4:
+          type: array
+          items:
+            type: object
+            additionalProperties:
+              type: string
