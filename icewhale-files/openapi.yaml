@@ -16,6 +16,10 @@ info:
 
 servers:
   - url: /v2
+    description: Development server
+  - url: /v2_1/files
+    # This path is maintained to ensure compatibility with the older v2 version of the API. Due to its integration across multiple projects, we have introduced a new version v2_1 to accommodate enhancements while still supporting the existing implementations that depend on v2. This strategy ensures a smooth transition and minimal disruption to ongoing services.
+    description: Development server
 
 tags:
   - name: Health methods
@@ -44,13 +48,13 @@ tags:
       Driver
   - name: Image
     description: |-
-      Image
+      Image 
 
 security:
   - access_token: []
 
 paths:
-  /health/dependencies:
+  /health/dependencies:  
     get:
       tags:
         - Health methods
@@ -109,7 +113,17 @@ paths:
               - "date"
               - "name"
               - "size"
-
+              - "format"
+        - name: direction
+          in: query
+          description: File Sorting
+          example: "true"
+          schema:
+            type: string
+            enum:
+              - "desc"
+              - "asc"
+          
       responses:
         "200":
           $ref: "#/components/responses/GetFilesOK"
@@ -185,6 +199,18 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+  /file/video/generate/image:
+    post:
+      tags:
+        - File
+      summary: Generate video thumbnail
+      description: Generate video thumbnail
+      operationId: postVideoThumbnail
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
   /file/online:
     get:
       tags:
@@ -214,8 +240,57 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+      
+  /file/compression:
+    post:
+      tags:
+        - File
+      summary: file decompress
+      description: decompress zip 7z rar file
+      operationId: postDecompress
+      requestBody:
+         $ref: "#/components/requestBodies/PostDecompress"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "404":
+          $ref: "#/components/responses/ResponseNotFoundError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+    get:
+      tags:
+        - File
+      summary: preview a compression file
+      description: preview a compression file
+      operationId: getCompression
+      parameters:
+        - name: path
+          in: query
+          description: file path
+          example: "/DATA.zip"
+          required: true
+          schema:
+            type: string
+        - name: in_path
+          in: query
+          description: path in the compressed package
+          example: "data"
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/GetFilesOKByCompression"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "404":
+          $ref: "#/components/responses/ResponseNotFoundError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"       
 
-  /file/download:
+
+  /file/download: 
     # 改为 /file/download，和下面 /file/upload 对应
     #
     # 如果 HTTP 请求头包含 Accept: application/json:
@@ -384,6 +459,16 @@ paths:
           example: 22
           schema:
             type: integer
+        - name: type
+          in: query
+          description: type of history
+          example: "all"
+          schema:
+            type: string
+            enum:
+              - "file"
+              - "folder"
+              - "all"
       responses:
         "200":
           $ref: "#/components/responses/ResponseHistoryOK"
@@ -414,6 +499,7 @@ paths:
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
     delete:
+      summary: Delete all history
       tags:
         - File
       description: Delete all history
@@ -425,9 +511,10 @@ paths:
           $ref: "#/components/responses/ResponseClientError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-
-  /file/history/{id}/:
+        
+  /file/history/{id}:
     delete:
+      summary: Delete history by id
       tags:
         - File
       description: Delete history
@@ -470,6 +557,7 @@ paths:
           $ref: "#/components/responses/ResponseInternalServerError"
   /filedrop/peers:
     get:
+      summary: Get filedrop peers
       tags:
         - filedrop
       operationId: getFiledropPeers
@@ -482,6 +570,7 @@ paths:
           $ref: "#/components/responses/ResponseInternalServerError"
   /folder:
     get:
+      summary: Get folder info
       tags:
         - Folder
       description: Get folder info, Split by ","
@@ -592,8 +681,48 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-  /task/{id}/:
+  /task/{id}:
+    put:
+      summary: Modify operate task
+      tags:
+        - File
+        - Folder
+      description: Modify operate task
+      operationId: putOperateTask
+      parameters:
+        - name: id
+          in: path
+          description: Task id
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                operate:
+                  type: string
+                  example: "success"
+                  enum:
+                    - "skip"
+                    - "rename"
+                    - "overwrite"
+              required:
+                - operate
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "404":
+          $ref: "#/components/responses/ResponseNotFoundError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
     delete:
+      summary: Delete operate task
       tags:
         - File
         - Folder
@@ -614,7 +743,25 @@ paths:
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
   /task:
+    # get:
+    #   summary: Get task list
+    #   tags:
+    #     - File
+    #     - Folder
+    #   description: Get task list
+    #   operationId: getOperateTask
+    #   responses:
+    #     "200":
+    #       $ref: "#/components/responses/GetTaskListOK"
+    #     "400":
+    #       $ref: "#/components/responses/ResponseClientError"
+    #     "404":
+    #       $ref: "#/components/responses/ResponseNotFoundError"
+    #     "500":
+    #       $ref: "#/components/responses/ResponseInternalServerError"
+
     post:
+      summary: create a task
       tags:
         - File
         - Folder
@@ -637,6 +784,7 @@ paths:
           $ref: "#/components/responses/ResponseInternalServerError"
   /share:
     get:
+      summary: Get share list
       tags:
         - Share
       description: Get share list
@@ -651,6 +799,7 @@ paths:
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
     post:
+      summary: Create a share
       tags:
         - Share
       description: Create a share
@@ -668,6 +817,7 @@ paths:
           $ref: "#/components/responses/ResponseInternalServerError"
   /share/{id}:
     delete:
+      summary: Delete a share
       tags:
         - Share
       description: Delete a share
@@ -690,6 +840,7 @@ paths:
           $ref: "#/components/responses/ResponseInternalServerError"
   /connect:
     get:
+      summary: Get connect list
       tags:
         - Connect
       description: Get connect list
@@ -704,6 +855,7 @@ paths:
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
     post:
+      summary: Create a connect
       tags:
         - Connect
       description: Create a connect
@@ -719,8 +871,25 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+  /web/connect_cloud:
+    get:
+      summary: Get web connect list and cloud list
+      tags:
+        - Connect
+      description: Get web connect list and cloud list
+      operationId: getWebConnectAndCloud
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseConnectAndCloudOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "404":
+          $ref: "#/components/responses/ResponseNotFoundError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
   /connect/{id}:
     delete:
+      summary: Delete a connect
       tags:
         - Connect
       description: Delete a connect
@@ -743,6 +912,7 @@ paths:
           $ref: "#/components/responses/ResponseInternalServerError"
   /recover/{type}/:
     get:
+      summary: Callback Address
       security: []
       tags:
         - Recover
@@ -764,8 +934,9 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-  /cloud:
+  /cloud: 
     get:
+      summary: Get cloud list
       tags:
         - Cloud
       description: Get cloud list
@@ -781,6 +952,7 @@ paths:
           $ref: "#/components/responses/ResponseInternalServerError"
   /cloud/{name}:
     delete:
+      summary: Delete a cloud
       tags:
         - Cloud
       description: Delete a cloud
@@ -801,8 +973,9 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-  /driver:
+  /driver: 
     get:
+      summary: Get driver list
       tags:
         - Driver
       description: Get driver list
@@ -818,6 +991,7 @@ paths:
           $ref: "#/components/responses/ResponseInternalServerError"
   /thumbnail:
     get:
+      summary: Get file thumbnail
       tags:
         - Image
       description: Get file thumbnail
@@ -838,6 +1012,69 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+  /pin:
+    get:
+      summary: get pins
+      tags:
+        - Pin methods
+      description: getpins
+      operationId: getPin
+      responses:
+        "200":
+          $ref: "#/components/responses/GetPinOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+    post:
+      summary: post a pin
+      tags:
+        - Pin methods
+      description: add a pin
+      operationId: postPin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PinModel"
+      responses:
+        "200":
+          $ref: "#/components/responses/GetPinOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+    put:
+      summary: put a pin
+      tags:
+        - Pin methods
+      description: update a pin
+      operationId: putPin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PinList"
+      responses:
+        "200":
+          $ref: "#/components/responses/GetPinOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+    delete:
+      summary: delete a pin
+      tags:
+        - Pin methods
+      description: Pin
+      operationId: deletePin
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PinModel"
+      responses:
+        "200":
+          $ref: "#/components/responses/GetPinOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
 
 components:
   securitySchemes:
@@ -855,6 +1092,13 @@ components:
             $ref: "#/components/schemas/PutFileModel"
             required:
               - path
+    PostDecompress:
+      description: create decompress
+      content:
+        application/json:
+          schema: 
+            type: object
+            $ref: "#/components/schemas/DecompressModel"
     PostShare:
       description: Create share
       content:
@@ -896,26 +1140,42 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/SuccessResponseInteger"
+    GetTaskListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items: 
+              $ref: "#/components/schemas/FileTaskModelResult"
     ResponseArrayOK:
       description: OK
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/SuccessResponseArray"
+    ResponseConnectAndCloudOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items: 
+              $ref: "#/components/schemas/ConnectAndCloudAggrgation"
     ResponseInterfaceOK:
       description: OK
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/SuccessResponseInterface"
+            $ref: "#/components/schemas/SuccessResponseInterface"   
     ResponseConnectListOK:
       description: OK
       content:
         application/json:
           schema:
             type: array
-            items:
-              $ref: "#/components/schemas/ConnectModel"
+            items: 
+              $ref: "#/components/schemas/ConnectModel"     
     ResponseInternalServerError:
       description: Internal Server Error
       content:
@@ -942,14 +1202,14 @@ components:
             type: array
             items:
               $ref: "#/components/schemas/FolderModel"
-
+            
     ResponseShareListOK:
       description: OK
       content:
         application/json:
           schema:
             type: array
-            items:
+            items: 
               $ref: "#/components/schemas/ShareModel"
     ResponsePeersOK:
       description: OK
@@ -957,7 +1217,7 @@ components:
         application/json:
           schema:
             type: array
-            items:
+            items: 
               $ref: "#/components/schemas/PeerModel"
     ResponseHistoryOK:
       description: OK
@@ -965,7 +1225,7 @@ components:
         application/json:
           schema:
             type: array
-            items:
+            items: 
               $ref: "#/components/schemas/HistoryModel"
     GetCloudListOK:
       description: OK
@@ -973,15 +1233,25 @@ components:
         application/json:
           schema:
             type: array
-            items:
+            items: 
               $ref: "#/components/schemas/CloudModel"
+
+    GetPinOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items: 
+              $ref: "#/components/schemas/PinModel"
+
     GetDriverListOK:
       description: OK
       content:
         application/json:
           schema:
             type: array
-            items:
+            items: 
               $ref: "#/components/schemas/DriverModel"
     GetHealthServicesOK:
       description: OK
@@ -1003,6 +1273,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/FileList"
+    GetFilesOKByCompression:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/FileListByCompression"
   schemas:
     SuccessResponse:
       allOf:
@@ -1039,7 +1315,7 @@ components:
                   items: {}
                 - type: object
                   description: When the interface returns success, this field is the specific success information
-
+    
     SuccessResponseInteger:
       allOf:
         - $ref: "#/components/schemas/BaseResponse"
@@ -1054,7 +1330,7 @@ components:
             data:
               type: array
               description: When the interface returns success, this field is the specific success information
-              items:
+              items: 
                 type: string
                 example: "/test"
     BaseResponse:
@@ -1111,6 +1387,21 @@ components:
             - type: object
           description: file extensions
           example: "mounted"
+    FileListByCompression:
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/FileModelByCompression"
+        total:
+          type: integer
+          description: total number of files
+          example: 100
+        size:
+          type: integer
+          description: total size of files
+          example: 1024
+
     FileList:
       properties:
         content:
@@ -1149,7 +1440,15 @@ components:
           description: processed size
           format: int64
           example: 1024
-
+        total_file_num:
+          type: integer
+          description: file num
+          example: 1024
+        processed_file_num:
+          type: integer
+          description: processed file num
+          example: 1024
+    
     FileTaskModel:
       properties:
         item:
@@ -1166,6 +1465,7 @@ components:
           enum:
             - copy
             - move
+            - duplicate
           example: "copy"
         total_size:
           type: integer
@@ -1177,6 +1477,14 @@ components:
           description: processed size
           example: 1024
           format: int64
+        total_file_num:
+          type: integer
+          description: file num
+          example: 1024
+        processed_file_num:
+          type: integer
+          description: processed file num
+          example: 1024
         style:
           type: string
           description: task style
@@ -1185,6 +1493,61 @@ components:
           type: boolean
           description: is finished
           example: true
+
+    TaskConflictList:
+      properties:
+        origin_path:
+          type: string
+          description: origin path
+          example: "/DATA/test.txt"
+        target_path:
+          type: string
+          description: target path
+          example: "/DATA/aa/test.txt"
+        current_path:
+          type: string
+          description: current path
+          example: "/DATA/aa/test_1.txt"
+
+    FileTaskModelResult:
+      properties:
+        to:
+          type: string
+          description: target path
+          example: "/DATA/test"
+        type:
+          type: string
+          description: task type
+          enum:
+            - copy
+            - move
+            - duplicate
+          example: "copy"
+        total_size:
+          type: integer
+          description: total size
+          example: 1024
+          format: int64
+        total_file_num:
+          type: integer
+          description: file num
+          example: 1024
+        status:
+          type: string
+          description: task status
+          enum:
+            - conflict
+            - failed
+            - processing
+          example: "conflict"
+        item:
+          type: array
+          items:
+            $ref: "#/components/schemas/TaskConflictList"
+          
+
+
+
     FolderModel:
       properties:
         name:
@@ -1198,6 +1561,10 @@ components:
         size:
           type: integer
           description: folder size
+          example: 1024
+        free:
+          type: integer
+          description: folder free size
           example: 1024
         file_count:
           type: integer
@@ -1219,6 +1586,10 @@ components:
             - type: object
           description: folder extensions
           example: "mounted"
+        read_only:
+          type: boolean
+          description: is read only
+          example: true
     PutFileModel:
       properties:
         path:
@@ -1241,6 +1612,9 @@ components:
         id:
           type: integer
           example: 1
+        name:
+          type: string
+          example: "test"
     ConnectModel:
       properties:
         id:
@@ -1297,7 +1671,7 @@ components:
           example: "292839"
         used:
           type: string
-          example: "292839"
+          example: "292839"  
     DriverModel:
       properties:
         auth_url:
@@ -1348,3 +1722,89 @@ components:
           type: integer
           example: 1682403656
           format: int64
+    DecompressModel:
+      properties:
+        file_path:
+          type: string
+          example: /DATA.zip
+        target_path:
+          type: string
+          example: /DATA
+    FileModelByCompression:
+      properties:
+        name:
+          type: string
+          description: file / folder name
+          example: "DATA"
+        size:
+          type: integer
+          description: file size
+          example: 1024
+        is_dir:
+          type: boolean
+          description: is directory
+          example: true
+        modified:
+          type: integer
+          description: last modified time
+          example: 2323232323
+          format: int64
+        path:
+          type: string
+          description: file path
+          example: "/DATA"
+    PinList:
+      properties:
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/PinModel"
+    PinModel:
+      properties:
+        index:
+          type: integer
+          example: 1
+        path:
+          type: string
+          example: "/DATA/test.log"
+        font:
+          type: string
+          example: "Arial"
+        name:
+          type: string
+          example: "test"
+        type:
+          type: string
+          enum:
+            - "pin"
+    ConnectAndCloudAggrgation:
+      required:
+        - name
+        - font
+        - path
+        - type
+        - extensions
+      type: object
+      properties:
+        name:
+          type: string
+          example: "SD"
+        font:
+          type: string
+          example: "aaaa"
+        path:
+          type: string
+          example: "/dev/md0"
+        type:
+          type: string
+          enum:
+            - "cloud"
+            - "smb"
+            - "dropbox"
+            - "onedrive"
+            - "drive"
+        extensions:
+          type: object
+          description: extensions
+          example: "mounted"
+      
