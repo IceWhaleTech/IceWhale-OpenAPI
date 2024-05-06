@@ -234,3 +234,6 @@ components:
         device_model:
           type: string
           example: "box"
+        request_ip:
+          type: string
+          example: "192.168.11.1"
