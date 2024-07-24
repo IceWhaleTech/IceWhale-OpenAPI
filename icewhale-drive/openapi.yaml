@@ -192,6 +192,8 @@ components:
     DriveInfo:
       required:
         - device_name
+        - lan_ipv4
+        - tb_ipv4
       properties:
         lan_ipv4:
           type: array
