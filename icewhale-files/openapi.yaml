@@ -782,6 +782,7 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+  
   /share:
     get:
       summary: Get share list
@@ -808,13 +809,14 @@ paths:
         $ref: "#/components/requestBodies/PostShare"
       responses:
         "200":
-          $ref: "#/components/responses/ResponseInterfaceOK"
+          $ref: "#/components/responses/ResponseUpsertShareOK"
         "400":
           $ref: "#/components/responses/ResponseClientError"
         "404":
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+  
   /share/{id}:
     delete:
       summary: Delete a share
@@ -838,6 +840,29 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+    put:
+      summary: Modify a share
+      tags:
+        - Share
+      description: Modify a share
+      parameters:
+        - name: id
+          in: path
+          description: Share id
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseUpsertShareOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "404":
+          $ref: "#/components/responses/ResponseNotFoundError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+
   /connect:
     get:
       summary: Get connect list
@@ -871,6 +896,7 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+  
   /web/connect_cloud:
     get:
       summary: Get web connect list and cloud list
@@ -1167,7 +1193,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/SuccessResponseInterface"   
+            $ref: "#/components/schemas/SuccessResponseInterface"
     ResponseConnectListOK:
       description: OK
       content:
@@ -1211,6 +1237,18 @@ components:
             type: array
             items: 
               $ref: "#/components/schemas/ShareModel"
+    
+    ResponseUpsertShareOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/ShareModel"
+
     ResponsePeersOK:
       description: OK
       content:
