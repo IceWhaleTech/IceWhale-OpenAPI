@@ -862,7 +862,6 @@ paths:
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
 
-
   /connect:
     get:
       summary: Get connect list
@@ -1639,20 +1638,38 @@ components:
         content:
           type: string
           example: "test"
+
     ShareModel:
       properties:
+        name:
+          type: string
+          example: "ZimaOS_HD"
         path:
           type: string
-          example: "/DATA/test.log"
+          example: "/media/ZimaOS-HD"
         anonymous:
           type: boolean
           example: true
         id:
           type: integer
           example: 1
-        name:
+        permission:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserPermission"
+    
+    UserPermission:
+      properties:
+        user:
           type: string
-          example: "test"
+          example: "casaos"
+        read:
+          type: boolean
+          example: true
+        write:
+          type: boolean
+          example: true
+
     ConnectModel:
       properties:
         id:
