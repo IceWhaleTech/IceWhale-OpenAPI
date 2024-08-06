@@ -845,6 +845,7 @@ paths:
       tags:
         - Share
       description: Modify a share
+      operationId: updateShare
       parameters:
         - name: id
           in: path
