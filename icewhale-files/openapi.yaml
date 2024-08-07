@@ -1532,9 +1532,7 @@ components:
           description: total number of files
           example: 100
         size:
-          type: integer
-          description: total size of files
-          example: 1024
+          $ref: "#/components/schemas/FileSize"
 
     FileList:
       properties:
@@ -1547,9 +1545,7 @@ components:
           description: total number of files
           example: 100
         size:
-          type: integer
-          description: total size of files
-          example: 1024
+          $ref: "#/components/schemas/FileSize"
         index:
           type: integer
           description: current page index
@@ -1690,9 +1686,7 @@ components:
           description: folder path
           example: "/DATA"
         size:
-          type: integer
-          description: folder size
-          example: 1024
+          $ref: "#/components/schemas/FileSize"
         free:
           type: integer
           description: folder free size
@@ -1868,9 +1862,7 @@ components:
           description: file / folder name
           example: "DATA"
         size:
-          type: integer
-          description: file size
-          example: 1024
+          $ref: "#/components/schemas/FileSize"
         is_dir:
           type: boolean
           description: is directory
