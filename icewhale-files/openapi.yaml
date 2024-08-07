@@ -1088,7 +1088,7 @@ paths:
       operationId: getMigrationInfo
       responses:
         "200":
-          $ref: "#/components/responses/ResponseStringOK"
+          $ref: "#/components/responses/GetMigratablePathInfoOK"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
   /migration/size:
@@ -1100,18 +1100,20 @@ paths:
       operationId: getMigrationSize
       responses:
         "200":
-          $ref: "#/components/responses/ResponseStringOK"
+          $ref: "#/components/responses/GetMigratablePathSizeOK"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
   /migration/err:
     get:
       tags:
         - DataMigration
-      description: Get migration error info
+      description: Get migration error info(the request only in the migration is error work. otherwise return 400)
       operationId: getMigrationErrorInfo
       responses:
         "200":
           $ref: "#/components/responses/ResponseStringOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
 
@@ -1133,6 +1135,7 @@ paths:
           $ref: "#/components/responses/ResponseStringOK"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+          
   /migration/end:
     post:
       summary: End migration(success, fail)
