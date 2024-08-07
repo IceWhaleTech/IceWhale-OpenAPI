@@ -1539,7 +1539,7 @@ components:
           description: total number of files
           example: 100
         size:
-          $ref: "#/components/schemas/FileSize"
+          $ref: "#/components/schemas/DeprecatedFileSize"
 
     FileList:
       properties:
