@@ -816,6 +816,33 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+    delete:
+      summary: Delete a share
+      tags:
+        - Share
+      description: Delete a share
+      operationId: deleteShareByPath
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                path:
+                  type: string
+                  example: "/DATA/test2"
+              required:
+                - path
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "404":
+          $ref: "#/components/responses/ResponseNotFoundError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
   
   /share/{id}:
     delete:
@@ -834,28 +861,6 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/ResponseStringOK"
-        "400":
-          $ref: "#/components/responses/ResponseClientError"
-        "404":
-          $ref: "#/components/responses/ResponseNotFoundError"
-        "500":
-          $ref: "#/components/responses/ResponseInternalServerError"
-    put:
-      summary: Modify a share
-      tags:
-        - Share
-      description: Modify a share
-      operationId: updateShare
-      parameters:
-        - name: id
-          in: path
-          description: Share id
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          $ref: "#/components/responses/ResponseUpsertShareOK"
         "400":
           $ref: "#/components/responses/ResponseClientError"
         "404":
@@ -1236,7 +1241,7 @@ components:
           schema:
             type: array
             items: 
-              $ref: "#/components/schemas/ShareModel"
+              $ref: "#/components/schemas/ShareListModel"
     
     ResponseUpsertShareOK:
       description: OK
@@ -1654,22 +1659,29 @@ components:
         id:
           type: integer
           example: 1
-        permission:
-          type: array
-          items:
-            $ref: "#/components/schemas/UserPermission"
-    
-    UserPermission:
-      properties:
         user:
           type: string
           example: "casaos"
-        read:
+        readonly:
           type: boolean
           example: true
-        write:
-          type: boolean
-          example: true
+
+    ShareListModel:
+      properties:
+        name:
+          type: string
+          example: "ZimaOS_HD"
+        path:
+          type: string
+          example: "/media/ZimaOS-HD"
+        id:
+          type: integer
+          example: 1
+        users:
+          type: array
+          items:
+            type: string
+            example: "users"
 
     ConnectModel:
       properties:
