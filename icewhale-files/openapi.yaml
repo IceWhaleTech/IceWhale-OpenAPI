@@ -1471,6 +1471,13 @@ components:
           type: string
           example: ""
           
+    # deprecated
+    # just for compatibility
+    DeprecatedFileSize:
+      type: integer
+      description: file or folder size
+      example: 1024
+  
     FileSize:
       type: integer
       description: file or folder size
@@ -1484,7 +1491,7 @@ components:
           description: file / folder name
           example: "DATA"
         size:
-          $ref: "#/components/schemas/FileSize"
+          $ref: "#/components/schemas/DeprecatedFileSize"
         is_dir:
           type: boolean
           description: is directory
@@ -1545,7 +1552,7 @@ components:
           description: total number of files
           example: 100
         size:
-          $ref: "#/components/schemas/FileSize"
+          $ref: "#/components/schemas/DeprecatedFileSize"
         index:
           type: integer
           description: current page index
@@ -1686,7 +1693,7 @@ components:
           description: folder path
           example: "/DATA"
         size:
-          $ref: "#/components/schemas/FileSize"
+          $ref: "#/components/schemas/DeprecatedFileSize"
         free:
           type: integer
           description: folder free size
@@ -1862,7 +1869,7 @@ components:
           description: file / folder name
           example: "DATA"
         size:
-          $ref: "#/components/schemas/FileSize"
+          $ref: "#/components/schemas/DeprecatedFileSize"
         is_dir:
           type: boolean
           description: is directory
