@@ -49,6 +49,9 @@ tags:
   - name: Image
     description: |-
       Image 
+  - name: DataMigration
+    description: |-
+      DataMigration API
 
 security:
   - access_token: []
@@ -1076,6 +1079,97 @@ paths:
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
 
+  /migration/info:
+    get:
+      summary: Get migration info(path)
+      tags:
+        - DataMigration
+      description: Get migration info
+      operationId: getMigrationInfo
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+  /migration/size:
+    get:
+      summary: Get migration size
+      tags:
+        - DataMigration
+      description: Get migration size
+      operationId: getMigrationSize
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+  /migration/err:
+    get:
+      tags:
+        - DataMigration
+      description: Get migration error info
+      operationId: getMigrationErrorInfo
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+  /migration/start:
+    post:
+      summary: Start migration
+      tags:
+        - DataMigration
+      description: Start migration
+      operationId: startMigration
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MigrationStartModel"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+  /migration/end:
+    post:
+      summary: End migration(success, fail)
+      tags:
+        - DataMigration
+      description: End migration
+      operationId: endMigration
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+  
+  /migration/reset:
+    post:
+      tags:
+        - DataMigration
+      description: Reset migratiable data
+      operationId: ResetData
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              required:
+                - reset_type
+              type: object
+              properties:
+                reset_type:
+                  type: string
+                  $ref: "#/components/schemas/MigrationType"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
 components:
   securitySchemes:
     access_token:
@@ -1118,7 +1212,6 @@ components:
             $ref: "#/components/schemas/CreateConnectModel"
             required:
               - host
-
               - username
               - password
   responses:
@@ -1279,6 +1372,43 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/FileListByCompression"
+
+    GetMigratablePathInfoOK:
+      description: the migration info include the path and if the path present
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - DockerImage
+              - AppData
+              - UserData
+            properties:
+              DockerImage:
+                $ref: "#/components/schemas/MigratablePathModel"
+              AppData:
+                $ref: "#/components/schemas/MigratablePathModel"
+              UserData:
+                $ref: "#/components/schemas/MigratablePathModel"
+
+    GetMigratablePathSizeOK:
+      description: the migration info include the path and if the path present
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - DockerImage
+              - AppData
+              - UserData
+            properties:
+              DockerImage:
+                $ref: "#/components/schemas/FileSize"
+              AppData:
+                $ref: "#/components/schemas/FileSize"
+              UserData:
+                $ref: "#/components/schemas/FileSize"     
+
   schemas:
     SuccessResponse:
       allOf:
@@ -1340,6 +1470,12 @@ components:
           description: message returned by server side if there is any
           type: string
           example: ""
+          
+    FileSize:
+      type: integer
+      description: file or folder size
+      format: int64
+      example: 1024
 
     FileModel:
       properties:
@@ -1348,9 +1484,7 @@ components:
           description: file / folder name
           example: "DATA"
         size:
-          type: integer
-          description: file size
-          example: 1024
+          $ref: "#/components/schemas/FileSize"
         is_dir:
           type: boolean
           description: is directory
@@ -1545,9 +1679,6 @@ components:
           items:
             $ref: "#/components/schemas/TaskConflictList"
           
-
-
-
     FolderModel:
       properties:
         name:
@@ -1808,3 +1939,32 @@ components:
           description: extensions
           example: "mounted"
       
+    MigrationType:
+      type: string
+      enum:
+        - "DockerImage"
+        - "AppData"
+        - "UserData"
+
+    MigrationStartModel:
+      type: object
+      properties:
+        targetPath:
+          type: string
+          example: "/media/Safe-Storage"
+        type:
+          type: string
+          $ref: "#/components/schemas/MigrationType"
+
+    MigratablePathModel:
+      type: object
+      required:
+        - path
+        - present
+      properties:
+        path:
+          type: string
+          example: "/DATA/test.log"
+        present:
+          type: boolean
+          example: true
