@@ -1091,12 +1091,19 @@ paths:
           $ref: "#/components/responses/GetMigratablePathInfoOK"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-  /migration/size:
+  /migration/size/{type}:
     get:
       summary: Get migration size
       tags:
         - DataMigration
       description: Get migration size
+      parameters:
+        - name: type
+          in: path
+          description: migration type
+          required: true
+          schema:
+            $ref: "#/components/schemas/MigrationType"
       operationId: getMigrationSize
       responses:
         "200":
@@ -1401,16 +1408,10 @@ components:
           schema:
             type: object
             required:
-              - DockerImage
-              - AppData
-              - UserData
+              - size
             properties:
-              DockerImage:
+              size:
                 $ref: "#/components/schemas/FileSize"
-              AppData:
-                $ref: "#/components/schemas/FileSize"
-              UserData:
-                $ref: "#/components/schemas/FileSize"     
 
   schemas:
     SuccessResponse:
