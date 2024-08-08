@@ -790,6 +790,18 @@ paths:
         - Share
       description: Get share list
       operationId: getShareList
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                path:
+                  type: string
+                  example: "/DATA/test2"
+              required:
+                - path
       responses:
         "200":
           $ref: "#/components/responses/ResponseShareListOK"
@@ -861,6 +873,23 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/ResponseStringOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "404":
+          $ref: "#/components/responses/ResponseNotFoundError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+  /shares:
+    get:
+      summary: Get shares list
+      tags:
+        - Share
+      description: Get shares list
+      operationId: getSharesList
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseSharesListOK"
         "400":
           $ref: "#/components/responses/ResponseClientError"
         "404":
@@ -1235,6 +1264,15 @@ components:
               $ref: "#/components/schemas/FolderModel"
             
     ResponseShareListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items: 
+              $ref: "#/components/schemas/ShareModel"
+            
+    ResponseSharesListOK:
       description: OK
       content:
         application/json:
