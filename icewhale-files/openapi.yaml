@@ -785,16 +785,17 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+  
   /share:
     get:
       summary: Get share list
       tags:
         - Share
       description: Get share list
-      operationId: getShareList
+      operationId: getSharesList
       responses:
         "200":
-          $ref: "#/components/responses/ResponseShareListOK"
+          $ref: "#/components/responses/ResponseSharesListOK"
         "400":
           $ref: "#/components/responses/ResponseClientError"
         "404":
@@ -811,13 +812,41 @@ paths:
         $ref: "#/components/requestBodies/PostShare"
       responses:
         "200":
-          $ref: "#/components/responses/ResponseInterfaceOK"
+          $ref: "#/components/responses/ResponseUpsertShareOK"
         "400":
           $ref: "#/components/responses/ResponseClientError"
         "404":
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+    delete:
+      summary: Delete a share
+      tags:
+        - Share
+      description: Delete a share
+      operationId: deleteShareByPath
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                path:
+                  type: string
+                  example: "/DATA/test2"
+              required:
+                - path
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "404":
+          $ref: "#/components/responses/ResponseNotFoundError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+  
   /share/{id}:
     delete:
       summary: Delete a share
@@ -841,6 +870,36 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+
+  /share/list:
+    get:
+      summary: Get share list
+      tags:
+        - Share
+      description: Get share list
+      operationId: getShareList
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                path:
+                  type: string
+                  example: "/DATA/test2"
+              required:
+                - path
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseShareListOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "404":
+          $ref: "#/components/responses/ResponseNotFoundError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
   /connect:
     get:
       summary: Get connect list
@@ -874,6 +933,7 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+  
   /web/connect_cloud:
     get:
       summary: Get web connect list and cloud list
@@ -1270,7 +1330,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/SuccessResponseInterface"   
+            $ref: "#/components/schemas/SuccessResponseInterface"
     ResponseConnectListOK:
       description: OK
       content:
@@ -1314,6 +1374,27 @@ components:
             type: array
             items: 
               $ref: "#/components/schemas/ShareModel"
+            
+    ResponseSharesListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items: 
+              $ref: "#/components/schemas/ShareListModel"
+    
+    ResponseUpsertShareOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/ShareModel"
+
     ResponsePeersOK:
       description: OK
       content:
@@ -1737,20 +1818,45 @@ components:
         content:
           type: string
           example: "test"
+
     ShareModel:
       properties:
+        name:
+          type: string
+          example: "ZimaOS_HD"
         path:
           type: string
-          example: "/DATA/test.log"
+          example: "/media/ZimaOS-HD"
         anonymous:
           type: boolean
           example: true
         id:
           type: integer
           example: 1
+        user:
+          type: string
+          example: "casaos"
+        readonly:
+          type: boolean
+          example: true
+
+    ShareListModel:
+      properties:
         name:
           type: string
-          example: "test"
+          example: "ZimaOS_HD"
+        path:
+          type: string
+          example: "/media/ZimaOS-HD"
+        id:
+          type: integer
+          example: 1
+        users:
+          type: array
+          items:
+            type: string
+            example: "users"
+
     ConnectModel:
       properties:
         id:
