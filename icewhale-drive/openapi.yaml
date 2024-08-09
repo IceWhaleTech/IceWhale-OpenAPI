@@ -30,7 +30,6 @@ x-tagGroups:
     tags:
       - Health methods
 
-security:
 
 paths:
   /health/services:
