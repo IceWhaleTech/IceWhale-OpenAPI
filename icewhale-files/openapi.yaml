@@ -1151,6 +1151,18 @@ paths:
           $ref: "#/components/responses/GetMigratablePathInfoOK"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+  /migration/state:
+    get:
+      summary: Get migration state
+      tags:
+        - DataMigration
+      description: Get migration state
+      operationId: getMigrationState
+      responses:
+        "200":
+          $ref: "#/components/responses/GetMigrationStateOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
   /migration/size/{type}:
     get:
       summary: Get migration size
@@ -1493,7 +1505,17 @@ components:
             properties:
               size:
                 $ref: "#/components/schemas/FileSize"
-
+    GetMigrationStateOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - state
+            properties:
+              state:
+                $ref: "#/components/schemas/MigrateState"
   schemas:
     SuccessResponse:
       allOf:
@@ -2077,3 +2099,12 @@ components:
         present:
           type: boolean
           example: true
+    
+    MigrateState:
+      type: string
+      enum:
+        - "idle"
+        - "migrating"
+        - "rolling"
+        - "error"
+        - "success"
