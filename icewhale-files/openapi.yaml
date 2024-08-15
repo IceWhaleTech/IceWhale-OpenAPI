@@ -819,6 +819,23 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+    put:
+      summary: Modify a share
+      tags:
+        - Share
+      description: Modify a share
+      operationId: modifyShare
+      requestBody:
+        $ref: "#/components/requestBodies/PutShare"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseUpsertShareOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "404":
+          $ref: "#/components/responses/ResponseNotFoundError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
     delete:
       summary: Delete a share
       tags:
@@ -1285,6 +1302,15 @@ components:
               $ref: "#/components/schemas/ShareModel"
               required:
                 - path
+    PutShare:
+      description: Modify share
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: "#/components/schemas/ShareModel"
+            required:
+              - path
     PostConnect:
       description: Create connect
       content:
@@ -1377,7 +1403,7 @@ components:
             type: array
             items:
               $ref: "#/components/schemas/FolderModel"
-            
+
     ResponseShareListOK:
       description: OK
       content:
@@ -1386,7 +1412,7 @@ components:
             type: array
             items: 
               $ref: "#/components/schemas/ShareModel"
-            
+
     ResponseSharesListOK:
       description: OK
       content:
@@ -1852,13 +1878,27 @@ components:
         anonymous:
           type: boolean
           example: true
+          deprecated: true
         id:
           type: integer
           example: 1
+          deprecated: true
+        permission:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserPermission"
+
+    UserPermission:
+      properties:
         user:
           type: string
-          example: "casaos"
-        readonly:
+          example:
+            - "casaos" 
+            - "guest"
+        read:
+          type: boolean
+          example: true
+        write:
           type: boolean
           example: true
 
