@@ -888,25 +888,20 @@ paths:
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
 
-  /share/list:
+  /share/list/{path}:
     get:
       summary: Get share list
       tags:
         - Share
       description: Get share list
       operationId: getShareList
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                path:
-                  type: string
-                  example: "/DATA/test2"
-              required:
-                - path
+      parameters:
+        - name: path
+          in: path
+          description: Share path
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           $ref: "#/components/responses/ResponseShareListOK"
@@ -1529,8 +1524,11 @@ components:
             type: object
             required:
               - size
+              - total_size
             properties:
               size:
+                $ref: "#/components/schemas/FileSize"
+              total_size:
                 $ref: "#/components/schemas/FileSize"
     GetMigrationStateOK:
       description: OK
