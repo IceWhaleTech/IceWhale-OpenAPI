@@ -1505,16 +1505,19 @@ components:
           schema:
             type: object
             required:
-              - DockerImage
-              - AppData
-              - UserData
+              - docker_image
+              - app_data
+              - user_data
             properties:
-              DockerImage:
+              docker_image:
                 $ref: "#/components/schemas/MigratablePathModel"
-              AppData:
+              app_data:
                 $ref: "#/components/schemas/MigratablePathModel"
-              UserData:
+              user_data:
                 $ref: "#/components/schemas/MigratablePathModel"
+              can_migrate:
+                type: boolean
+                example: true
 
     GetMigratablePathSizeOK:
       description: the migration info include the path and if the path present
@@ -1602,7 +1605,7 @@ components:
           description: message returned by server side if there is any
           type: string
           example: ""
-          
+
     # deprecated
     # just for compatibility
     DeprecatedFileSize:
@@ -2112,9 +2115,9 @@ components:
     MigrationType:
       type: string
       enum:
-        - "DockerImage"
-        - "AppData"
-        - "UserData"
+        - "docker_image"
+        - "app_data"
+        - "user_data"
 
     MigrationStartModel:
       type: object
