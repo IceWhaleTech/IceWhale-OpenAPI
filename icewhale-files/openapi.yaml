@@ -842,18 +842,13 @@ paths:
         - Share
       description: Delete a share
       operationId: deleteShareByPath
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                path:
-                  type: string
-                  example: "/DATA/test2"
-              required:
-                - path
+      parameters:
+        - name: path
+          in: query
+          description: Share path
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           $ref: "#/components/responses/ResponseStringOK"
@@ -888,7 +883,7 @@ paths:
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
 
-  /share/list/{path}:
+  /share/list:
     get:
       summary: Get share list
       tags:
@@ -897,7 +892,7 @@ paths:
       operationId: getShareList
       parameters:
         - name: path
-          in: path
+          in: query
           description: Share path
           required: true
           schema:
