@@ -2129,13 +2129,17 @@ components:
       required:
         - path
         - present
+        - storage_name
       properties:
         path:
           type: string
-          example: "/DATA/test.log"
+          example: "/media/Safe-Storage"
         present:
           type: boolean
           example: true
+        storage_name:
+          type: string
+          example: "Safe-Storage"
     
     MigrateState:
       type: string
