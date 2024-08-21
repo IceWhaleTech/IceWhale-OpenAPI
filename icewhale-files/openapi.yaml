@@ -1539,6 +1539,20 @@ components:
             properties:
               state:
                 $ref: "#/components/schemas/MigrateState"
+              type:
+                $ref: "#/components/schemas/MigrationType"
+              from_storage_name:
+                type: string
+                example: "ZimaOS-HD"
+              to_storage_name:
+                type: string
+                example: "Main-Storage"
+              progress_label:
+                type: string
+                example: "create symlink"
+              progress:
+                type: string
+                example: "20"
   schemas:
     SuccessResponse:
       allOf:
