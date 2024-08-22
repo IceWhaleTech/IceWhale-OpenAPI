@@ -1165,6 +1165,12 @@ paths:
         - DataMigration
       description: Get migration state
       operationId: getMigrationState
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MigrationStateModel"
       responses:
         "200":
           $ref: "#/components/responses/GetMigrationStateOK"
@@ -1218,10 +1224,10 @@ paths:
               $ref: "#/components/schemas/MigrationStartModel"
       responses:
         "200":
-          $ref: "#/components/responses/ResponseStringOK"
+          $ref: "#/components/responses/GetMigrationStateOK"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-          
+
   /migration/end:
     post:
       summary: End migration(success, fail)
@@ -1553,6 +1559,8 @@ components:
               progress:
                 type: string
                 example: "20"
+              total_size:
+                $ref: "#/components/schemas/FileSize"
   schemas:
     SuccessResponse:
       allOf:
@@ -2137,6 +2145,13 @@ components:
         type:
           type: string
           $ref: "#/components/schemas/MigrationType"
+
+    MigrationStateModel:
+      type: object
+      properties:
+        id:
+          type: number
+          example: 1
 
     MigratablePathModel:
       type: object
