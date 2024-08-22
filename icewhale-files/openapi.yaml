@@ -1543,6 +1543,9 @@ components:
             required:
               - state
             properties:
+              id:
+                type: integer
+                example: 1
               state:
                 $ref: "#/components/schemas/MigrateState"
               type:
@@ -2150,7 +2153,7 @@ components:
       type: object
       properties:
         id:
-          type: number
+          type: integer
           example: 1
 
     MigratablePathModel:
