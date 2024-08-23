@@ -1165,11 +1165,13 @@ paths:
         - DataMigration
       description: Get migration state
       operationId: getMigrationState
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/MigrationStateModel"
+      parameters:
+        - name: id
+          in: query
+          description: migration task id
+          required: true
+          schema:
+            type: string
       responses:
         "200":
           $ref: "#/components/responses/GetMigrationStateOK"
@@ -2147,13 +2149,6 @@ components:
         type:
           type: string
           $ref: "#/components/schemas/MigrationType"
-
-    MigrationStateModel:
-      type: object
-      properties:
-        id:
-          type: integer
-          example: 1
 
     MigratablePathModel:
       type: object
