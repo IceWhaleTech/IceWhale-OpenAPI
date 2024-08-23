@@ -1166,7 +1166,6 @@ paths:
       description: Get migration state
       operationId: getMigrationState
       requestBody:
-        required: true
         content:
           application/json:
             schema:
