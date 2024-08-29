@@ -48,16 +48,19 @@ tags:
       Driver
   - name: Image
     description: |-
-      Image 
+      Image
   - name: DataMigration
     description: |-
       DataMigration API
+  - name: ShareViaLink
+    description: |-
+      Share via link API
 
 security:
   - access_token: []
 
 paths:
-  /health/dependencies:  
+  /health/dependencies:
     get:
       tags:
         - Health methods
@@ -126,7 +129,7 @@ paths:
             enum:
               - "desc"
               - "asc"
-          
+
       responses:
         "200":
           $ref: "#/components/responses/GetFilesOK"
@@ -243,7 +246,7 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-      
+
   /file/compression:
     post:
       tags:
@@ -252,7 +255,7 @@ paths:
       description: decompress zip 7z rar file
       operationId: postDecompress
       requestBody:
-         $ref: "#/components/requestBodies/PostDecompress"
+        $ref: "#/components/requestBodies/PostDecompress"
       responses:
         "200":
           $ref: "#/components/responses/ResponseStringOK"
@@ -290,10 +293,9 @@ paths:
         "404":
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
-          $ref: "#/components/responses/ResponseInternalServerError"       
+          $ref: "#/components/responses/ResponseInternalServerError"
 
-
-  /file/download: 
+  /file/download:
     # 改为 /file/download，和下面 /file/upload 对应
     #
     # 如果 HTTP 请求头包含 Accept: application/json:
@@ -514,7 +516,7 @@ paths:
           $ref: "#/components/responses/ResponseClientError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-        
+
   /file/history/{id}:
     delete:
       summary: Delete history by id
@@ -785,7 +787,7 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-  
+
   /share:
     get:
       summary: Get share list
@@ -858,7 +860,7 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-  
+
   /share/{id}:
     delete:
       summary: Delete a share
@@ -940,7 +942,7 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-  
+
   /web/connect_cloud:
     get:
       summary: Get web connect list and cloud list
@@ -1004,7 +1006,7 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-  /cloud: 
+  /cloud:
     get:
       summary: Get cloud list
       tags:
@@ -1043,7 +1045,7 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-  /driver: 
+  /driver:
     get:
       summary: Get driver list
       tags:
@@ -1241,7 +1243,7 @@ paths:
           $ref: "#/components/responses/ResponseStringOK"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-  
+
   /migration/reset:
     post:
       tags:
@@ -1266,6 +1268,128 @@ paths:
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
 
+  /link:
+    get:
+      summary: Get link list
+      tags:
+        - ShareViaLink
+      description: Get link list
+      operationId: getLinkList
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseArrayOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "404":
+          $ref: "#/components/responses/ResponseNotFoundError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+    post:
+      summary: Create a link
+      tags:
+        - ShareViaLink
+      description: Create a link
+      operationId: createLink
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "404":
+          $ref: "#/components/responses/ResponseNotFoundError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+  /link/{hash}:
+    get:
+      summary: Get link info
+      tags:
+        - ShareViaLink
+      description: Get link info
+      operationId: getLinkInfo
+      parameters:
+        - name: hash
+          in: path
+          description: Link hash
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "404":
+          $ref: "#/components/responses/ResponseNotFoundError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+    delete:
+      summary: Cancel a link
+      tags:
+        - ShareViaLink
+      description: Cancel a link
+      operationId: cancelLink
+      parameters:
+        - name: hash
+          in: path
+          description: Link hash
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "404":
+          $ref: "#/components/responses/ResponseNotFoundError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+    post:
+      summary: Update link info
+      tags:
+        - ShareViaLink
+      description: Update link info
+      operationId: updateLinkInfo
+      parameters:
+        - name: hash
+          in: path
+          description: Link hash
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "404":
+          $ref: "#/components/responses/ResponseNotFoundError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+  /link/{hash}/location:
+    get:
+      summary: Get link location
+      tags:
+        - ShareViaLink
+      description: Get link location
+      operationId: getLinkLocation
+      parameters:
+        - name: hash
+          in: path
+          description: Link hash
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "404":
+          $ref: "#/components/responses/ResponseNotFoundError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
 components:
   securitySchemes:
     access_token:
@@ -1286,7 +1410,7 @@ components:
       description: create decompress
       content:
         application/json:
-          schema: 
+          schema:
             type: object
             $ref: "#/components/schemas/DecompressModel"
     PostShare:
@@ -1344,7 +1468,7 @@ components:
         application/json:
           schema:
             type: array
-            items: 
+            items:
               $ref: "#/components/schemas/FileTaskModelResult"
     ResponseArrayOK:
       description: OK
@@ -1358,7 +1482,7 @@ components:
         application/json:
           schema:
             type: array
-            items: 
+            items:
               $ref: "#/components/schemas/ConnectAndCloudAggrgation"
     ResponseInterfaceOK:
       description: OK
@@ -1372,8 +1496,8 @@ components:
         application/json:
           schema:
             type: array
-            items: 
-              $ref: "#/components/schemas/ConnectModel"     
+            items:
+              $ref: "#/components/schemas/ConnectModel"
     ResponseInternalServerError:
       description: Internal Server Error
       content:
@@ -1417,9 +1541,9 @@ components:
         application/json:
           schema:
             type: array
-            items: 
+            items:
               $ref: "#/components/schemas/ShareListModel"
-    
+
     ResponseUpsertShareOK:
       description: OK
       content:
@@ -1437,7 +1561,7 @@ components:
         application/json:
           schema:
             type: array
-            items: 
+            items:
               $ref: "#/components/schemas/PeerModel"
     ResponseHistoryOK:
       description: OK
@@ -1445,7 +1569,7 @@ components:
         application/json:
           schema:
             type: array
-            items: 
+            items:
               $ref: "#/components/schemas/HistoryModel"
     GetCloudListOK:
       description: OK
@@ -1453,7 +1577,7 @@ components:
         application/json:
           schema:
             type: array
-            items: 
+            items:
               $ref: "#/components/schemas/CloudModel"
 
     GetPinOK:
@@ -1462,7 +1586,7 @@ components:
         application/json:
           schema:
             type: array
-            items: 
+            items:
               $ref: "#/components/schemas/PinModel"
 
     GetDriverListOK:
@@ -1471,7 +1595,7 @@ components:
         application/json:
           schema:
             type: array
-            items: 
+            items:
               $ref: "#/components/schemas/DriverModel"
     GetHealthServicesOK:
       description: OK
@@ -1601,7 +1725,7 @@ components:
                   items: {}
                 - type: object
                   description: When the interface returns success, this field is the specific success information
-    
+
     SuccessResponseInteger:
       allOf:
         - $ref: "#/components/schemas/BaseResponse"
@@ -1616,7 +1740,7 @@ components:
             data:
               type: array
               description: When the interface returns success, this field is the specific success information
-              items: 
+              items:
                 type: string
                 example: "/test"
     BaseResponse:
@@ -1633,7 +1757,7 @@ components:
       type: integer
       description: file or folder size
       example: 1024
-  
+
     FileSize:
       type: integer
       description: file or folder size
@@ -1741,7 +1865,7 @@ components:
           type: integer
           description: processed file num
           example: 1024
-    
+
     FileTaskModel:
       properties:
         item:
@@ -1837,7 +1961,7 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TaskConflictList"
-          
+
     FolderModel:
       properties:
         name:
@@ -1916,7 +2040,7 @@ components:
         user:
           type: string
           example:
-            - "casaos" 
+            - "casaos"
             - "guest"
         read:
           type: boolean
@@ -1998,7 +2122,7 @@ components:
           example: "292839"
         used:
           type: string
-          example: "292839"  
+          example: "292839"
     DriverModel:
       properties:
         auth_url:
@@ -2132,7 +2256,7 @@ components:
           type: object
           description: extensions
           example: "mounted"
-      
+
     MigrationType:
       type: string
       enum:
@@ -2166,7 +2290,7 @@ components:
         storage_name:
           type: string
           example: "Safe-Storage"
-    
+
     MigrateState:
       type: string
       enum:
