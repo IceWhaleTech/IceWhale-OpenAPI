@@ -1228,19 +1228,6 @@ paths:
           $ref: "#/components/responses/GetMigrationStateOK"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-
-  /migration/end:
-    post:
-      summary: End migration(success, fail)
-      tags:
-        - DataMigration
-      description: End migration
-      operationId: endMigration
-      responses:
-        "200":
-          $ref: "#/components/responses/ResponseStringOK"
-        "500":
-          $ref: "#/components/responses/ResponseInternalServerError"
   
   /migration/reset:
     post:
