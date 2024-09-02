@@ -2339,6 +2339,9 @@ components:
           type: integer
           example: 1682403656
           format: int64
+        share_by:
+          type: string
+          example: "Leo Chen's ZimaCube"
         state:
           type: string
           enum:
