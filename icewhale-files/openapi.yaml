@@ -444,6 +444,32 @@ paths:
           $ref: "#/components/responses/ResponseClientError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+  /file/uploadV2:
+    post:
+      tags:
+        - File
+      summary: Upload file V2
+      description: Upload file V2
+      operationId: postUploadFileV2
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                path:
+                  type: string
+                  example: "/DATA"
+                file:
+                  type: string
+                  format: binary
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
   /file/history:
     get:
       tags:
@@ -1230,20 +1256,7 @@ paths:
           $ref: "#/components/responses/GetMigrationStateOK"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-
-  /migration/end:
-    post:
-      summary: End migration(success, fail)
-      tags:
-        - DataMigration
-      description: End migration
-      operationId: endMigration
-      responses:
-        "200":
-          $ref: "#/components/responses/ResponseStringOK"
-        "500":
-          $ref: "#/components/responses/ResponseInternalServerError"
-
+  
   /migration/reset:
     post:
       tags:
@@ -2323,6 +2336,7 @@ components:
         - "rolling"
         - "error"
         - "success"
+        
     ShareLink:
       type: object
       properties:
