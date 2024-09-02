@@ -1277,7 +1277,7 @@ paths:
       operationId: getLinkList
       responses:
         "200":
-          $ref: "#/components/responses/ResponseArrayOK"
+          $ref: "#/components/responses/GetShareLinksOK"
         "400":
           $ref: "#/components/responses/ResponseClientError"
         "404":
@@ -1292,7 +1292,7 @@ paths:
       operationId: createLink
       responses:
         "200":
-          $ref: "#/components/responses/ResponseStringOK"
+          $ref: "#/components/responses/GetShareLinkOK"
         "400":
           $ref: "#/components/responses/ResponseClientError"
         "404":
@@ -1315,7 +1315,7 @@ paths:
             type: string
       responses:
         "200":
-          $ref: "#/components/responses/ResponseStringOK"
+          $ref: "#/components/responses/GetShareLinkOK"
         "400":
           $ref: "#/components/responses/ResponseClientError"
         "404":
@@ -1359,7 +1359,7 @@ paths:
             type: string
       responses:
         "200":
-          $ref: "#/components/responses/ResponseStringOK"
+          $ref: "#/components/responses/GetShareLinkOK"
         "400":
           $ref: "#/components/responses/ResponseClientError"
         "404":
@@ -1382,7 +1382,7 @@ paths:
             type: string
       responses:
         "200":
-          $ref: "#/components/responses/ResponseStringOK"
+          $ref: "#/components/responses/GetShareLinkLocationOK"
         "400":
           $ref: "#/components/responses/ResponseClientError"
         "404":
@@ -1689,7 +1689,7 @@ components:
                 example: "20"
               total_size:
                 $ref: "#/components/schemas/FileSize"
-    CreateShareLinkOK:
+    GetShareLinkOK:
       description: OK
       content:
         application/json:
@@ -1705,14 +1705,14 @@ components:
             type: array
             items:
               $ref: "#/components/schemas/ShareLink"
-    GetShareLinkRootPathOK:
+    GetShareLinkLocationOK:
       description: OK
       content:
         application/json:
           schema:
             type: object
             items:
-              $ref: "#/components/schemas/ShareLinkRootPath"
+              $ref: "#/components/schemas/ShareLinkLocation"
   schemas:
     SuccessResponse:
       allOf:
@@ -2351,7 +2351,7 @@ components:
         link:
           type: string
           example: "https://share.zimaspace.com/xxxxxx"
-    ShareLinkRootPath:
+    ShareLinkLocation:
       type: object
       properties:
         path:
