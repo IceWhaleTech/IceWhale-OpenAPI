@@ -1689,6 +1689,30 @@ components:
                 example: "20"
               total_size:
                 $ref: "#/components/schemas/FileSize"
+    CreateShareLinkOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            items:
+              $ref: "#/components/schemas/ShareLink"
+    GetShareLinksOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/ShareLink"
+    GetShareLinkRootPathOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            items:
+              $ref: "#/components/schemas/ShareLinkRootPath"
   schemas:
     SuccessResponse:
       allOf:
@@ -2299,3 +2323,34 @@ components:
         - "rolling"
         - "error"
         - "success"
+    ShareLink:
+      type: object
+      properties:
+        item_name:
+          type: string
+          example: "Zima Projects 2.mp4,etc."
+        count:
+          type: integer
+          example: 1
+        size:
+          type: integer
+          example: 1024
+        share_date:
+          type: integer
+          example: 1682403656
+          format: int64
+        state:
+          type: string
+          enum:
+            - "Expired"
+            - "Partially Expired"
+            - "Sharing"
+        link:
+          type: string
+          example: "https://share.zimaspace.com/xxxxxx"
+    ShareLinkRootPath:
+      type: object
+      properties:
+        path:
+          type: string
+          example: "/media/Safe-Storage"
