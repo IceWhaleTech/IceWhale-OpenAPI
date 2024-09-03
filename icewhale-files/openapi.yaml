@@ -1256,7 +1256,7 @@ paths:
           $ref: "#/components/responses/GetMigrationStateOK"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-  
+
   /migration/reset:
     post:
       tags:
@@ -1303,9 +1303,43 @@ paths:
         - ShareViaLink
       description: Create a link
       operationId: createLink
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file_paths:
+                  $ref: "#/components/schemas/ShareLinkFilePaths"
       responses:
         "200":
           $ref: "#/components/responses/GetShareLinkOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "404":
+          $ref: "#/components/responses/ResponseNotFoundError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+  /link/check:
+    get:
+      summary: Check link
+      tags:
+        - ShareViaLink
+      description: Check link
+      operationId: checkLink
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                file_paths:
+                  $ref: "#/components/schemas/ShareLinkFilePaths"
+      responses:
+        "200":
+          $ref: "#/components/responses/ShareViaLinkCheckOK"
         "400":
           $ref: "#/components/responses/ResponseClientError"
         "404":
@@ -1320,9 +1354,9 @@ paths:
       description: Get link info
       operationId: getLinkInfo
       parameters:
-        - name: hash
+        - name: info_hash
           in: path
-          description: Link hash
+          description: Link Info hash
           required: true
           schema:
             type: string
@@ -1335,16 +1369,16 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-    delete:
+    put:
       summary: Cancel a link
       tags:
         - ShareViaLink
       description: Cancel a link
       operationId: cancelLink
       parameters:
-        - name: hash
+        - name: info_hash
           in: path
-          description: Link hash
+          description: Link Info hash
           required: true
           schema:
             type: string
@@ -1364,9 +1398,9 @@ paths:
       description: Update link info
       operationId: updateLinkInfo
       parameters:
-        - name: hash
+        - name: info_hash
           in: path
-          description: Link hash
+          description: Link Info hash
           required: true
           schema:
             type: string
@@ -1387,9 +1421,9 @@ paths:
       description: Get link location
       operationId: getLinkLocation
       parameters:
-        - name: hash
+        - name: info_hash
           in: path
-          description: Link hash
+          description: Link Info hash
           required: true
           schema:
             type: string
@@ -1456,6 +1490,7 @@ components:
               - host
               - username
               - password
+
   responses:
     ResponseOK:
       description: OK
@@ -1709,7 +1744,7 @@ components:
           schema:
             type: object
             items:
-              $ref: "#/components/schemas/ShareLink"
+              $ref: "#/components/schemas/ShareViaLink"
     GetShareLinksOK:
       description: OK
       content:
@@ -1717,7 +1752,7 @@ components:
           schema:
             type: array
             items:
-              $ref: "#/components/schemas/ShareLink"
+              $ref: "#/components/schemas/ShareViaLink"
     GetShareLinkLocationOK:
       description: OK
       content:
@@ -1725,7 +1760,15 @@ components:
           schema:
             type: object
             items:
-              $ref: "#/components/schemas/ShareLinkLocation"
+              $ref: "#/components/schemas/ShareViaLinkLocation"
+    ShareViaLinkCheckOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            items:
+              $ref: "#/components/schemas/ShareViaLinkCheck"
   schemas:
     SuccessResponse:
       allOf:
@@ -2336,8 +2379,17 @@ components:
         - "rolling"
         - "error"
         - "success"
-        
-    ShareLink:
+
+    ShareLinkFilePaths:
+      description: Create share link
+      properties:
+        file_paths:
+          type: array
+          items:
+            type: string
+          example: ["/media/Safe-Storage"]
+
+    ShareViaLink:
       type: object
       properties:
         item_name:
@@ -2353,19 +2405,30 @@ components:
           type: integer
           example: 1682403656
           format: int64
-        share_by:
-          type: string
-          example: "Leo Chen's ZimaCube"
         state:
           type: string
           enum:
             - "Expired"
             - "Partially Expired"
             - "Sharing"
-        link:
+        info_hash:
           type: string
-          example: "https://share.zimaspace.com/xxxxxx"
-    ShareLinkLocation:
+          example: "7454c6f0912e95a1153d925ddfda01e5a84719d9"
+    ShareViaLinkCheck:
+      type: object
+      properties:
+        item_name:
+          type: string
+          example: "Zima Projects 2.mp4,etc."
+        file_paths:
+          $ref: "#/components/schemas/ShareLinkFilePaths"
+        count:
+          type: integer
+          example: 1
+        size:
+          type: integer
+          example: 1024
+    ShareViaLinkLocation:
       type: object
       properties:
         path:
