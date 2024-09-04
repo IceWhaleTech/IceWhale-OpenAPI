@@ -2371,7 +2371,10 @@ components:
           type: string
           example: "Zima Projects 2.mp4"
         file_paths:
-          $ref: "#/components/schemas/ShareLinkFilePaths"
+          type: array
+          items:
+            type: string
+          example: ["/media/Safe-Storage"]
         root_path:
           $ref: "#/components/schemas/ShareViaLinkLocation"
         size:
@@ -2403,7 +2406,10 @@ components:
           type: string
           example: "Zima Projects 2.mp4,etc."
         file_paths:
-          $ref: "#/components/schemas/ShareLinkFilePaths"
+          type: array
+          items:
+            type: string
+          example: ["/media/Safe-Storage"]
         file_count:
           type: integer
           example: 1
