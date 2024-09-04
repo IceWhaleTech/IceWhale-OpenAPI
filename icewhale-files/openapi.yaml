@@ -2372,6 +2372,8 @@ components:
           example: "Zima Projects 2.mp4"
         file_paths:
           $ref: "#/components/schemas/ShareLinkFilePaths"
+        root_path:
+          $ref: "#/components/schemas/ShareViaLinkLocation"
         size:
           type: integer
           example: 1024
