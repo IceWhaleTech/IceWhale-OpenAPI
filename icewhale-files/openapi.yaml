@@ -1391,28 +1391,6 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-    post:
-      summary: Update link info
-      tags:
-        - ShareViaLink
-      description: Update link info
-      operationId: updateLinkInfo
-      parameters:
-        - name: info_hash
-          in: path
-          description: Link Info hash
-          required: true
-          schema:
-            type: string
-      responses:
-        "200":
-          $ref: "#/components/responses/GetShareLinkOK"
-        "400":
-          $ref: "#/components/responses/ResponseClientError"
-        "404":
-          $ref: "#/components/responses/ResponseNotFoundError"
-        "500":
-          $ref: "#/components/responses/ResponseInternalServerError"
   /link/{hash}/location:
     get:
       summary: Get link location
@@ -1742,9 +1720,7 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            items:
-              $ref: "#/components/schemas/ShareViaLink"
+            $ref: "#/components/schemas/ShareViaLink"
     GetShareLinksOK:
       description: OK
       content:
@@ -1758,17 +1734,13 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            items:
-              $ref: "#/components/schemas/ShareViaLinkLocation"
+            $ref: "#/components/schemas/ShareViaLinkLocation"
     ShareViaLinkCheckOK:
       description: OK
       content:
         application/json:
           schema:
-            type: object
-            items:
-              $ref: "#/components/schemas/ShareViaLinkCheck"
+            $ref: "#/components/schemas/ShareViaLinkCheck"
   schemas:
     SuccessResponse:
       allOf:
