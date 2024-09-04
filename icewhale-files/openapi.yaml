@@ -1281,13 +1281,13 @@ paths:
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
 
-  /link:
+  /torrent:
     get:
-      summary: Get link list
+      summary: Get torrent list
       tags:
         - ShareViaLink
-      description: Get link list
-      operationId: getLinkList
+      description: Get torrent list
+      operationId: getShareLinks
       responses:
         "200":
           $ref: "#/components/responses/GetShareLinksOK"
@@ -1302,7 +1302,7 @@ paths:
       tags:
         - ShareViaLink
       description: Create a link
-      operationId: createLink
+      operationId: createShareLink
       requestBody:
         required: true
         content:
@@ -1321,13 +1321,13 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-  /link/check:
+  /torrent/check:
     get:
-      summary: Check link
+      summary: Check validation
       tags:
         - ShareViaLink
-      description: Check link
-      operationId: checkLink
+      description: Check validation
+      operationId: checkShareLink
       requestBody:
         required: true
         content:
@@ -1346,13 +1346,13 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-  /link/{hash}:
+  /torrent/{hash}:
     get:
       summary: Get link info
       tags:
         - ShareViaLink
       description: Get link info
-      operationId: getLinkInfo
+      operationId: getShareLink
       parameters:
         - name: info_hash
           in: path
@@ -1370,11 +1370,11 @@ paths:
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
     put:
-      summary: Cancel a link
+      summary: Cancel a share
       tags:
         - ShareViaLink
       description: Cancel a link
-      operationId: cancelLink
+      operationId: cancelShareLink
       parameters:
         - name: info_hash
           in: path
@@ -1391,13 +1391,13 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-  /link/{hash}/location:
+  /torrent/{hash}/location:
     get:
       summary: Get link location
       tags:
         - ShareViaLink
       description: Get link location
-      operationId: getLinkLocation
+      operationId: getShareLinkLocation
       parameters:
         - name: info_hash
           in: path
@@ -2364,25 +2364,33 @@ components:
     ShareViaLink:
       type: object
       properties:
-        item_name:
-          type: string
-          example: "Zima Projects 2.mp4,etc."
-        count:
+        file_count:
           type: integer
           example: 1
+        file_name:
+          type: string
+          example: "Zima Projects 2.mp4"
+        file_paths:
+          $ref: "#/components/schemas/ShareLinkFilePaths"
         size:
           type: integer
           example: 1024
-        share_date:
+        created_by:
+          type: string
+          example: "IceWhaleTech"
+        device_name:
+          type: string
+          example: "ZimaCube"
+        creation_date:
           type: integer
           example: 1682403656
           format: int64
         state:
           type: string
           enum:
-            - "Expired"
-            - "Partially Expired"
-            - "Sharing"
+            - "invalid"
+            - "partly_invalid"
+            - "seeding"
         info_hash:
           type: string
           example: "7454c6f0912e95a1153d925ddfda01e5a84719d9"
@@ -2394,7 +2402,7 @@ components:
           example: "Zima Projects 2.mp4,etc."
         file_paths:
           $ref: "#/components/schemas/ShareLinkFilePaths"
-        count:
+        file_count:
           type: integer
           example: 1
         size:
