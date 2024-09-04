@@ -1370,11 +1370,11 @@ paths:
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
     put:
-      summary: Cancel a share
+      summary: Stop a share
       tags:
         - ShareViaLink
-      description: Cancel a link
-      operationId: cancelShareLink
+      description: Stop a share
+      operationId: stopShareLink
       parameters:
         - name: info_hash
           in: path
