@@ -1346,7 +1346,7 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-  /torrent/{hash}:
+  /torrent/{info_hash}:
     get:
       summary: Get link info
       tags:
@@ -1391,7 +1391,7 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-  /torrent/{hash}/location:
+  /torrent/{info_hash}/location:
     get:
       summary: Get link location
       tags:
