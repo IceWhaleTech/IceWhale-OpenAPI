@@ -2365,7 +2365,7 @@ components:
       type: object
       properties:
         file_count:
-          type: int64
+          type: integer
           example: 1
         file_name:
           type: string
@@ -2378,8 +2378,9 @@ components:
         root_path:
           $ref: "#/components/schemas/ShareViaLinkLocation"
         size:
-          type: int64
+          type: integer
           example: 1024
+          format: int64
         created_by:
           type: string
           example: "IceWhaleTech"
@@ -2387,8 +2388,9 @@ components:
           type: string
           example: "ZimaCube"
         creation_date:
-          type: int64
+          type: integer
           example: 1682403656
+          format: int64
         state:
           type: string
           enum:
@@ -2410,11 +2412,12 @@ components:
             type: string
           example: ["/media/Safe-Storage"]
         file_count:
-          type: int64
+          type: integer
           example: 1
         size:
-          type: int64
+          type: integer
           example: 1024
+          format: int64
     ShareViaLinkLocation:
       type: object
       properties:
