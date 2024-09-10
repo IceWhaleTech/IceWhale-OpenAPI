@@ -1322,7 +1322,7 @@ paths:
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
   /torrent/check:
-    get:
+    post:
       summary: Check validation
       tags:
         - ShareViaLink
@@ -1734,7 +1734,8 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ShareViaLinkLocation"
+            type: string
+            example: "/DATA/test"
     ShareViaLinkCheckOK:
       description: OK
       content:
@@ -2376,7 +2377,8 @@ components:
             type: string
           example: ["/media/Safe-Storage"]
         root_path:
-          $ref: "#/components/schemas/ShareViaLinkLocation"
+          type: string
+          example: "/media/Safe-Storage"
         size:
           type: integer
           example: 1024
@@ -2418,9 +2420,3 @@ components:
           type: integer
           example: 1024
           format: int64
-    ShareViaLinkLocation:
-      type: object
-      properties:
-        path:
-          type: string
-          example: "/media/Safe-Storage"
