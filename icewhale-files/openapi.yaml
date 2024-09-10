@@ -2380,6 +2380,7 @@ components:
         size:
           type: integer
           example: 1024
+          format: int64
         created_by:
           type: string
           example: "IceWhaleTech"
@@ -2416,6 +2417,7 @@ components:
         size:
           type: integer
           example: 1024
+          format: int64
     ShareViaLinkLocation:
       type: object
       properties:
