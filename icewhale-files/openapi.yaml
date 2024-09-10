@@ -1311,7 +1311,10 @@ paths:
               type: object
               properties:
                 file_paths:
-                  $ref: "#/components/schemas/ShareLinkFilePaths"
+                  type: array
+                  items:
+                    type: string
+                  example: ["/media/Movies/1.mp4"]
       responses:
         "200":
           $ref: "#/components/responses/GetShareLinkOK"
@@ -1336,7 +1339,10 @@ paths:
               type: object
               properties:
                 file_paths:
-                  $ref: "#/components/schemas/ShareLinkFilePaths"
+                  type: array
+                  items:
+                    type: string
+                  example: ["/media/Movies/1.mp4"]
       responses:
         "200":
           $ref: "#/components/responses/ShareViaLinkCheckOK"
@@ -1720,7 +1726,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ShareViaLink"
+            $ref: "#/components/schemas/ShareLinkJob"
     GetShareLinksOK:
       description: OK
       content:
@@ -1728,7 +1734,7 @@ components:
           schema:
             type: array
             items:
-              $ref: "#/components/schemas/ShareViaLink"
+              $ref: "#/components/schemas/ShareLinkJob"
     GetShareLinkLocationOK:
       description: OK
       content:
@@ -1741,7 +1747,7 @@ components:
       content:
         application/json:
           schema:
-            $ref: "#/components/schemas/ShareViaLinkCheck"
+            $ref: "#/components/schemas/ShareLinkJobBasic"
   schemas:
     SuccessResponse:
       allOf:
@@ -2353,70 +2359,87 @@ components:
         - "error"
         - "success"
 
-    ShareLinkFilePaths:
-      description: Create share link
+    ShareLinkFile:
+      type: object
       properties:
-        file_paths:
-          type: array
-          items:
-            type: string
-          example: ["/media/Safe-Storage"]
-
-    ShareViaLink:
+        name:
+          type: string
+          example: "Zima Projects 2.mp4"
+        path:
+          type: string
+          example: "/media/Safe-Storage/Zima Projects 2.mp4"
+        size:
+          type: integer
+          example: 1234
+          format: int64
+    ShareLinkJobBasic:
       type: object
       properties:
         file_count:
           type: integer
           example: 1
-        file_name:
+        primary_file_name:
           type: string
           example: "Zima Projects 2.mp4"
-        file_paths:
+        file_list:
           type: array
           items:
-            type: string
-          example: ["/media/Safe-Storage"]
-        root_path:
-          type: string
-          example: "/media/Safe-Storage"
-        size:
+            $ref: "#/components/schemas/ShareLinkFile"
+        total_size:
           type: integer
           example: 1024
           format: int64
-        created_by:
+      required:
+        - file_count
+        - primary_file_name
+        - file_list
+        - total_size
+    ShareLinkJob:
+      type: object
+      properties:
+        file_count:
+          type: integer
+          example: 1
+        primary_file_name:
+          type: string
+          example: "Zima Projects 2.mp4"
+        file_list:
+          type: array
+          items:
+            $ref: "#/components/schemas/ShareLinkFile"
+        location:
+          type: string
+          example: "/media"
+        total_size:
+          type: integer
+          example: 1024
+          format: int64
+        created_at:
+          type: integer
+          example: 1682403656
+          format: int64
+        share_status:
+          type: string
+          enum:
+            - "invalid"
+            - "partially_invalid"
+            - "seeding"
+        info_hash:
+          type: string
+          example: "7454c6f0912e95a1153d925ddfda01e5a84719d9"
+        creator:
           type: string
           example: "IceWhaleTech"
         device_name:
           type: string
           example: "ZimaCube"
-        creation_date:
-          type: integer
-          example: 1682403656
-          format: int64
-        state:
-          type: string
-          enum:
-            - "invalid"
-            - "partly_invalid"
-            - "seeding"
-        info_hash:
-          type: string
-          example: "7454c6f0912e95a1153d925ddfda01e5a84719d9"
-    ShareViaLinkCheck:
-      type: object
-      properties:
-        item_name:
-          type: string
-          example: "Zima Projects 2.mp4,etc."
-        file_paths:
-          type: array
-          items:
-            type: string
-          example: ["/media/Safe-Storage"]
-        file_count:
-          type: integer
-          example: 1
-        size:
-          type: integer
-          example: 1024
-          format: int64
+      required:
+        - file_count
+        - primary_file_name
+        - file_list
+        - location
+        - total_size
+        - created_at
+        - share_status
+        - info_hash
+        - metadata
