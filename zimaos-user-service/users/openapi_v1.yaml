@@ -1,0 +1,780 @@
+openapi: 3.0.3
+
+info:
+  title: Casaos User Service API
+  version: v1
+  description: |
+    <picture>
+         <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/IceWhaleTech/logo/main/casaos/casaos_banner_dark_night_800px.png">
+         <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/IceWhaleTech/logo/main/casaos/casaos_banner_twilight_blue_800px.png">
+         <img alt="CasaOS" src="https://raw.githubusercontent.com/IceWhaleTech/logo/main/casaos/casaos_banner_twilight_blue_800px.png">
+     </picture>
+     This is the API for the Casaos User Service.
+     It is used to manage users and their access to Casaos services.
+
+servers:
+  - url: /v1/users
+    description: Casaos User Service API
+
+tags:
+  - name: user
+    description: user related operations
+security:
+  - access_token: []
+
+paths:
+  /register:
+    post:
+      summary: Register user
+      description: -|
+        Register a new user.
+      operationId: registerUser
+      tags:
+        - user
+      requestBody:
+        $ref: "#/components/requestBodies/PostUserRegisterBody"
+      responses:
+        "200":
+          $ref: "#/components/responses/OKResponse"
+        "400":
+          $ref: "#/components/responses/ResponseInvalidParams"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+  /login:
+    post:
+      summary: Login user
+      description: -|
+        Login a user.
+      operationId: loginUser
+      tags:
+        - user
+      requestBody:
+        $ref: "#/components/requestBodies/PostUserLoginBody"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseLoginOK"
+        "400":
+          $ref: "#/components/responses/BadResponse"
+        "429":
+          $ref: "#/components/responses/ResponseTooManyRequests"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+  /name:
+    get:
+      summary: Get all users' name
+      description: -|
+        Get all users' name
+      operationId: getUserName
+      tags:
+        - user
+      responses:
+        "200":
+          $ref: "#/components/responses/ReponseGetUserAllUsernameOK"
+
+  /refresh:
+    post:
+      summary: Refresh user token
+      description: -|
+        Refresh user token
+      operationId: refreshUserToken
+      tags:
+        - user
+      requestBody:
+        $ref: "#/components/requestBodies/PostUserRefreshTokenBody"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseVerifyInfoOK"
+        "401":
+          $ref: "#/components/responses/ResponseVerificationFailure"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+  /image:
+    get:
+      summary: Get user image
+      description: -|
+        Get current user's image
+      operationId: getUserImage
+      tags:
+        - user
+      parameters:
+        - $ref: "#/components/parameters/image_path"
+      responses:
+        "200":
+          # TODO
+          $ref: "#/components/responses/ResponseFileOK"
+        "404":
+          $ref: "#/components/responses/ResponseInvalidParams"
+
+  /status:
+    get:
+      summary: Check for boot status
+      description: -|
+        Check for boot status
+      operationId: getUserStatus
+      tags:
+        - user
+      responses:
+        "200":
+          $ref: "#/components/responses/OKResponse"
+
+  /current:
+    get:
+      summary: Get current user
+      description: -|
+        Get user info
+      operationId: getCurrentUser
+      tags:
+        - user
+      parameters:
+        - $ref: "#/components/parameters/user_id"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseUserOK"
+    put:
+      summary: Update current user
+      description: -|
+        (TODO)
+      operationId: updateCurrentUser
+      tags:
+        - user
+      parameters:
+        - $ref: "#/components/parameters/user_id"
+      requestBody:
+        $ref: "#/components/requestBodies/PutUserInfoBody"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseUserOK"
+        "400":
+          $ref: "#/components/responses/ResponseUserExists"
+        "500":
+          $ref: "#/components/responses/ResponseUserNotExistsOrPwdInvalid"
+
+  /current/password:
+    put:
+      summary: Update current user's password
+      description: -|
+        Update current user's password
+      operationId: updateCurrentUserPassword
+      tags:
+        - user
+      parameters:
+        - $ref: "#/components/parameters/user_id"
+      requestBody:
+        $ref: "#/components/requestBodies/PutUserPasswordBody"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseUserOK"
+        "400":
+          $ref: "#/components/responses/BadResponse"
+        "500":
+          $ref: "#/components/responses/ResponseInvalidParams"
+
+  /current/custom/{key}:
+    get:
+      summary: Get user custom conf
+      description: -|
+        Get custom file by user
+      operationId: getCurrentUserCustom
+      tags:
+        - user
+      parameters:
+        - $ref: "#/components/parameters/user_id"
+        - $ref: "#/components/parameters/key"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+        "400":
+          $ref: "#/components/responses/ResponseInvalidParams"
+        "500":
+          $ref: "#/components/responses/ResponseUserNotExists"
+    post:
+      summary: Create or upload user custom conf
+      description: -|
+        Create or upload custom file by user
+      operationId: uploadUserCustom
+      tags:
+        - user
+      parameters:
+        - $ref: "#/components/parameters/user_id"
+        - $ref: "#/components/parameters/key"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+        "400":
+          $ref: "#/components/responses/ResponseInvalidParams"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+    delete:
+      summary: Delete user custom conf
+      description: -|
+        Delete custom file by user
+      operationId: deleteUserCustomConf
+      tags:
+        - user
+      parameters:
+        - $ref: "#/components/parameters/user_id"
+        - $ref: "#/components/parameters/key"
+      responses:
+        "200":
+          $ref: "#/components/responses/OKResponse"
+        "400":
+          $ref: "#/components/responses/BadResponse"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+  /current/image/{key}:
+    post:
+      summary: Upload user image
+      description: -|
+        Upload image by user
+      operationId: uploadUserImage
+      tags:
+        - user
+      parameters:
+        - $ref: "#/components/parameters/user_id"
+        - $ref: "#/components/parameters/key"
+        - $ref: "#/components/parameters/type"
+      requestBody:
+        $ref: "#/components/requestBodies/PostUserImageBody"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseImageDataOK"
+        "400":
+          $ref: "#/components/responses/BadResponse"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+    put:
+      summary: Update current user image
+      description: -|
+        Update current user image
+      operationId: updateCurrentUserImage
+      tags:
+        - user
+      parameters:
+        - $ref: "#/components/parameters/user_id"
+        - $ref: "#/components/parameters/key"
+      requestBody:
+        $ref: "#/components/requestBodies/PutUserImageBody"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseImageDataOK"
+        "400":
+          $ref: "#/components/responses/BadResponse"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+  /current/image:
+    delete:
+      summary: Delete current user image
+      description: -|
+        Delete current user image
+      operationId: deleteCurrentUserImage
+      tags:
+        - user
+      parameters:
+        - $ref: "#/components/parameters/user_id"
+        - $ref: "#/components/parameters/image_path"
+      responses:
+        "200":
+          $ref: "#/components/responses/OKResponse"
+        "400":
+          $ref: "#/components/responses/ResponseInvalidParams"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+  /avatar:
+    get:
+      summary: Get user avatar
+      description: -|
+        (TODO)
+      operationId: getUserAvatar
+      tags:
+        - user
+      parameters:
+        - $ref: "#/components/parameters/user_id"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseFileOK"
+        "500":
+          $ref: "#/components/responses/ResponseUserNotExists"
+    put:
+      summary: Update user avatar
+      description: -|
+        Update current user avatar
+      operationId: updateUserAvatar
+      tags:
+        - user
+      parameters:
+        - $ref: "#/components/parameters/user_id"
+      requestBody:
+        $ref: "#/components/requestBodies/PutUserAvatarBody"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseUserOK"
+        "500":
+          $ref: "#/components/responses/ResponseUserNotExists"
+
+  /{id}:
+    delete:
+      summary: Delete user by ID
+      description: -|
+        (TODO)
+      operationId: deleteUserById
+      tags:
+        - user
+      parameters:
+        - $ref: "#/components/parameters/id"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseIdOK"
+
+  /v1/users/{username}:
+    get:
+      summary: Get user info by username
+      description: -|
+        Get user info by username
+      operationId: getUserInfo
+      tags:
+        - user
+      servers:
+        - url: /
+      parameters:
+        - $ref: "#/components/parameters/username"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseUserOK"
+        "400":
+          $ref: "#/components/responses/ResponseInvalidParams"
+        "500":
+          $ref: "#/components/responses/ResponseUserNotExists"
+
+  /:
+    delete:
+      summary: Delete all users
+      description: -|
+        Delete all users
+      operationId: deleteAllUser
+      tags:
+        - user
+      responses:
+        "200":
+          $ref: "#/components/responses/OKResponse"
+
+components:
+  securitySchemes:
+    access_token:
+      type: apiKey
+      in: header
+      name: Authorization
+  parameters:
+    key:
+      name: key
+      in: path
+      description: Key of the custom conf
+      required: true
+      schema:
+        type: string
+        example: appgrid
+    user_id:
+      name: user_id
+      in: header
+      description: User ID
+      required: true
+      schema:
+        type: string
+        example: 1
+    id:
+      name: id
+      in: path
+      description: User ID
+      required: true
+      schema:
+        type: string
+        example: 1
+    username:
+      name: username
+      in: path
+      description: Username of the user
+      required: true
+      schema:
+        type: string
+        example: casaos
+    image_path:
+      name: path
+      in: query
+      description: Path of the image
+      required: true
+      schema:
+        type: string
+        example: /usr/share/casaos/www/avatar.svg
+    type:
+      name: type
+      in: query
+      description: Type of the image
+      required: true
+      schema:
+        type: string
+        example: svg
+  responses:
+    OKResponse:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: "#/components/schemas/BaseResponse"
+    BadResponse:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+    ResponseInternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "Internal Server Error"
+    ResponseUserOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/User"
+    ResponseTooManyRequests:
+      description: Too Many Requests
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "Too many login requests"
+    ResponseInvalidParams:
+      description: Invalid Parameters
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "Parameters Error"
+    ResponseUserExists:
+      description: User Exists
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "User already exists"
+    ResponseUserNotExists:
+      description: User Does Not Exists
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "User does not exist"
+    ResponseUserNotExistsOrPwdInvalid:
+      description: User Not Exists Or Password Invalid
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "User does not exist or password is invalid"
+    ResponseLoginOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              user:
+                $ref: "#/components/schemas/User"
+              token:
+                type: string
+                description: Access token of the user
+                example: "yJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNhc2FvcyIsImlkIjoxLCJpc3MiOiJjYXNhb3MiLCJleHAiOjE3MTY4ODUwODgsIm5iZiI6MTcxNjg3NDI4OCwiaWF0IjoxNzE2ODc0Mjg4fQ.0B5_RHmxCg04SAmb5CuIlfHiA0jebWq3wf6iQnWmg0ENqaGGcpcr0AZfujHh3lYRLhpTiN2yuRKZqDomtkviWA"
+    ResponseFileOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              file:
+                type: string
+                description: File path of the image
+                example: "/usr/share/casaos/www/avatar.svg"
+    ResponseVerifyInfoOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              access_token:
+                type: string
+                description: Access token of the user
+                example: "yJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNhc2FvcyIsImlkIjoxLCJpc3MiOiJjYXNhb3MiLCJleHAiOjE3MTY4ODUwODgsIm5iZiI6MTcxNjg3NDI4OCwiaWF0IjoxNzE2ODc0Mjg4fQ.0B5_RHmxCg04SAmb5CuIlfHiA0jebWq3wf6iQnWmg0ENqaGGcpcr0AZfujHh3lYRLhpTiN2yuRKZqDomtkviWA"
+              refresh_token:
+                type: string
+                description: Refresh token of the user
+                example: "yJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNhc2FvcyIsImlkIjoxLCJpc3MiOiJjYXNhb3MiLCJleHAiOjE3MTY4ODUwODgsIm5iZiI6MTcxNjg3NDI4OCwiaWF0IjoxNzE2ODc0Mjg4fQ.0B5_RHmxCg04SAmb5CuIlfHiA0jebWq3wf6iQnWmg0ENqaGGcpcr0AZfujHh3lYRLhpTiN2yuRKZqDomtkviWA"
+              expires_at:
+                type: string
+                description: Expire time of the token
+                example: "2023-04-06T07:59:59.000Z"
+    ResponseVerificationFailure:
+      description: Verification Failure
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "Verification Failure"
+    ResponseIdOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              id:
+                type: string
+                description: User ID
+                example: 1
+    ResponseImageDataOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              path:
+                type: string
+                description: File path of the image
+                example: "/usr/share/casaos/www/avatar.svg"
+              file_name:
+                type: string
+                description: File name of the image
+                example: "avatar.svg"
+              online_path:
+                type: string
+                description: Online path of the image
+                example: "/v1/users/image?path=/usr/share/casaos/www/avatar.svg"
+    ReponseGetUserAllUsernameOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              usernames:
+                type: array
+                items:
+                  type: string
+                description: Usernames of all users
+                example: ["casaos", "admin"]
+    ResponseGetUserStatusOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: object
+                properties:
+                  initialized:
+                    type: boolean
+                    description: Whether the system has been initialized
+                    example: true
+                  key:
+                    type: string
+                    description: Registration key
+                    example: "casaos"
+                  gpus:
+                    type: integer
+                    description: Number of GPUs
+                    example: 1
+                  gpuCount:
+                    type: integer
+                    description: Number of GPUs
+                    example: 1
+    ResponseStringOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: string
+                description: Data
+                example: "OK"
+  requestBodies:
+    PostUserRegisterBody:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - "username"
+              - "password"
+              - "key"
+            properties:
+              username:
+                type: string
+                description: Username of the user
+                example: "casaos"
+              password:
+                type: string
+                description: Password of the user
+                example: "casaos"
+              key:
+                type: string
+                description: registration key
+                example: ""
+    PostUserLoginBody:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - "username"
+              - "password"
+            properties:
+              username:
+                type: string
+                description: Username of the user
+                example: "casaos"
+              password:
+                type: string
+                description: Password of the user
+                example: "casaos"
+    PutUserAvatarBody:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - "file"
+            properties:
+              file:
+                type: string
+                description: File path of the avatar
+                example: "/usr/share/casaos/www/avatar.svg"
+    PutUserInfoBody:
+      content:
+        application/json:
+          schema:
+            required:
+            $ref: "#/components/schemas/User"
+    PutUserPasswordBody:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - "password"
+              - "old_password"
+            properties:
+              password:
+                type: string
+                description: New password of the user
+                example: "casaos"
+              old_password:
+                type: string
+                description: Old password of the user
+                example: "casaos"
+    PutUserImageBody:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - "path"
+            properties:
+              path:
+                type: string
+                description: File path of the image
+                example: "/usr/share/casaos/www/avatar.svg"
+    PostUserRefreshTokenBody:
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - "refresh_token"
+            properties:
+              refresh_token:
+                type: string
+                description: Refresh token of the user
+                example: "casaos"
+    PostUserImageBody:
+      content:
+        application/form-data:
+          schema:
+            type: object
+            required:
+              - "file"
+            properties:
+              file:
+                type: string
+                format: binary
+                description: File path of the image
+                example: "/usr/share/casaos/www/avatar.svg"
+  schemas:
+    BaseResponse:
+      type: object
+      properties:
+        message:
+          readOnly: true
+          type: string
+          example: "Bad request"
+          description: Error message
+    User:
+      type: object
+      required:
+        - "username"
+        - "password"
+      properties:
+        id:
+          type: integer
+          description: User ID
+          example: 1
+        username:
+          type: string
+          description: Username of the user
+          example: "casaos"
+        password:
+          type: string
+          description: Password of the user
+          example: "casaos"
+        role:
+          type: string
+          description: Role of the user
+          example: "admin"
+        email:
+          type: string
+          description: Email of the user
+          example: "admin@examle.com"
+        nickname:
+          type: string
+          description: Nickname of the user
+          example: "casaos"
+        avatar:
+          type: string
+          description: Avatar of the user
+          example: "/usr/share/casaos/www/avatar.svg"
+        description:
+          type: string
+          description: Description of the user
+          example: "CasaOS Admin"
