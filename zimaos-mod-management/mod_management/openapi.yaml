@@ -1,0 +1,232 @@
+openapi: 3.0.3
+
+info:
+  title: ZimaOS Module Management API
+  version: v2
+
+servers:
+  - url: /v2/mod_management
+
+tags:
+  - name: Module methods
+    description: |-
+      methods for module management
+
+  - name: Module Info
+    description: |-
+      <SchemaDefinition schemaRef="#/components/schemas/module" />
+    
+x-tagGroups:
+  - name: Methods
+    tags:
+      - Module methods
+
+  - name: Schemas
+    tags:
+      - Module Info
+
+security:
+  - access_token: []
+
+paths:
+  /modules:
+    get:
+      summary: Get the list of modules
+      operationId: module_list
+      tags:
+        - Module methods
+      responses:
+        "200":
+          $ref: "#/components/responses/module_list_ok"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
+components:
+  securitySchemes:
+    access_token:
+      type: apiKey
+      in: header
+      name: Authorization
+
+  parameters:
+    name:
+      name: name
+      in: path
+      required: true
+      schema:
+        type: string
+        example: "847d7fde"
+
+  responses:
+    response_ok:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/base_response"
+          example:
+            message: "OK"
+      x-go-name: ResponseOK
+
+    response_conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/base_response"
+          example:
+            message: "Conflict"
+
+    response_internal_server_error:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/base_response"
+          example:
+            message: "Internal Server Error"
+
+    response_not_found:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/base_response"
+          example:
+            message: "Not Found"
+
+    response_bad_request:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/base_response"
+          example:
+            message: "Bad Request"
+
+    module_list_ok:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/base_response"
+              - properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/module"
+      x-go-name: ModuleListOK
+
+
+  schemas:
+    base_response: # Every response should inherit from BaseResponse
+      properties:
+        message:
+          description: message returned by server side if there is any
+          type: string
+
+    module:
+      required:
+        - name
+      readOnly: true
+      properties:
+        name:
+          readOnly: true
+          type: string
+          example: "zimaos-chat"
+        ui:
+          readOnly: true
+          allOf:
+            - $ref: "#/components/schemas/module_ui"
+          x-go-name: UI
+        services:
+          description: a module can have one or more backend services
+          readOnly: true
+          type: array
+          items:
+            $ref: "#/components/schemas/module_service"
+
+    module_ui:
+      required:
+        - entry
+      readOnly: true
+      properties:
+        title:
+          readOnly: true
+          type: object
+          additionalProperties:
+            type: string
+          example:
+            en_us: Assist
+        description:
+          readOnly: true
+          type: string
+          example: Assist
+        prefetch:
+          readOnly: true
+          type: boolean
+        show:
+          readOnly: true
+          type: boolean
+        formality:
+          allOf:
+            - $ref: "#/components/schemas/module_ui_formality"
+          x-go-name: Formality
+        entry:
+          readOnly: true
+          type: string
+          example: "/modules/zimaos-chat/index.html"
+        icon:
+          readOnly: true
+          type: string
+          example: "/modules/zimaos-chat/appicon.svg"
+      x-go-name: ModuleUI
+
+    module_ui_formality:
+      readOnly: true
+      properties:
+        type:
+          readOnly: true
+          type: string
+          enum:
+            - newtab
+            - modal
+          x-enum-varnames:
+            - ModuleFormalityNewTab
+            - ModuleFormalityModal
+        props:
+          allOf:
+            - $ref: "#/components/schemas/module_ui_formality_properties"
+          x-go-name: Props
+      x-go-name: ModuleUIFormality
+
+    module_ui_formality_properties:
+      readOnly: true
+      properties:
+        width:
+          readOnly: true
+          type: string
+          example: "100vh"
+        height:
+          readOnly: true
+          type: string
+          example: "100vh"
+        has_modal_card:
+          readOnly: true
+          type: boolean
+          x-oapi-codegen-extra-tags:
+            json: "hasModalCard,omitempty"  # frontend team says JSON must be camelCase. ¯\_(ツ)_/¯
+            yaml: "hasModalCard,omitempty"
+        animation:
+          readOnly: true
+          type: string
+          example: zoom-in
+      x-go-name: ModuleUIFormalityProperties
+
+    module_service:
+      readOnly: true
+      properties:
+        name:
+          readOnly: true
+          type: string
+          example: "zimaos-chat"
