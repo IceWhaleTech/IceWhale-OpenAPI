@@ -1,0 +1,1652 @@
+openapi: 3.0.3
+
+info:
+  title: ZimaOS Virtual Machine Management API
+  version: v2
+
+servers:
+  - url: /v2/virt_management
+
+tags:
+  - name: Common methods
+    description: |-
+      methods for common usage
+
+  - name: Installation methods
+    description: |-
+      methods for managing installation assistant processes
+
+  - name: Domain methods
+    description: |-
+      methods for managing virtual machines
+
+  - name: Storage methods
+    description: |-
+      methods for managing storage pools and volumes
+
+  - name: Web methods
+    description: |-
+      methods for web interface (INTERNAL USE ONLY)
+
+  - name: Host Info
+    description: |-
+      <SchemaDefinition schemaRef="#/components/schemas/host_info" />
+
+  - name: Metadata Info
+    description: |-
+      <SchemaDefinition schemaRef="#/components/schemas/info" />
+
+  - name: Installation
+    description: |-
+      <SchemaDefinition schemaRef="#/components/schemas/installation" />
+
+  - name: Domain
+    description: |-
+      <SchemaDefinition schemaRef="#/components/schemas/domain" />
+
+  - name: Domain with Info
+    description: |-
+      <SchemaDefinition schemaRef="#/components/schemas/domain_with_info" />
+
+  - name: Domain Action
+    description: |-
+      <SchemaDefinition schemaRef="#/components/schemas/domain_action" />
+
+  - name: Domain Status
+    description: |-
+      <SchemaDefinition schemaRef="#/components/schemas/domain_status" />
+
+  - name: Storage Pool
+    description: |-
+      <SchemaDefinition schemaRef="#/components/schemas/storage_pool" />
+
+  - name: Storage Volume
+    description: |-
+      <SchemaDefinition schemaRef="#/components/schemas/storage_volume" />
+
+x-tagGroups:
+  - name: Methods
+    tags:
+      - Common methods
+      - Installation methods
+      - Domain methods
+      - Storage methods
+      - Web methods
+
+  - name: Schemas
+    tags:
+      - Host Info
+      - Metadata Info
+      - Installation
+      - Domain
+      - Domain with Metadata Info
+      - Domain Action
+      - Domain Status
+      - Domain Disk
+      - Storage Pool
+      - Storage Volume
+
+security:
+  - access_token: []
+
+paths:
+  /info:
+    get:
+      summary: Get information about the host
+      operationId: getHostInfo
+      tags:
+        - Common methods
+      responses:
+        "200":
+          $ref: "#/components/responses/host_info_ok"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
+
+  /installation:
+    post:
+      summary: Start an installation assistant process
+      operationId: startInstallation
+      tags:
+        - Installation methods
+      requestBody:
+        $ref: "#/components/requestBodies/request_installation"
+      responses:
+        "200":
+          $ref: "#/components/responses/installation_ok"
+        "400":
+          $ref: "#/components/responses/response_bad_request"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
+
+  /domain:
+    post:
+      summary: Create a domain
+      operationId: createDomain
+      tags:
+        - Domain methods
+      requestBody:
+        $ref: "#/components/requestBodies/request_domain"
+      responses:
+        "200":
+          $ref: "#/components/responses/domain_create_ok"
+        "400":
+          $ref: "#/components/responses/domain_bad_request"
+        "409":
+          $ref: "#/components/responses/response_conflict"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
+
+    get:
+      summary: Get list of defined domains
+      operationId: getDomainList
+      tags:
+        - Domain methods
+      responses:
+        "200":
+          $ref: "#/components/responses/domain_list_ok"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
+
+  /domain/{name}:
+    put:
+      summary: Update a domain
+      operationId: updateDomain
+      tags:
+        - Domain methods
+      parameters:
+        - $ref: "#/components/parameters/name"
+      requestBody:
+        $ref: "#/components/requestBodies/request_domain"
+      responses:
+        "200":
+          $ref: "#/components/responses/response_ok"
+        "400":
+          $ref: "#/components/responses/domain_bad_request"
+        "404":
+          $ref: "#/components/responses/response_not_found"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
+
+    delete:
+      summary: Delete a domain
+      operationId: deleteDomain
+      tags:
+        - Domain methods
+      parameters:
+        - $ref: "#/components/parameters/name"
+        - name: graceful
+          in: query
+          schema:
+            type: boolean
+            default: true
+        - name: purge
+          description: |-
+            If true, all storage volumes associated with the domain will be deleted as well.
+          in: query
+          schema:
+            type: boolean
+            default: true
+      responses:
+        "200":
+          $ref: "#/components/responses/response_ok"
+        "404":
+          $ref: "#/components/responses/response_not_found"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
+
+  /domain/{name}/status:
+    put:
+      summary: Change the status of a domain
+      operationId: setDomainStatus
+      tags:
+        - Domain methods
+      parameters:
+        - $ref: "#/components/parameters/name"
+      requestBody:
+        $ref: "#/components/requestBodies/request_domain_action"
+      responses:
+        "200":
+          $ref: "#/components/responses/response_ok"
+        "400":
+          $ref: "#/components/responses/response_bad_request"
+        "404":
+          $ref: "#/components/responses/response_not_found"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
+
+  /domain/{name}/interface:
+    get:
+      summary: Return the list of network cards associated with the corresponding virtual machine whose physical network card has been changed
+      operationId: getNetworkCardStatus
+      tags:
+        - Domain methods
+      parameters:
+        - $ref: "#/components/parameters/name"
+        - name: filter
+          in: query
+          required: false
+          schema:
+            type: string
+            enum:
+              - changed
+      responses:
+        "200":
+          $ref: "#/components/responses/domain_interface_list_ok"
+        "404":
+          $ref: "#/components/responses/response_not_found"
+        "501":
+          $ref: "#/components/responses/response_not_implemented_error"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
+
+  /domain/{name}/disk:
+    get:
+      summary: Get list of disks of a domain
+      operationId: getDomainDiskList
+      tags:
+        - Domain methods
+      parameters:
+        - $ref: "#/components/parameters/name"
+      responses:
+        "200":
+          $ref: "#/components/responses/domain_disk_list_ok"
+        "404":
+          $ref: "#/components/responses/response_not_found"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
+
+    post:
+      summary: Add a disk to a domain
+      operationId: addDomainDisk
+      tags:
+        - Domain methods
+      parameters:
+        - $ref: "#/components/parameters/name"
+      requestBody:
+        $ref: "#/components/requestBodies/request_domain_disk"
+      responses:
+        "200":
+          $ref: "#/components/responses/response_ok"
+        "400":
+          $ref: "#/components/responses/response_bad_request"
+        "404":
+          $ref: "#/components/responses/response_not_found"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
+
+  /domain/{name}/disk/{dev}:
+    delete:
+      summary: Delete a disk from a domain
+      operationId: deleteDomainDisk
+      tags:
+        - Domain methods
+      parameters:
+        - $ref: "#/components/parameters/name"
+        - name: dev
+          in: path
+          required: true
+          schema:
+            $ref: "#/components/schemas/domain_disk_target_dev"
+      responses:
+        "200":
+          $ref: "#/components/responses/response_ok"
+        "404":
+          $ref: "#/components/responses/response_not_found"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
+
+  /domain/{name}/key:
+    post:
+      summary: Send one or more keys to a domain, with a hold time
+      description: |-
+        > This API does NOT work until https://gitlab.com/libvirt/libvirt-go-module/-/merge_requests/28 is merged and released
+      operationId: sendKey
+      tags:
+        - Domain methods
+      parameters:
+        - $ref: "#/components/parameters/name"
+      requestBody:
+        $ref: "#/components/requestBodies/request_key"
+      responses:
+        "200":
+          $ref: "#/components/responses/response_ok"
+        "400":
+          $ref: "#/components/responses/response_bad_request"
+        "404":
+          $ref: "#/components/responses/response_not_found"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
+
+  /pool:
+    get:
+      summary: Get list of storage pools
+      operationId: getStoragePoolList
+      tags:
+        - Storage methods
+      responses:
+        "200":
+          $ref: "#/components/responses/storage_pool_list_ok"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
+
+  /pool/{uuid}/volume:
+    get:
+      summary: Get list of volumes of a storage pool
+      operationId: getStorageVolumeList
+      tags:
+        - Storage methods
+      parameters:
+        - name: uuid
+          in: path
+          required: true
+          schema:
+            type: string
+            example: f3e3e3e3-3e3e-3e3e-3e3e-3e3e3e3e3e3e
+            x-go-name: UUID
+      responses:
+        "200":
+          $ref: "#/components/responses/storage_volume_list_ok"
+        "404":
+          $ref: "#/components/responses/response_not_found"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
+
+  /web/domain:
+    get:
+      summary: Get list of defined domains, along with extra information needed by the web
+      description: Frontend developer needs an API that is easier for them to code. Anyone else should NOT depend on this API.
+      operationId: getDomainListForWeb
+      tags:
+        - Web methods
+      parameters:
+        - $ref: "#/components/parameters/ascending"
+      responses:
+        "200":
+          $ref: "#/components/responses/domain_list_for_web_ok"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
+
+  /web/domain/last:
+    get:
+      summary: Get the name of last domain viewed
+      operationId: getNameOfLastDomain
+      tags:
+        - Web methods
+      responses:
+        "200":
+          $ref: "#/components/responses/domain_name_ok"
+        "404":
+          $ref: "#/components/responses/response_not_found"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
+
+    put:
+      summary: Set the name of last domain viewed
+      operationId: setNameOfLastDomain
+      tags:
+        - Web methods
+      requestBody:
+        $ref: "#/components/requestBodies/request_domain_name"
+      responses:
+        "200":
+          $ref: "#/components/responses/response_ok"
+        "404":
+          $ref: "#/components/responses/response_not_found"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
+
+components:
+  securitySchemes:
+    access_token:
+      type: apiKey
+      in: header
+      name: Authorization
+
+  parameters:
+    name:
+      name: name
+      in: path
+      required: true
+      schema:
+        $ref: "#/components/schemas/domain_name"
+
+    ascending:
+      name: ascending
+      in: query
+      schema:
+        type: boolean
+
+  requestBodies:
+    request_installation:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/installation"
+
+    request_domain:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/domain"
+
+    request_domain_disk:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/domain_disk"
+
+    request_domain_action:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/domain_action"
+
+    request_key:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/key"
+
+    request_domain_name:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/domain_name"
+
+  responses:
+    response_ok:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/base_response"
+          example:
+            message: "OK"
+      x-go-name: ResponseOK
+
+    response_conflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/base_response"
+              - properties:
+                  data: 
+                    $ref: "#/components/schemas/vir_error"
+          example:
+            message: "Conflict"
+
+    response_not_implemented_error:
+      description: Not Implemented Error
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/base_response"
+              - properties:
+                  data: 
+                    $ref: "#/components/schemas/vir_error"
+          example:
+            message: "Not Implemented Error"
+
+    response_internal_server_error:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/base_response"
+              - properties:
+                  data: 
+                    $ref: "#/components/schemas/vir_error"
+          example:
+            message: "Internal Server Error"
+
+    response_not_found:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/base_response"
+              - properties:
+                  data: 
+                    $ref: "#/components/schemas/vir_error"
+          example:
+            message: "Not Found"
+
+    response_bad_request:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/base_response"
+              - properties:
+                  data: 
+                    $ref: "#/components/schemas/vir_error"
+          example:
+            message: "Bad Request"
+
+    host_info_ok:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/base_response"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/host_info"
+      x-go-name: HostInfoOK
+
+    installation_ok:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/base_response"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/installation"
+      x-go-name: InstallationOK
+
+    domain_bad_request:
+      description: Bad request
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/base_response"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/domain_validation_errors"
+
+    domain_create_ok:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/base_response"
+      x-go-name: DomainCreateOK
+
+    domain_list_ok:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/base_response"
+              - properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/domain_with_info"
+      x-go-name: DomainListOK
+
+    domain_list_for_web_ok:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/base_response"
+              - properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/domain_with_info_for_web"
+      x-go-name: DomainListForWebOK
+
+    domain_interface_list_ok:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/domain_interface_list"
+      x-go-name: DomainNetworkStatusOK
+
+    domain_disk_list_ok:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/base_response"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/domain_disk_list"
+      x-go-name: DomainDiskListOK
+
+    storage_pool_list_ok:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/base_response"
+              - properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/storage_pool"
+      x-go-name: StoragePoolListOK
+
+    storage_volume_list_ok:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/base_response"
+              - properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/storage_volume"
+      x-go-name: StorageVolumeListOK
+
+    domain_name_ok:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/base_response"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/domain_name"
+      x-go-name: DomainNameOK
+
+  schemas:
+    base_response: # Every response should inherit from BaseResponse
+      properties:
+        message:
+          description: message returned by server side if there is any
+          type: string
+
+    vir_error:
+      description: |-
+        Error from libvirt
+        > undefined if not a libvirt error
+      properties:
+        code:
+          description: See https://libvirt.org/html/libvirt-virterror.html#virErrorNumber for more information
+          type: integer
+        domain:
+          description: See https://libvirt.org/html/libvirt-virterror.html#virErrorDomain for more information
+          type: integer
+        level:
+          description: See https://libvirt.org/html/libvirt-virterror.html#virErrorLevel for more information
+          type: integer
+
+    host_info:
+      readOnly: true
+      properties:
+        memory:
+          $ref: "#/components/schemas/caps_host_numa_memory"
+        cpus:
+          $ref: "#/components/schemas/caps_host_numa_cpus"
+        networks:
+          type: array
+          items:
+            $ref: "#/components/schemas/network_card"
+        storage_pools:
+          type: array
+          items:
+            $ref: "#/components/schemas/storage_pool"
+        last_target_path:
+          $ref: "#/components/schemas/storage_pool_target_path"
+
+    installation:
+      required:
+        - title
+        - domain_memory
+        - domain_vcpu
+        - domain_interface
+        - volume_size
+      properties:
+        name:
+          readOnly: true
+          type: string
+          example: 9ae6e97d
+        title:
+          type: string
+          example: "My VM"
+        domain_memory:
+          $ref: "#/components/schemas/domain_memory"
+        domain_vcpu:
+          $ref: "#/components/schemas/domain_vcpu"
+        domain_interface:
+          $ref: "#/components/schemas/domain_interface_list"
+        source_file:
+          $ref: "#/components/schemas/domain_disk_source_file"
+        target_path:
+          $ref: "#/components/schemas/storage_pool_target_path"
+        volume_size:
+          $ref: "#/components/schemas/storage_volume_size"
+        os_type:
+          $ref: "#/components/schemas/os_type"
+        firmware:
+          $ref: "#/components/schemas/firmware"
+
+    info:
+      properties:
+        _:
+          x-go-name: XMLName
+          x-go-type: xml.Name
+          x-oapi-codegen-extra-tags:
+            json: "-"
+            xml: "http://casaos.io/XMLSchema/virt-management/info x-casaos"
+        os_type:
+          $ref: "#/components/schemas/os_type"
+        source_file:
+          $ref: "#/components/schemas/domain_disk_source_file"
+        physical_interface:
+          $ref: "#/components/schemas/domain_interface_list"
+        created_at:
+          allOf:
+            - $ref: "#/components/schemas/timestamp"
+          x-oapi-codegen-extra-tags:
+            xml: "created_at,omitempty"
+      x-go-name: Info
+
+    timestamp:
+      type: integer
+      format: int64
+      example: 1713346519
+
+    domain_with_info:
+      readOnly: true
+      properties:
+        info:
+          $ref: "#/components/schemas/info"
+        domain:
+          $ref: "#/components/schemas/domain"
+        status:
+          $ref: "#/components/schemas/domain_status"
+
+    domain_action:
+      type: string
+      enum:
+        - force_off
+        - force_reset
+        - pause
+        - power_on
+        - reboot
+        - resume
+        - shut_down
+      x-enum-varnames:
+        - DomainActionForceOff
+        - DomainActionForceReset
+        - DomainActionPause
+        - DomainActionPowerOn
+        - DomainActionReboot
+        - DomainActionResume
+        - DomainActionShutDown
+
+    domain_status:
+      type: string
+      enum:
+        - no_state
+        - running
+        - blocked
+        - paused
+        - shutdown
+        - crashed
+        - pm_suspended
+        - shut_off
+      x-enum-varnames:
+        - DomainStateNoState
+        - DomainStateRunning
+        - DomainStateBlocked
+        - DomainStatePaused
+        - DomainStateShutdown
+        - DomainStateCrashed
+        - DomainStatePMSuspended
+        - DomainStateShutOff
+
+    os_type:
+      type: string
+      enum:
+        - windows
+        - linux
+      default: windows
+      x-go-name: OSType
+      x-enum-varnames:
+        - OSTypeWindows
+        - OSTypeLinux
+      x-oapi-codegen-extra-tags:
+        xml: "os_type,omitempty"
+
+    firmware:
+      type: string
+      enum:
+        - efi
+        - bios
+      default: bios
+      x-enum-varnames:
+        - FirmwareEFI
+        - FirmwareBIOS
+      x-oapi-codegen-extra-tags:
+        xml: "firmware,attr,omitempty"
+
+    domain_boot_menu:
+      required:
+        - enable
+      properties:
+        enable:
+          type: string
+          example: yes
+          x-oapi-codegen-extra-tags:
+            xml: "enable,attr,omitempty"
+      x-oapi-codegen-extra-tags:
+        xml: "bootmenu"
+
+    domain_validation_errors:
+      readOnly: true
+
+    key:
+      required:
+        - codes
+      properties:
+        hold_time:
+          type: integer
+          format: uint
+          default: 100
+        codes:
+          type: array
+          items:
+            type: integer
+            format: uint
+            description: See https://libvirt.org/manpages/virkeycode-win32.html for available keycodes
+          minItems: 1
+          example: [17, 18]
+
+    network_card:
+      readOnly: true
+      properties:
+        # dev means device name
+        dev:
+          readOnly: true
+          allOf:
+            - $ref: "#/components/schemas/domain_interface_source_dev"
+        model:
+          readOnly: true
+          type: string
+          example: r8169
+        status:
+          readOnly: true
+          type: string
+          enum:
+            - active
+            - inactive
+          example: active
+
+    #################################################
+    # subset of libvirt capabilities                #
+    # (https://libvirt.org/formatcapabilities.html) #
+    #################################################
+    caps_host_numa_memory:
+      readOnly: true
+      properties:
+        size:
+          readOnly: true
+          type: integer
+          format: uint64
+          example: 16084344
+          x-oapi-codegen-extra-tags:
+            xml: ",chardata"
+        unit:
+          readOnly: true
+          type: string
+          example: KiB
+          x-oapi-codegen-extra-tags:
+            xml: "unit,attr"
+      x-oapi-codegen-extra-tags:
+        xml: "memory"
+
+    caps_host_numa_cpus:
+      readOnly: true
+      properties:
+        num:
+          readOnly: true
+          type: integer
+          format: uint
+          example: 16
+          x-oapi-codegen-extra-tags:
+            xml: "num,attr"
+      x-oapi-codegen-extra-tags:
+        xml: "cpus"
+
+    ###########################################
+    # subset of libvirt domain                #
+    # (https://libvirt.org/formatdomain.html) #
+    ###########################################
+    domain_name:
+      type: string
+      example: 847d7fde
+
+    domain:
+      required:
+        - title
+        - memory
+        - vcpu
+      properties:
+        # !!! MUST be a subset of https://libvirt.org/formatdomain.html - Any custom property MUST be inside of the `metadata` property !!!
+        # (Use https://codebeautify.org/xml-to-yaml to see how a domain defined in libvirt XML looks like in YAML)
+        _:
+          x-go-name: XMLName
+          x-go-type: xml.Name
+          x-oapi-codegen-extra-tags:
+            json: "-"
+            xml: "domain"
+
+        type:
+          readOnly: true
+          type: string
+          example: kvm
+          x-oapi-codegen-extra-tags:
+            xml: "type,attr,omitempty"
+
+        name:
+          readOnly: true
+          allOf:
+            - $ref: "#/components/schemas/domain_name"
+          x-oapi-codegen-extra-tags:
+            xml: "name,omitempty"
+
+        title:
+          type: string
+          example: "My VM"
+          x-oapi-codegen-extra-tags:
+            xml: "title,omitempty"
+
+        metadata:
+          $ref: "#/components/schemas/domain_metadata"
+
+        memory:
+          $ref: "#/components/schemas/domain_memory"
+
+        vcpu:
+          $ref: "#/components/schemas/domain_vcpu"
+          # x-go-name: VCPU
+          # Uncomment above line once https://github.com/deepmap/oapi-codegen/issues/863 is resolved
+          # For now, the generated variable name in Golang is `Vcpu` which is not consistent with the style guide
+
+        os:
+          $ref: "#/components/schemas/domain_os"
+          # x-go-name: OS
+          # Uncomment above line once https://github.com/deepmap/oapi-codegen/issues/863 is resolved
+          # For now, the generated variable name in Golang is `Os` which is not consistent with the style guide
+
+        devices:
+          $ref: "#/components/schemas/domain_device_list"
+
+    domain_metadata:
+      properties:
+        _:
+          x-go-name: XMLName
+          x-go-type: xml.Name
+          x-oapi-codegen-extra-tags:
+            json: "-"
+            xml: "metadata"
+        x-casaos:
+          $ref: "#/components/schemas/info"
+      x-oapi-codegen-extra-tags:
+        xml: "metadata"
+
+    domain_memory:
+      required:
+        - value
+      properties:
+        _:
+          x-go-name: XMLName
+          x-go-type: xml.Name
+          x-oapi-codegen-extra-tags:
+            json: "-"
+            xml: "memory"
+        value:
+          type: integer
+          format: uint
+          example: 2147483648 # 2GB
+          x-oapi-codegen-extra-tags:
+            xml: ",chardata"
+      x-oapi-codegen-extra-tags:
+        xml: "memory"
+
+    domain_interface_list:
+      type: array
+      items:
+        $ref: "#/components/schemas/domain_interface"
+      x-oapi-codegen-extra-tags:
+        xml: "interface"
+
+    domain_interface:
+      required:
+        - type
+      properties:
+        _:
+          x-go-name: XMLName
+          x-go-type: xml.Name
+          x-oapi-codegen-extra-tags:
+            json: "-"
+            xml: "interface"
+        type:
+          type: string
+          enum:
+            - direct
+            - network
+          x-enum-varnames:
+            - DomainNetworkDirect
+            - DomainNetworkNetwork
+          x-oapi-codegen-extra-tags:
+            xml: "type,attr,omitempty"
+        mac:
+          $ref: "#/components/schemas/domain_interface_mac"
+        source:
+          $ref: "#/components/schemas/domain_interface_source"
+        model:
+          $ref: "#/components/schemas/domain_interface_model"
+        address:
+          $ref: "#/components/schemas/domain_interface_address"
+    domain_interface_mac:
+      required:
+        - address
+      properties:
+        address:
+          type: string
+          example: 52:54:00:8d:3e:3e
+          x-oapi-codegen-extra-tags:
+            xml: "address,attr"
+      x-oapi-codegen-extra-tags:
+        xml: "mac"
+
+    domain_interface_address:
+      readOnly: true
+      properties:
+        type:
+          type: string
+          example: pci
+          x-oapi-codegen-extra-tags:
+            xml: "type,attr"
+        domain:
+          type: string
+          example: 0x0000
+          x-oapi-codegen-extra-tags:
+            xml: "domain,attr"
+        bus:
+          type: string
+          example: 0x06
+          x-oapi-codegen-extra-tags:
+            xml: "bus,attr"
+        slot:
+          type: string
+          example: 0x00
+          x-oapi-codegen-extra-tags:
+            xml: "slot,attr"
+        function:
+          type: string
+          example: 0x0
+          x-oapi-codegen-extra-tags:
+            xml: "function,attr"
+
+    domain_interface_source_dev:
+      type: string
+      example: eth0
+      x-oapi-codegen-extra-tags:
+        xml: "dev,attr"
+
+    domain_interface_source:
+      properties:
+        network:
+          type: string
+          example: default
+          x-oapi-codegen-extra-tags:
+            xml: "network,attr"
+        dev:
+          $ref: "#/components/schemas/domain_interface_source_dev"
+        mode:
+          type: string
+          enum:
+            - bridge
+            - network
+          x-enum-varnames:
+            - DomainNetworkSourceModeBridge
+            - DomainNetworkSourceModeNetwork
+          x-oapi-codegen-extra-tags:
+            xml: "mode,attr"
+      x-oapi-codegen-extra-tags:
+        xml: "source"
+    domain_interface_model:
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          example: e1000e
+          x-oapi-codegen-extra-tags:
+            xml: "type,attr"
+      x-oapi-codegen-extra-tags:
+        xml: "model"
+
+    domain_vcpu:
+      required:
+        - value
+      properties:
+        _:
+          x-go-name: XMLName
+          x-go-type: xml.Name
+          x-oapi-codegen-extra-tags:
+            json: "-"
+            xml: "vcpu"
+        value:
+          type: integer
+          format: uint
+          example: 2
+          x-oapi-codegen-extra-tags:
+            xml: ",chardata"
+      x-oapi-codegen-extra-tags:
+        xml: "vcpu"
+      # x-go-name: DomainVCPU
+      # Uncomment above line once https://github.com/deepmap/oapi-codegen/issues/863 is resolved
+      # For now, the generated variable name in Golang is `DomainVcpu` which is not consistent with the style guide
+
+    domain_os:
+      properties:
+        type:
+          $ref: "#/components/schemas/domain_os_type"
+        firmware:
+          $ref: "#/components/schemas/firmware"
+        bootmenu:
+          $ref: "#/components/schemas/domain_boot_menu"
+      x-oapi-codegen-extra-tags:
+        xml: "os"
+      # x-go-name: DomainOS
+      # Uncomment above line once https://github.com/deepmap/oapi-codegen/issues/863 is resolved
+      # For now, the generated variable name in Golang is `DomainOS` which is not consistent with the style guide
+
+    domain_os_type:
+      readOnly: true
+      properties:
+        type:
+          type: string
+          example: hvm
+          x-oapi-codegen-extra-tags:
+            xml: ",chardata"
+      x-oapi-codegen-extra-tags:
+        xml: "type"
+      # x-go-name: DomainOSType
+      # Uncomment above line once https://github.com/deepmap/oapi-codegen/issues/863 is resolved
+      # For now, the generated variable name in Golang is `DomainOSType` which is not consistent with the style guide
+
+    domain_device_list:
+      properties:
+        _:
+          x-go-name: XMLName
+          x-go-type: xml.Name
+          x-oapi-codegen-extra-tags:
+            json: "-"
+            xml: "devices"
+
+        disks:
+          $ref: "#/components/schemas/domain_disk_list"
+
+        interfaces:
+          $ref: "#/components/schemas/domain_interface_list"
+
+        graphics:
+          type: array
+          items:
+            $ref: "#/components/schemas/domain_graphic"
+          x-oapi-codegen-extra-tags:
+            xml: "graphics"
+
+      x-oapi-codegen-extra-tags:
+        xml: "devices"
+
+    domain_disk_list:
+      type: array
+      items:
+        $ref: "#/components/schemas/domain_disk"
+      x-oapi-codegen-extra-tags:
+        xml: "disk"
+
+    domain_disk:
+      required:
+        - device
+      properties:
+        _:
+          x-go-name: XMLName
+          x-go-type: xml.Name
+          x-oapi-codegen-extra-tags:
+            json: "-"
+            xml: "disk"
+        device:
+          type: string
+          enum:
+            - disk
+            - cdrom
+          x-enum-varnames:
+            - Disk
+            - CDROM
+          x-oapi-codegen-extra-tags:
+            xml: "device,attr,omitempty"
+        driver:
+          $ref: "#/components/schemas/domain_disk_driver"
+        source:
+          $ref: "#/components/schemas/domain_disk_source"
+        target:
+          $ref: "#/components/schemas/domain_disk_target"
+        address:
+          $ref: "#/components/schemas/domain_address_drive"
+
+    domain_address_drive:
+      readOnly: true
+      properties:
+        type:
+          type: string
+          example: drive
+          x-oapi-codegen-extra-tags:
+            xml: "type,attr,omitempty"
+        controller:
+          type: integer
+          format: uint
+          example: 0
+          x-oapi-codegen-extra-tags:
+            xml: "controller,attr,omitempty"
+        bus:
+          type: integer
+          format: uint
+          example: 0
+          x-oapi-codegen-extra-tags:
+            xml: "bus,attr,omitempty"
+        target:
+          type: integer
+          format: uint
+          example: 0
+          x-oapi-codegen-extra-tags:
+            xml: "target,attr,omitempty"
+        unit:
+          type: integer
+          format: uint
+          example: 2
+          x-oapi-codegen-extra-tags:
+            xml: "unit,attr,omitempty"
+      x-oapi-codegen-extra-tags:
+        xml: "address"
+
+    domain_disk_driver:
+      required:
+        - name
+        - type
+      properties:
+        name:
+          type: string
+          example: qemu
+          x-oapi-codegen-extra-tags:
+            xml: "name,attr,omitempty"
+        type:
+          type: string
+          example: qcow2
+          x-oapi-codegen-extra-tags:
+            xml: "type,attr,omitempty"
+      x-oapi-codegen-extra-tags:
+        xml: "driver"
+
+    domain_disk_source:
+      required:
+        - file
+      properties:
+        _:
+          x-go-name: XMLName
+          x-go-type: xml.Name
+          x-oapi-codegen-extra-tags:
+            json: "-"
+            xml: "source"
+
+        file:
+          $ref: "#/components/schemas/domain_disk_source_file"
+
+      x-oapi-codegen-extra-tags:
+        xml: "source"
+
+    domain_disk_source_file:
+      type: string
+      example: "/DATA/Downloads/Windows10.iso"
+      x-oapi-codegen-extra-tags:
+        xml: "file,attr,omitempty"
+
+    domain_disk_target:
+      required:
+        - dev
+        - bus
+      properties:
+        _:
+          x-go-name: XMLName
+          x-go-type: xml.Name
+          x-oapi-codegen-extra-tags:
+            json: "-"
+            xml: "target"
+
+        dev:
+          $ref: "#/components/schemas/domain_disk_target_dev"
+
+        bus:
+          type: string
+          enum:
+            - sata
+            - scsi
+            - usb
+          x-enum-varnames:
+            - DomainDiskTargetBusVirtIO
+            - DomainDiskTargetBusSATA
+            - DomainDiskTargetBusSCSI
+            - DomainDiskTargetBusIDE
+          x-oapi-codegen-extra-tags:
+            xml: "bus,attr,omitempty"
+
+      x-oapi-codegen-extra-tags:
+        xml: "target"
+
+    domain_disk_target_dev:
+      type: string
+      example: "sda"
+      x-oapi-codegen-extra-tags:
+        xml: "dev,attr,omitempty"
+
+    domain_graphic:
+      required:
+        - type
+        - port
+        - websocket
+      properties:
+        _:
+          x-go-name: XMLName
+          x-go-type: xml.Name
+          x-oapi-codegen-extra-tags:
+            json: "-"
+            xml: "graphics"
+
+        type:
+          type: string
+          default: vnc
+          x-oapi-codegen-extra-tags:
+            xml: "type,attr,omitempty"
+
+        listen:
+          type: string
+          default: "::"
+          x-oapi-codegen-extra-tags:
+            xml: "listen,attr,omitempty"
+
+        autoport:
+          type: string
+          default: yes
+          x-oapi-codegen-extra-tags:
+            xml: "autoport,attr,omitempty"
+
+        port:
+          type: integer
+          default: -1
+          x-oapi-codegen-extra-tags:
+            xml: "port,attr,omitempty"
+
+        websocket:
+          type: integer
+          default: -1
+          x-go-name: WebSocket
+          x-oapi-codegen-extra-tags:
+            json: "websocket,omitempty"
+            xml: "websocket,attr,omitempty"
+
+    ############################################
+    # subset of libvirt storage                #
+    # (https://libvirt.org/formatstorage.html) #
+    ############################################
+
+    storage_pool:
+      required:
+        - name
+      properties:
+        _:
+          x-go-name: XMLName
+          x-go-type: xml.Name
+          x-oapi-codegen-extra-tags:
+            json: "-"
+            xml: "pool"
+        name:
+          type: string
+          example: default
+          x-oapi-codegen-extra-tags:
+            xml: "name,omitempty"
+        uuid:
+          type: string
+          example: f3e3e3e3-3e3e-3e3e-3e3e-3e3e3e3e3e3e
+          x-oapi-codegen-extra-tags:
+            xml: "uuid,omitempty"
+          x-go-name: UUID
+        target:
+          $ref: "#/components/schemas/storage_pool_target"
+
+    storage_pool_target:
+      required:
+        - path
+      properties:
+        path:
+          allOf:
+            - $ref: "#/components/schemas/storage_pool_target_path"
+          x-oapi-codegen-extra-tags:
+            xml: "path,omitempty"
+      x-oapi-codegen-extra-tags:
+        xml: "target"
+
+    storage_pool_target_path:
+      type: string
+      example: /var/lib/libvirt/images
+
+    storage_volume:
+      required:
+        - type
+        - name
+        - key
+      properties:
+        _:
+          x-go-name: XMLName
+          x-go-type: xml.Name
+          x-oapi-codegen-extra-tags:
+            json: "-"
+            xml: "volume"
+        type:
+          type: string
+          example: file
+          x-oapi-codegen-extra-tags:
+            xml: "type,attr,omitempty"
+        name:
+          type: string
+          example: d5c87263
+          x-oapi-codegen-extra-tags:
+            xml: "name"
+        key:
+          type: string
+          example: /var/lib/casaos/virt/pool/d5c87263
+          x-oapi-codegen-extra-tags:
+            xml: "key,omitempty"
+        allocation:
+          allOf:
+            - $ref: "#/components/schemas/storage_volume_size"
+          x-oapi-codegen-extra-tags:
+            xml: "allocation"
+        capacity:
+          allOf:
+            - $ref: "#/components/schemas/storage_volume_size"
+          x-oapi-codegen-extra-tags:
+            xml: "capacity"
+        phyiscal:
+          allOf:
+            - $ref: "#/components/schemas/storage_volume_size"
+          x-oapi-codegen-extra-tags:
+            xml: "phyiscal"
+        target:
+          allOf:
+            - $ref: "#/components/schemas/storage_volume_target"
+          x-oapi-codegen-extra-tags:
+            xml: "target"
+
+    storage_volume_size:
+      required:
+        - value
+      properties:
+        value:
+          type: integer
+          format: uint64
+          example: 10737418240 # 10GB
+          x-oapi-codegen-extra-tags:
+            xml: ",chardata"
+
+    storage_volume_target:
+      required:
+        - path
+      properties:
+        path:
+          type: string
+          example: /var/lib/casaos/virt/pool/d5c87263
+          x-oapi-codegen-extra-tags:
+            xml: "path,omitempty"
+        format:
+          allOf:
+            - $ref: "#/components/schemas/storage_volume_target_format"
+          x-oapi-codegen-extra-tags:
+            xml: "format"
+
+    storage_volume_target_format:
+      properties:
+        type:
+          type: string
+          example: qcow2
+          x-oapi-codegen-extra-tags:
+            xml: "type,attr"
+
+    ###################################################################################
+    # schema for web (INTERNAL USE)                                                   #
+    # (yes this is ugly but frontend developer asks for this so it's easier to code.) #
+    ###################################################################################
+    domain_with_info_for_web:
+      description: INTERNAL USE - DO NOT USE
+      readOnly: true
+      properties:
+        info:
+          $ref: "#/components/schemas/info"
+        domain:
+          $ref: "#/components/schemas/domain_for_web"
+        status:
+          $ref: "#/components/schemas/domain_status"
+        last_viewed:
+          type: boolean
+          example: false
+
+    domain_for_web:
+      description: INTERNAL USE - DO NOT USE
+      required:
+        - title
+        - memory
+        - vcpu
+      properties:
+        _:
+          x-go-name: XMLName
+          x-go-type: xml.Name
+          x-oapi-codegen-extra-tags:
+            json: "-"
+            xml: "domain"
+
+        type:
+          readOnly: true
+          type: string
+          example: kvm
+          x-oapi-codegen-extra-tags:
+            xml: "type,attr,omitempty"
+
+        name:
+          readOnly: true
+          allOf:
+            - $ref: "#/components/schemas/domain_name"
+          x-oapi-codegen-extra-tags:
+            xml: "name,omitempty"
+
+        title:
+          type: string
+          example: "My VM"
+          x-oapi-codegen-extra-tags:
+            xml: "title,omitempty"
+
+        metadata:
+          $ref: "#/components/schemas/domain_metadata"
+
+        memory:
+          $ref: "#/components/schemas/domain_memory"
+
+        vcpu:
+          $ref: "#/components/schemas/domain_vcpu"
+          # x-go-name: VCPU
+          # Uncomment above line once https://github.com/deepmap/oapi-codegen/issues/863 is resolved
+          # For now, the generated variable name in Golang is `Vcpu` which is not consistent with the style guide
+
+        os:
+          $ref: "#/components/schemas/domain_os"
+          # x-go-name: OS
+          # Uncomment above line once https://github.com/deepmap/oapi-codegen/issues/863 is resolved
+          # For now, the generated variable name in Golang is `Os` which is not consistent with the style guide
+
+        devices:
+          $ref: "#/components/schemas/domain_device_list_for_web"
+
+    domain_device_list_for_web:
+      properties:
+        _:
+          x-go-name: XMLName
+          x-go-type: xml.Name
+          x-oapi-codegen-extra-tags:
+            json: "-"
+            xml: "devices"
+
+        disks:
+          $ref: "#/components/schemas/domain_disk_list_for_web"
+
+        interfaces:
+          $ref: "#/components/schemas/domain_interface_list"
+
+        graphics:
+          type: array
+          items:
+            $ref: "#/components/schemas/domain_graphic"
+          x-oapi-codegen-extra-tags:
+            xml: "graphics"
+
+      x-oapi-codegen-extra-tags:
+        xml: "devices"
+
+    domain_disk_list_for_web:
+      type: array
+      items:
+        $ref: "#/components/schemas/domain_disk_for_web"
+      x-oapi-codegen-extra-tags:
+        xml: "disk"
+
+    domain_disk_for_web:
+      required:
+        - device
+      allOf:
+        - $ref: "#/components/schemas/domain_disk"
+        - properties:
+            allocation: # yes I know this property does not belong here, but frontend developer asks for this for easier coding.
+              $ref: "#/components/schemas/storage_volume_size"
+            capacity: # yes I know this property does not belong here, but frontend developer asks for this for easier coding.
+              $ref: "#/components/schemas/storage_volume_size"
