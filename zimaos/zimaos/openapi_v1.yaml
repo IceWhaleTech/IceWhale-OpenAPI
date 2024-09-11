@@ -1,0 +1,318 @@
+openapi: 3.0.3
+
+info:
+  title: ZimaOS API
+  version: v1
+
+servers:
+  - url: /v1
+
+tags:
+  - name: System methonds
+    description: System related operations
+  - name: Notify methods
+    description: Notify related operations
+  - name: Other methods
+    description: Other operations
+
+security:
+  - access_token: []
+
+paths:
+  /sys/hardware:
+    get:
+      summary: Get hardware information
+      tags:
+        - System methonds
+      operationId: getHardware
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseHardwareInfoOK"
+
+  /sys/logs:
+    get:
+      summary: Get logs
+      tags:
+        - System methonds
+      operationId: getLogs
+      parameters:
+        - $ref: "#/components/parameters/logs_line"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseLogsOK"
+
+  /sys/stop:
+    post:
+      summary: Stop the system
+      tags:
+        - System methonds
+      operationId: stopSystem
+      responses:
+        default:
+          description: Stop the system
+
+  /sys/utilization:
+    get:
+      summary: Get system utilization
+      tags:
+        - System methonds
+      operationId: getUtilization
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseSystemUtilizationOK"
+
+  /sys/proxy:
+    get:
+      summary: Get proxy information
+      tags:
+        - System methonds
+      operationId: getProxy
+      parameters:
+        - $ref: "#/components/parameters/proxy_url"
+      responses:
+        default:
+          description: Get proxy information
+
+  /sys/state/{state}:
+    put:
+      summary: Set system state
+      tags:
+        - System methonds
+      operationId: setSystemState
+      parameters:
+        - $ref: "#/components/parameters/system_state"
+      responses:
+        "200":
+          $ref: "#/components/responses/OKResponse"
+
+  /sys/entry:
+    get:
+      summary: Get system entry
+      tags:
+        - System methonds
+      operationId: getSystemEntry
+      responses:
+        "200":
+          $ref: "#/components/responses/OKResponse"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+  /notify/{path}:
+    post:
+      summary: Notify system
+      tags:
+        - Notify methods
+      operationId: notifySystem
+      parameters:
+        - $ref: "#/components/parameters/notify_name"
+      responses:
+        "200":
+          $ref: "#/components/responses/OKResponse"
+        "400":
+          $ref: "#/components/responses/ResponseInvalidParams"
+
+  /notify/system_status:
+    post:
+      summary: Notify system status
+      tags:
+        - Notify methods
+      operationId: notifySystemStatus
+      responses:
+        "200":
+          $ref: "#/components/responses/OKResponse"
+        "400":
+          $ref: "#/components/responses/ResponseInvalidParams"
+
+  /other/search:
+    get:
+      summary: Search
+      tags:
+        - Other methods
+      operationId: search
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                url:
+                  type: string
+                  example: "example"
+      responses:
+        "200":
+          $ref: "#/components/responses/OKResponse"
+        "400":
+          $ref: "#/components/responses/ResponseInvalidParams"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+components:
+  securitySchemes:
+    access_token:
+      type: apiKey
+      in: header
+      name: Authorization
+
+  parameters:
+    logs_line:
+      name: line
+      in: query
+      description: Number of log lines
+      required: false
+      schema:
+        type: integer
+        example: 100
+    proxy_url:
+      name: url
+      in: query
+      description: Proxy URL
+      required: false
+      schema:
+        type: string
+        example: "http://example.com"
+    system_state:
+      name: state
+      in: path
+      description: System state
+      required: true
+      schema:
+        type: string
+        enum:
+          - "start"
+          - "stop"
+    notify_name:
+      name: "path"
+      in: path
+      description: Notify name
+      required: true
+      schema:
+        type: string
+        enum:
+          - "system_status"
+          - "system_error"
+          - "system_warning"
+
+  responses:
+    OKResponse:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            $ref: "#/components/schemas/BaseResponse"
+    ResponseInternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "Internal Server Error"
+    ResponseInvalidParams:
+      description: Invalid params
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "Invalid params"
+    ResponseHardwareInfoOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              drive_model:
+                type: string
+                example: "ST1000DM003-1SB102"
+              arch:
+                type: string
+                example: "x86_64"
+    ResponseLogsOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              data:
+                type: string
+                example: "logs"
+    ResponseSystemUtilizationOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              cpu:
+                type: object
+                properties:
+                  percent:
+                    type: string
+                    example: "10%"
+                  num:
+                    type: integer
+                    example: 4
+                  temperature:
+                    type: string
+                    example: "10°C"
+                  power:
+                    type: string
+                    example: "10W"
+                  model:
+                    type: string
+                    example: "intel"
+              mem:
+                type: string
+                example: "1GB"
+              gpu:
+                $ref: "#/components/schemas/GPUInfo"
+
+  schemas:
+    BaseResponse:
+      type: object
+      properties:
+        message:
+          readOnly: true
+          type: string
+          example: "Bad request"
+          description: Error message
+    GPUInfo:
+      type: object
+      properties:
+        memory_free:
+          type: string
+          example: "1GB"
+        memory_total:
+          type: string
+          example: "4GB"
+        memory_used:
+          type: string
+          example: "3GB"
+        memory_utilization:
+          type: string
+          example: "75%"
+        name:
+          type: string
+          example: "NVIDIA GeForce RTX A2000"
+        power_draw:
+          type: string
+          example: "100W"
+        power_limit:
+          type: string
+          example: "150W"
+        temperature:
+          type: string
+          example: "50°C"
+        utilization:
+          type: string
+          example: "75%"
+        uuid:
+          type: string
+          example: "GPU-123456"
