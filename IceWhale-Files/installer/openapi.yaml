@@ -1,0 +1,345 @@
+openapi: 3.0.3
+
+info:
+  title: CasaOS Installer API
+  version: v2
+  description: API for installing and updating CasaOS on a device
+
+servers:
+  - url: /v2/installer
+
+tags:
+  - name: Common methods
+    description: |-
+      methods for common usage
+  - name: OTA methods
+    description: |-
+      methods for OTA usage
+
+x-tagGroups:
+  - name: Methods
+    tags:
+      - Common methods
+      - OTA methods
+      - Web methods
+
+security:
+  - access_token: []
+
+paths:
+  /background:
+    get:
+      summary: Get the background image of the latest release
+      operationId: getBackground
+      parameters:
+        - $ref: "#/components/parameters/Version"
+      tags:
+        - Web methods
+        - OTA methods
+      responses:
+        "200":
+          description: OK
+          content:
+            image/png:
+              schema:
+                type: string
+                format: binary
+        "404":
+          $ref: "#/components/responses/ResponseNotFound"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+  /release:
+    get:
+      summary: Get the information about the latest release of CasaOS
+      operationId: getRelease
+      tags:
+        - Web methods
+        - OTA methods
+      parameters:
+        - $ref: "#/components/parameters/Version"
+      responses:
+        "200":
+          $ref: "#/components/responses/ReleaseOK"
+        "404":
+          $ref: "#/components/responses/ResponseNotFound"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+    post:
+      summary: Install a release of CasaOS
+      operationId: installRelease
+      tags:
+        - Common methods
+        - OTA methods
+      parameters:
+        - $ref: "#/components/parameters/Version"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseOK"
+        "404":
+          $ref: "#/components/responses/ResponseNotFound"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+ 
+  /install:
+    get:
+      summary: Get the Info of the installation. such as install package path
+      operationId: getInstall
+      tags:
+        - Common methods
+        - OTA methods
+      responses:
+        "200":
+          $ref: "#/components/responses/InstallInfoOk"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+  /status:
+    get:
+      deprecated: true
+      summary: Get the status of the OTA program.
+      tags:
+        - Common methods
+        - OTA methods
+      operationId: getStatus
+      responses:
+        "200":
+          $ref: "#/components/responses/StatusOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+    
+  /reset:
+    put:
+      deprecated: true
+      summary: Change error status to idle
+      operationId: resetStatus
+      tags:
+        - Web methods
+        - OTA methods
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+  /web/notice:
+    get:
+      summary: Get the notice info of Update Info
+      operationId: getNoticeInfo
+      tags:
+        - Web methods
+        - OTA methods
+      responses:
+        "200":
+          $ref: "#/components/responses/NoticeInfoOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"      
+    
+components:
+  securitySchemes:
+    access_token:
+      type: apiKey
+      in: header
+      name: Authorization
+
+  parameters:
+    Version:
+      name: version
+      in: query
+      description: version of the release
+      required: false
+      schema:
+        type: string
+        default: latest
+
+  responses:
+    ResponseOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+
+    ResponseInternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "Internal Server Error"
+
+    ResponseNotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "Not Found"
+
+    ResponseBadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "Bad Request"
+
+    ReleaseOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/Release"
+                  upgradable:
+                    readOnly: true
+                    type: boolean
+                    example: false
+    InstallInfoOk:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  path:
+                    type: string
+                    example: /var/lib/casaos_data/offline/test.raucb
+    StatusOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/Status"
+
+    NoticeInfoOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/NoticeInfoOKData"
+  schemas:
+    BaseResponse:
+      properties:
+        message:
+          description: message returned by server side if there is any
+          type: string
+          example: ""
+    Status:
+      readOnly: true
+      required:
+        - status
+        - message
+      properties:
+        status:
+          type: string
+          enum:
+            - "idle"
+            - "fetchUpdating"
+            - "fetchError"
+            - "downloading"
+            - "downloadError"
+            - "installing"
+            - "installError"
+
+    NoticeInfoOKData:
+      type: string
+      enum:
+        - "no-update"
+        - "normal-update"
+        - "important-update"
+        # the field is not used right now. but it is reserved for future use
+        - "force-update"
+
+    Release:
+      readOnly: true
+      required:
+        - version
+        - release_notes
+        - mirrors
+        - packages
+        - checksums
+        - modules
+      properties:
+        version:
+          type: string
+          example: v0.4.5
+        release_notes:
+          type: string
+          example: |
+            Changes:
+            ...
+          x-oapi-codegen-extra-tags:
+            yaml: "release_notes,omitempty"
+        code:
+          type: string
+          example: Big Sur
+        background:
+          type: string
+          example: https://ubuntu/get/releases/download/v0.4.4-alpha2/background.png
+        # important means the update is very important. zimaos should show a dialog to ask user to update
+        important:
+          type: boolean
+          example: true
+        mirrors:
+          type: array
+          minItems: 1
+          items:
+            type: string
+            example: https://github.com/IceWhaleTech
+        packages:
+          type: array
+          minItems: 3
+          items:
+            $ref: "#/components/schemas/Package"
+        checksums:
+          type: string
+          example: /get/releases/download/v0.4.4-alpha2/checksums.txt
+        modules:
+          type: array
+          items:
+            $ref: "#/components/schemas/Module"
+
+    Package:
+      readOnly: true
+      required:
+        - path
+        - architecture
+      properties:
+        path:
+          type: string
+          example: /get/releases/download/v0.4.4-alpha1/casaos-amd64-v0.4.4-alpha1.tar.gz
+        architecture:
+          type: string
+          enum:
+            - amd64
+            - arm64
+            - arm-7
+    Module:
+      readOnly: true
+      required:
+        - name
+        - short
+      properties:
+        name:
+          type: string
+          example: casaos-gateway
+        short:
+          type: string
+          example: gateway
