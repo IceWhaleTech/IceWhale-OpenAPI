@@ -1,0 +1,1243 @@
+openapi: 3.0.3
+
+info:
+  title: CasaOS Local Storage API
+  version: v2
+  description: |-
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/IceWhaleTech/logo/main/casaos/casaos_banner_dark_night_800px.png">
+        <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/IceWhaleTech/logo/main/casaos/casaos_banner_twilight_blue_800px.png">
+        <img alt="CasaOS" src="https://raw.githubusercontent.com/IceWhaleTech/logo/main/casaos/casaos_banner_twilight_blue_800px.png">
+    </picture>
+
+    CasaOS Local Storage service manages local storage including disks, partitions and mounting points.
+
+    This API allows interacting with the service to conduct such management.
+
+    For issues and discussions, please visit the [GitHub repository](https://github.com/IceWhaleTech/CasaOS) or join [our Discord](https://discord.gg/knqAbbBbeX).
+
+servers:
+  - url: /v2/local_storage
+
+tags:
+  - name: Mount methods
+    description: |-
+      Low-level API
+
+  - name: Merge methods
+    description: |-
+      High-level API
+  
+  - name: Raid methods
+    description: |-
+      Raid API
+  - name: Disk methods
+    description: |-
+      Disk API
+  - name: Storage methods
+    description: |-
+      Storage API
+
+  - name: Merge
+    description: |-
+      <SchemaDefinition schemaRef="#/components/schemas/Merge" />
+
+  - name: Mount
+    description: |-
+      <SchemaDefinition schemaRef="#/components/schemas/Mount" />
+
+x-tagGroups:
+  - name: Mount
+    tags:
+      - Merge methods
+      - Mount methods
+
+  - name: Schemas
+    tags:
+      - Merge
+      - Mount
+
+security:
+  - access_token: []
+
+paths:
+
+  /disk:
+    get:
+      summary: Get disks
+      description: |-
+        Get a list of all disks, or a single disk by path.
+      operationId: getDisks
+      parameters:
+        - name: free
+          in: query
+          description: |-
+            Filter the results by path
+          schema:
+            type: string
+            example: "show"
+      tags:
+        - Disk methods
+      responses:
+        "200":
+          $ref: "#/components/responses/GetDisksResponseOK"
+        "503":
+          $ref: "#/components/responses/ResponseServiceUnavailable"
+        "400":
+          $ref: "#/components/responses/ResponseBadRequest"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+  /disk/info:
+    get:
+      summary: Get disk info
+      description: |-
+        Get a list of all disks, or a single disk by path.
+      operationId: getDiskInfo
+      tags:
+        - Disk methods
+      parameters:
+        - name: path
+          in: query
+          description: |-
+            Filter the results by path
+          schema:
+            type: string
+            example: "/dev/sda"
+      responses:
+        "200":
+          $ref: "#/components/responses/GetDiskInfoResponseOK"
+        "503":
+          $ref: "#/components/responses/ResponseServiceUnavailable"
+        "400":
+          $ref: "#/components/responses/ResponseBadRequest"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+  /storage:
+    get:
+      summary: Get storages
+      description: |-
+        Get a list of all storage, or a single storage by path.
+      operationId: getStorage
+      tags:
+        - Storage methods
+      parameters:
+        - name: system
+          in: query
+          description: |-
+            Whether system storage is required
+          schema:
+            type: string
+            example: "show"
+        - name: path
+          in: query
+          description: |-
+            Filter the results by path
+          schema:
+            type: string
+            example: "/dev/sda"    
+      responses:
+        "200":
+          $ref: "#/components/responses/GetStorageResponseOK"
+        "503":
+          $ref: "#/components/responses/ResponseServiceUnavailable"
+        "400":
+          $ref: "#/components/responses/ResponseBadRequest"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+    post:
+      summary: Create a storage
+      description: |-
+        Create a storage
+      operationId: createStorage
+      tags:
+        - Storage methods
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PostStorageBody"
+      responses:
+        "200":
+          $ref: "#/components/responses/PostStorageResponseOK"
+        "503":
+          $ref: "#/components/responses/ResponseServiceUnavailable"
+        "400":
+          $ref: "#/components/responses/ResponseBadRequest"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+    delete:
+      summary: Delete a storage
+      description: |-
+        Delete a storage by path
+      operationId: deleteStorage
+      tags:
+        - Storage methods
+      parameters:
+        - name: path
+          in: query
+          required: true
+          description: |-
+            Filter the delete by path
+          schema:
+            type: string
+            example: "/dev/sda"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseOKRequest"
+        "503":
+          $ref: "#/components/responses/ResponseServiceUnavailable"
+        "400":
+          $ref: "#/components/responses/ResponseBadRequest"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+  /storages:
+    get:
+      summary: Get all storages
+      description: |-
+        Get a list of all storage, or a single storage by path.
+      operationId: getAllStorages
+      tags:
+        - Storage methods 
+      responses:
+        "200":
+          $ref: "#/components/responses/GetStoragesOK"
+        "503":
+          $ref: "#/components/responses/ResponseServiceUnavailable"
+        "400":
+          $ref: "#/components/responses/ResponseBadRequest"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+
+  /raid:
+    get:
+      summary: Get raids
+      description: |-
+        Get a list of all raids, or a single raid by name.
+      operationId: getRaids
+      tags:
+        - Raid methods
+      parameters:
+        - name: path
+          in: query
+          description: |-
+            Filter the results by raid
+          schema:
+            type: string
+            example: "/dev/md0"
+      responses:
+        "200":
+          $ref: "#/components/responses/GetRaidsResponseOK"
+        "503":
+          $ref: "#/components/responses/ResponseServiceUnavailable" 
+    post: 
+      summary: create a raid
+      description: |-
+        Create a raid
+      operationId: createRaid
+      tags:
+        - Raid methods
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RaidBody"
+      responses:
+        "200":
+          $ref: "#/components/responses/SetRaidResponseOK"
+        "503":
+          $ref: "#/components/responses/ResponseServiceUnavailable"
+    put:
+      summary: Update a raid
+      description: |-
+        Update raid-related configurations by name
+      operationId: updateRaid
+      tags:
+        - Raid methods
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/PutRaidBody"
+      responses:
+        "200":
+          $ref: "#/components/responses/UpdateRaidResponseOK"
+        "503":
+          $ref: "#/components/responses/ResponseServiceUnavailable"
+    delete:
+      summary: Delete a raid
+      description: |-
+        Delete a raid by path
+      operationId: deleteRaid
+      tags:
+        - Raid methods
+      parameters:
+        - name: path
+          in: query
+          required: true
+          description: |-
+            Filter the delete by raid
+          schema:
+            type: string
+            example: "/dev/md0"
+      responses:
+        "200":
+          $ref: "#/components/responses/DeleteRaidResponseOK"
+        "503":
+          $ref: "#/components/responses/ResponseServiceUnavailable"
+
+  /merge:
+    get:
+      summary: Get merges
+      description: |-
+        (TODO)
+      operationId: getMerges
+      tags:
+        - Merge methods
+      parameters:
+        - name: mount_point
+          in: query
+          description: |-
+            Filter the results by mount point
+          schema:
+            type: string
+            example: "/DATA"
+      responses:
+        "200":
+          $ref: "#/components/responses/GetMergesResponseOK"
+        "503":
+          $ref: "#/components/responses/ResponseServiceUnavailable"
+
+    post:
+      summary: Set a merge
+      description: |-
+        (TODO)
+      operationId: setMerge
+      tags:
+        - Merge methods
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Merge"
+      responses:
+        "200":
+          $ref: "#/components/responses/SetMergeResponseOK"
+        "503":
+          $ref: "#/components/responses/ResponseServiceUnavailable"
+  /merge/init:
+    get:
+      summary: Get merge initialization status
+      description: |-
+        (TODO)
+      operationId: getMergeInitStatus
+      tags:
+        - Merge methods
+      responses:
+        "200":
+          $ref: "#/components/responses/GetMergeInitStatusResponseOK"
+        "503":
+          $ref: "#/components/responses/ResponseServiceUnavailable"
+    post:
+      summary: Initialize a merge
+      description: |-
+        (TODO)
+      operationId: initMerge
+      tags:
+        - Merge methods
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MountPoint"
+      responses:
+        "200":
+          $ref: "#/components/responses/InitMergeResponseOK"
+        "503":
+          $ref: "#/components/responses/ResponseServiceUnavailable"
+  /mount:
+    get:
+      summary: Get mounted volumes
+      description: |-
+        Get all volumes currently mounted on the system. Volumes can be filtered by corresponding query parameters.
+      operationId: getMounts
+      tags:
+        - Mount methods
+      parameters:
+        - name: id
+          in: query
+          description: |-
+            Filter the results by id
+          schema:
+            type: string
+            example: "0"
+        - name: mount_point
+          in: query
+          description: |-
+            Filter the results by mount point
+          schema:
+            type: string
+            example: "/"
+        - name: type
+          in: query
+          description: |-
+            Filter the results by type
+          schema:
+            type: string
+            example: "ext4"
+        - name: source
+          in: query
+          description: |-
+            Filter the results by source
+          schema:
+            type: string
+            example: "/dev/sda1"
+      responses:
+        "200":
+          $ref: "#/components/responses/GetMountsResponseOK"
+
+    post:
+      summary: Mount a volume
+      description: |-
+        (TODO)
+      operationId: mount
+      tags:
+        - Mount methods
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Mount"
+      responses:
+        "200":
+          $ref: "#/components/responses/AddMountResponseOK"
+        "400":
+          $ref: "#/components/responses/ResponseBadRequest"
+        "403":
+          $ref: "#/components/responses/ResponseForbidden"
+        "409":
+          $ref: "#/components/responses/ResponseConflict"
+
+    put:
+      summary: Update a mount volume
+      description: |-
+        Updating a mount volume is equivalent to unmounting the volume and mounting it again with the new parameters.
+      operationId: updateMount
+      tags:
+        - Mount methods
+      parameters:
+        - name: mount_point
+          in: query
+          required: true
+          description: |-
+            Filter the results by mount point
+          schema:
+            type: string
+            example: "/"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Mount"
+      responses:
+        "200":
+          $ref: "#/components/responses/UpdateMountResponseOK"
+        "400":
+          $ref: "#/components/responses/ResponseBadRequest"
+        "403":
+          $ref: "#/components/responses/ResponseForbidden"
+        "404":
+          $ref: "#/components/responses/ResponseNotFound"
+        "409":
+          $ref: "#/components/responses/ResponseConflict"
+
+    delete:
+      summary: Umount volume
+      description: |-
+        (TODO)
+      operationId: Umount
+      tags:
+        - Mount methods
+      parameters:
+        - name: mount_point
+          in: query
+          required: true
+          description: |-
+            Filter the results by mount point
+          schema:
+            type: string
+            example: "/DATA"
+      responses:
+        "200":
+          $ref: "#/components/responses/UmountResponseOK"
+        "400":
+          $ref: "#/components/responses/ResponseBadRequest"
+        "403":
+          $ref: "#/components/responses/ResponseForbidden"
+        "404":
+          $ref: "#/components/responses/ResponseNotFound"
+        "409":
+          $ref: "#/components/responses/ResponseConflict"
+
+components:
+  securitySchemes:
+    access_token:
+      type: apiKey
+      in: header
+      name: Authorization
+
+  responses:
+    PostStorageResponseOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/PostStorageBody"
+    GetStorageResponseOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Storage"
+    
+    GetStoragesOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: "#/components/schemas/StorageAggrgation"
+
+    GetDiskInfoResponseOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/DiskInfo"
+    GetDisksResponseOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Disk"
+
+
+    GetRaidsResponseOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Raid"
+    DeleteRaidResponseOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+
+    SetRaidResponseOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/Raid"
+
+    UpdateRaidResponseOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/Raid"
+
+    GetMergesResponseOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Merge"
+
+    SetMergeResponseOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Merge"
+    GetMergeInitStatusResponseOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/MergeStatus"
+    InitMergeResponseOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/MergeStatus"
+    GetMountsResponseOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Mount"
+
+    AddMountResponseOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Mount"
+
+    UpdateMountResponseOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Mount"
+
+    UmountResponseOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+    ResponseOKRequest:
+      description: OK Request
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "OK Request"
+    ResponseBadRequest:
+      description: Bad Request
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "Bad Request"
+
+    ResponseInternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "Internal Server Error"
+
+    ResponseNotFound:
+      description: Not Found
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "Not Found"
+
+    ResponseForbidden:
+      description: Forbidden
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "Forbidden"
+
+    ResponseConflict:
+      description: Conflict
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "Conflict"
+
+    ResponseServiceUnavailable:
+      description: Service Unavailable
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+          example:
+            message: "Service Unavailable"
+
+  schemas:
+    BaseResponse:
+      properties:
+        message:
+          readOnly: true
+          description: message returned by server side if there is any
+          type: string
+          example: ""
+    MountPoint:
+      type: object
+      required:
+        - mount_point
+      properties:
+        mount_point:
+          type: string
+          example: "/DATA"
+    MergeStatus:
+      type: string
+      enum:
+        - "initialized"
+        - "uninitialized"
+        - "error"
+      default: "initialized state"
+      example: "initialized"
+    Merge:
+      type: object
+      required:
+        - mount_point
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        fstype:
+          type: string
+          default: "fuse.mergerfs"
+        mount_point:
+          type: string
+          example: "/DATA"
+        source_base_path:
+          type: string
+          example: "/var/lib/casaos/files"
+        source_volume_uuids:
+          type: array
+          items:
+            type: string
+            example: 5c682e86-cec3-4761-9350-8e1a0c2d1ae9
+        created_at:
+          type: string
+          readOnly: true
+          format: date-time
+        updated_at:
+          type: string
+          readOnly: true
+          format: date-time
+
+    Mount:
+      type: object
+      required:
+        - mount_point
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        mount_point:
+          type: string
+          example: "/DATA"
+        fstype:
+          type: string
+          example: "fuse.mergerfs"
+        source:
+          type: string
+          example: "/mnt/a:/mnt/b"
+        options:
+          type: string
+          example: "defaults,allow_other,category.create=mfs,moveonenospc=true,minfreespace=1M"
+        extended:
+          type: object
+          description: |-
+            Extended properties of the mount
+          additionalProperties:
+            type: string
+          example:
+            "mergerfs.srcmounts": "/mnt/a:/mnt/b"
+
+    Volume:
+      type: object
+      required:
+        - path
+        - mount_point
+      properties:
+        id:
+          type: integer
+          readOnly: true
+        uuid:
+          type: string
+          description: (TODO)
+          readOnly: true
+          example: 5c682e86-cec3-4761-9350-8e1a0c2d1ae9
+        path:
+          type: string
+          example: /dev/sdb1
+        state:
+          type: integer
+          description: (TODO)
+        mount_point:
+          type: string
+          example: /mnt/sdb_1
+        created_at:
+          type: string
+          readOnly: true
+          format: date-time
+    Raid:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "aaaa"
+        devices:
+          type: array
+          items:
+            $ref: "#/components/schemas/Device"
+        mount_point:
+          type: string
+          example: "/DATA"
+        raid_level:
+          type: integer
+          example: 5
+        size:
+          type: integer
+          example: 2222222222
+        used:
+          type: integer
+          example: 2222222222
+        percentage:
+          type: number
+          format: double
+          example: 1
+        shortage:
+          type: boolean
+          example: false
+        damaged:
+          type: boolean
+          example: false
+        finish_time:
+          type: number
+          format: double
+          example: 1
+        path:
+          type: string
+          example: "/dev/md0"
+        disk_number:
+          type: integer
+          example: 1
+        status:
+          type: string
+          enum:
+            - "recover"
+            - "idle"
+            - "reshape"
+        dev_size:
+          type: integer
+          description: |-
+            The size of the smallest disk in RAID.
+          example: 4194304000
+    Device:
+      type: object
+      properties:
+        health:
+          type: boolean
+          example: false
+        faulty:
+          type: boolean
+          description: |-
+            Whether the disk is faulty in RAID
+          example: false
+        path:
+          type: string
+          example: "/dev/sdb"
+        size:
+          type: integer
+          example: 2222222222
+        index:
+          type: integer
+          example: 1
+        model:
+          type: string
+          example: "aaaa"
+        type:
+          type: string
+          example: "aaaa"
+
+
+
+    PutRaidBody:
+      type: object
+      properties:
+        path:
+          type: string
+          example: "/dev/md0"
+        action:
+          type: string
+          enum:
+            - "add"
+            - "remove"
+          example: "add"
+        devices:
+          type: array
+          items:
+            type: string
+            description: |-
+               Here's the disk number, so be careful.
+            example: "/dev/sda"
+
+    RaidBody:
+      type: object
+      required:
+        - devices
+        - raid_level
+        - name
+      properties:
+        devices:
+          type: array
+          items:
+            type: string
+            description: |-
+               Here's the disk number, so be careful.
+            example: "1"
+        raid_level:
+          type: integer
+          enum:
+            - 0
+            - 1
+            - 5
+          example: 5
+        is_default:
+          type: boolean
+          description: |-
+            Whether to replace the existing /DATA directory
+          example: false
+        mount_point:
+          type: string
+          example: "/DATA"
+        name:
+          type: string
+          example: "aaaa"
+        path:
+          type: string
+          example: "/dev/md0"
+    Chilren:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "aaaa"
+        mount_point:
+          type: string
+          example: "/media/aaaa"
+        path:
+          type: string
+          example: "/dev/sdb"
+        storage_name:
+          type: string
+          example: "aaaa"
+        size:
+          type: integer
+          example: 2222222222
+        supported:
+          type: boolean
+          example: false
+        file_system:
+          type: string
+          example: "ext4"
+        raid:
+          type: boolean
+          example: false
+        raid_level:
+          type: integer
+          example: 1
+
+
+    Disk:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "aaaa"
+        storage_name:
+          type: string
+          example: "aaaa"
+        size:
+          type: integer
+          example: 2222222222
+        model:
+          type: string
+          example: "aaaa"
+        health:
+          type: string
+          example: "healthy"
+        temperature:
+          type: integer
+          example: 1
+        type:
+          $ref: "#/components/schemas/DiskType"
+        need_format:
+          type: boolean
+          example: false
+        serial:
+          type: string
+          example: "aaaa"
+        path:
+          type: string
+          example: "/dev/sdb"
+        children_number:
+          type: integer
+          example: 1
+        support:
+          type: boolean
+          example: false
+        index:
+          type: integer
+          example: 1
+        free:
+          type: boolean
+          example: false
+        usage:
+          type: string
+          example: "storage"
+        children:
+          type: array
+          items:
+            $ref: "#/components/schemas/Chilren"
+        rota:
+          type: boolean
+          example: false
+        
+
+    Partition:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "aaaa"
+        size:
+          type: integer
+          example: 2222222222
+        supported:
+          type: boolean
+          example: false
+        FileSystem:
+          type: string
+          example: "ext4"
+
+    DiskInfo:
+      type: object
+      properties:
+        disk:
+          $ref: "#/components/schemas/Disk"
+        partitions:
+          type: array
+          items:
+            $ref: "#/components/schemas/Partition"
+      # allOf:
+      #   - $ref: "#/components/schemas/Disk"
+      # properties:
+      #   partitions:
+      #     type: array
+      #     items:
+      #       $ref: "#/components/schemas/Partition"
+    Storage:
+      type: object
+      properties:
+        uuid:
+          type: string
+          example: "aaaa"
+        mount_point:
+          type: string
+          example: "/DATA"
+        size:
+          type: string
+          example: "2222222222"
+        avail:
+          type: string
+          example: "2222222222"
+        used:
+          type: string
+          example: "2222222222"
+        type:
+          type: string
+          example: "aaaa"
+        path:
+          type: string
+          example: "/dev/sdb"
+        drive_name:
+          type: string
+          example: "aaaa"
+        name:
+          type: string
+          example: "aaaa"
+        persisted_in:
+          type: string
+          example: "casaos"
+        disk_type:
+          $ref: "#/components/schemas/DiskType"
+        raid:
+          type: boolean
+          example: false
+        raid_level:
+          type: integer
+          example: 1
+        health:
+          type: boolean
+          example: true
+
+    DiskType:
+      type: string
+      enum:
+        - "HDD"
+        - "SSD"
+        - "USB"
+        - "NVME"
+        - "MMC"
+      example: "HDD"
+
+    PostStorageBody:
+      type: object
+      required:
+        - path
+        - name
+      properties:
+        path:
+          type: string
+          example: "/dev/sdb"
+        name:
+          type: string
+          example: "DATA"
+        format:
+          type: boolean
+          example: false
+    StorageAggrgation:
+      required:
+        - name
+        - font
+        - path
+        - type
+        - extensions
+      type: object
+      properties:
+        name:
+          type: string
+          example: "SD"
+        font:
+          type: string
+          example: "aaaa"
+        path:
+          type: string
+          example: "/dev/md0"
+        type:
+          type: string
+          enum:
+            - "raid"
+            - "system"
+            - "USB"
+            - "disk"
+            - "cloud"
+            - "smb"
+        extensions:
+          type: object
+          description: extensions
+          example: "mounted"
+        

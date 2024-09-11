@@ -1,0 +1,97 @@
+openapi: 3.0.3
+
+info:
+  title: CasaOS Local Storage API
+  version: v1
+  description: |-
+    <picture>
+        <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/IceWhaleTech/logo/main/casaos/casaos_banner_dark_night_800px.png">
+        <source media="(prefers-color-scheme: light)" srcset="https://raw.githubusercontent.com/IceWhaleTech/logo/main/casaos/casaos_banner_twilight_blue_800px.png">
+        <img alt="CasaOS" src="https://raw.githubusercontent.com/IceWhaleTech/logo/main/casaos/casaos_banner_twilight_blue_800px.png">
+    </picture>
+
+    CasaOS Local Storage service manages local storage including disks, partitions and mounting points.
+
+    This API allows interacting with the service to conduct such management.
+
+    For issues and discussions, please visit the [GitHub repository](https://github.com/IceWhaleTech/CasaOS) or join [our Discord](https://discord.gg/knqAbbBbeX).
+
+servers:
+  - url: /v1
+
+tags:
+  - name: USB methods
+    description: |-
+      USB methods
+
+security:
+  - access_token: []
+
+paths:
+  /usb/usb-auto-mount:
+    put:
+      summary: Enable or disable USB auto-mounting
+      description: |-
+        Enable or disable USB auto-mounting.
+      operationId: putSystemUSBAutoMount
+      tags:
+        - USB methods
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                state:
+                  type: string
+                  description: USB auto-mounting state
+                  example: "on"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseOK"
+    get:
+      summary: Get USB auto-mounting status
+      description: |-
+        Get system USB auto-mount state
+      operationId: getSystemUSBAutoMount
+      tags:
+        - USB methods
+      responses:
+        "200":
+          $ref: "#/components/responses/SystemUSBAutoMountOK"
+
+components:
+  securitySchemes:
+    access_token:
+      type: apiKey
+      in: header
+      name: Authorization
+
+  responses:
+    ResponseOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+    SystemUSBAutoMountOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+            type: object
+            properties:
+              state:
+                type: string
+                description: USB auto-mounting state
+                example: "true"
+
+  schemas:
+    BaseResponse:
+      properties:
+        message:
+          readOnly: true
+          description: message returned by server side if there is any
+          type: string
+          example: ""
