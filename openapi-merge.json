@@ -1,0 +1,15 @@
+{
+    "inputs": [
+      {
+        "inputFile": "./casaos-installer/installer/openapi.yaml"
+      },
+      {
+        "inputFile": "./zimaos-local-storage/local_storage/openapi.yaml"
+      },
+      {
+        "inputFile": "./zimaos-local-storage/local_storage/openapi_v1.yaml"
+      }
+    ],
+    "output": "./output.zimaos-all-in-one.yaml"
+  }
+  
