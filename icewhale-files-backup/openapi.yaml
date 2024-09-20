@@ -279,11 +279,9 @@ components:
               - $ref: "#/components/schemas/BaseResponse"
               - properties:
                   data:
-                    type: object
-                    additionalProperties:
-                      type: array
-                      items:
-                        $ref: "#/components/schemas/DeviceInfo"
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/DeviceInfo"
 
   schemas:
     DeviceInfo:
@@ -344,7 +342,7 @@ components:
           format: int64
           description: Available system storage in bytes
           example: 8000000000
-        is_charing:
+        is_charging:
           type: boolean
           description: Whether the device is currently charging
           example: true
