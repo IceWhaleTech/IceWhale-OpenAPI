@@ -645,8 +645,10 @@ components:
             allOf:
               - $ref: "#/components/schemas/BaseResponse"
               - type: object
+                required:
+                  - level
                 properties:
-                  wait_time:
+                  level:
                     type: integer
                     example: 10
     GetRaidsResponseOK:
