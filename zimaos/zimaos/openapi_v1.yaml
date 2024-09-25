@@ -28,6 +28,8 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/ResponseHardwareInfoOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
 
   /sys/logs:
     get:
@@ -39,7 +41,7 @@ paths:
         - $ref: "#/components/parameters/logs_line"
       responses:
         "200":
-          $ref: "#/components/responses/ResponseLogsOK"
+          $ref: "#/components/responses/ResponseStringOK"
 
   /sys/stop:
     post:
@@ -48,8 +50,8 @@ paths:
         - System methonds
       operationId: stopSystem
       responses:
-        default:
-          description: Stop the system
+        "200":
+          $ref: "#/components/responses/OKResponse"
 
   /sys/utilization:
     get:
@@ -70,8 +72,8 @@ paths:
       parameters:
         - $ref: "#/components/parameters/proxy_url"
       responses:
-        default:
-          description: Get proxy information
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
 
   /sys/state/{state}:
     put:
@@ -80,10 +82,10 @@ paths:
         - System methonds
       operationId: setSystemState
       parameters:
-        - $ref: "#/components/parameters/system_state"
+        - $ref: "#/components/parameters/state"
       responses:
         "200":
-          $ref: "#/components/responses/OKResponse"
+          $ref: "#/components/responses/ResponseStringOK"
 
   /sys/entry:
     get:
@@ -93,9 +95,31 @@ paths:
       operationId: getSystemEntry
       responses:
         "200":
-          $ref: "#/components/responses/OKResponse"
+          $ref: "#/components/responses/ResponseStringOK"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+
+  /port:
+    get:
+      summary: Get port
+      tags:
+        - System methonds
+      operationId: getPort
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseIntegerOK"
+
+  /port/state/{port}:
+    put:
+      summary: Set port state
+      tags:
+        - System methonds
+      operationId: setPortState
+      parameters:
+        - $ref: "#/components/parameters/port"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseBoolOK"
 
   /notify/{path}:
     post:
@@ -104,7 +128,7 @@ paths:
         - Notify methods
       operationId: notifySystem
       parameters:
-        - $ref: "#/components/parameters/notify_name"
+        - $ref: "#/components/parameters/path"
       responses:
         "200":
           $ref: "#/components/responses/OKResponse"
@@ -117,6 +141,11 @@ paths:
       tags:
         - Notify methods
       operationId: notifySystemStatus
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
       responses:
         "200":
           $ref: "#/components/responses/OKResponse"
@@ -140,9 +169,21 @@ paths:
                   example: "example"
       responses:
         "200":
-          $ref: "#/components/responses/OKResponse"
+          $ref: "#/components/responses/ResponseBytesOK"
         "400":
           $ref: "#/components/responses/ResponseInvalidParams"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+  /zt/{url}:
+    get:
+      summary: Zerotier proxy
+      tags:
+        - Other methods
+      operationId: zerotierProxy
+      parameters:
+        - $ref: "#/components/parameters/zt_url"
+      responses:
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
 
@@ -166,11 +207,19 @@ components:
       name: url
       in: query
       description: Proxy URL
-      required: false
+      required: true
       schema:
         type: string
         example: "http://example.com"
-    system_state:
+    zt_url:
+      name: url
+      in: path
+      description: Proxy URL
+      required: true
+      schema:
+        type: string
+        example: "http://example.com"
+    state:
       name: state
       in: path
       description: System state
@@ -180,8 +229,8 @@ components:
         enum:
           - "start"
           - "stop"
-    notify_name:
-      name: "path"
+    path:
+      name: "name"
       in: path
       description: Notify name
       required: true
@@ -191,6 +240,14 @@ components:
           - "system_status"
           - "system_error"
           - "system_warning"
+    port:
+      name: port
+      in: path
+      description: Port number
+      required: true
+      schema:
+        type: integer
+        example: 8080
 
   responses:
     OKResponse:
@@ -200,6 +257,30 @@ components:
           schema:
             type: object
             $ref: "#/components/schemas/BaseResponse"
+    ResponseStringOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/SuccessResponseString"
+    ResponseBoolOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/SuccessResponseBool"
+    ResponseIntegerOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/SuccessResponseInteger"
+    ResponseBytesOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/SuccessResponseBytes"
     ResponseInternalServerError:
       description: Internal Server Error
       content:
@@ -225,14 +306,7 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              drive_model:
-                type: string
-                example: "ST1000DM003-1SB102"
-              arch:
-                type: string
-                example: "x86_64"
+            $ref: "#/components/schemas/HardwareInfo"
     ResponseLogsOK:
       description: OK
       content:
@@ -240,7 +314,7 @@ components:
           schema:
             type: object
             properties:
-              data:
+              logs:
                 type: string
                 example: "logs"
     ResponseSystemUtilizationOK:
@@ -248,31 +322,7 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              cpu:
-                type: object
-                properties:
-                  percent:
-                    type: string
-                    example: "10%"
-                  num:
-                    type: integer
-                    example: 4
-                  temperature:
-                    type: string
-                    example: "10°C"
-                  power:
-                    type: string
-                    example: "10W"
-                  model:
-                    type: string
-                    example: "intel"
-              mem:
-                type: string
-                example: "1GB"
-              gpu:
-                $ref: "#/components/schemas/GPUInfo"
+            $ref: "#/components/schemas/SystemUtilization"
 
   schemas:
     BaseResponse:
@@ -283,6 +333,40 @@ components:
           type: string
           example: "Bad request"
           description: Error message
+
+    SuccessResponseString:
+      allOf:
+        - $ref: "#/components/schemas/BaseResponse"
+        - properties:
+            data:
+              type: string
+              description: When the interface returns success, this field is the specific success information
+
+    SuccessResponseBool:
+      allOf:
+        - $ref: "#/components/schemas/BaseResponse"
+        - properties:
+            data:
+              type: boolean
+              description: When the interface returns success, this field is the specific success information
+
+    SuccessResponseInteger:
+      allOf:
+        - $ref: "#/components/schemas/BaseResponse"
+        - properties:
+            data:
+              type: integer
+              description: When the interface returns success, this field is the specific success information
+
+    SuccessResponseBytes:
+      allOf:
+        - $ref: "#/components/schemas/BaseResponse"
+        - properties:
+            data:
+              type: string
+              format: byte
+              description: When the interface returns success, this field is the specific success information
+
     GPUInfo:
       type: object
       properties:
@@ -316,3 +400,40 @@ components:
         uuid:
           type: string
           example: "GPU-123456"
+
+    HardwareInfo:
+      type: object
+      properties:
+        drive_model:
+          type: string
+          example: "ST1000DM003-1SB102"
+        arch:
+          type: string
+          example: "x86_64"
+
+    SystemUtilization:
+      type: object
+      properties:
+        cpu:
+          type: object
+          properties:
+            percent:
+              type: string
+              example: "10%"
+            num:
+              type: integer
+              example: 4
+            temperature:
+              type: string
+              example: "10°C"
+            power:
+              type: string
+              example: "10W"
+            model:
+              type: string
+              example: "intel"
+        mem:
+          type: string
+          example: "1GB"
+        gpu:
+          $ref: "#/components/schemas/GPUInfo"
