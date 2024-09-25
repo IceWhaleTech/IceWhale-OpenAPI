@@ -23,11 +23,252 @@ tags:
   - name: USB methods
     description: |-
       USB methods
+  - name: Disk methods
+    description: |-
+      Disk methods
+  - name: Storage methods
+    description: |-
+      Storage methods
+  - name: Cloud methods
+    description: |-
+      Cloud methods
 
 security:
   - access_token: []
 
 paths:
+  /disks:
+    get:
+      summary: Get all disks
+      description: |-
+        Get all disks.
+      operationId: getDiskList
+      tags:
+        - Disk methods
+      responses:
+        "200":
+          $ref: "#/components/responses/ReponseDiskListOK"
+    delete:
+      summary: Delete all disks
+      description: |-
+        Delete all disks.
+      operationId: deleteDisksUmount
+      tags:
+        - Disk methods
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                path:
+                  type: string
+                  description: disk path
+                  example: "/dev/sda"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+        "400":
+          $ref: "#/components/responses/ResponseBadRequest"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+  /disks/usb:
+    get:
+      summary: Get all USB disks
+      description: |-
+        Get all USB disks.
+      operationId: getDisksUSBList
+      tags:
+        - Disk methods
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseUSBListOK"
+    delete:
+      summary: Delete all USB disks
+      description: |-
+        Delete all USB disks.
+      operationId: deleteDiskUSB
+      tags:
+        - Disk methods
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mount_point:
+                  type: string
+                  description: USB mount point
+                  example: "/mnt/sda1"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+        "400":
+          $ref: "#/components/responses/ResponseBadRequest"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+  /disks/size:
+    get:
+      summary: Get disk size
+      description: |-
+        Get disk size.
+      operationId: getDiskSize
+      tags:
+        - Disk methods
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseUSBListOK"
+        "400":
+          $ref: "#/components/responses/ResponseBadRequest"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+  /storage:
+    post:
+      summary: Add storage
+      description: |-
+        Add storage.
+      operationId: postAddStorage
+      tags:
+        - Storage methods
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                path:
+                  type: string
+                  description: storage path
+                  example: "/dev/sda"
+                name:
+                  type: string
+                  description: storage name
+                  example: "sda"
+                format:
+                  type: boolean
+                  description: whether the storage needs to be formatted
+                  example: false
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseOK"
+        "400":
+          $ref: "#/components/responses/ResponseBadRequest"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+    put:
+      summary: Update storage
+      description: |-
+        Update storage.
+      operationId: putFormatStorage
+      tags:
+        - Storage methods
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                path:
+                  type: string
+                  description: storage path
+                  example: "/dev/sda"
+                volume:
+                  type: string
+                  description: storage volume
+                  example: "1TB"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseOK"
+        "400":
+          $ref: "#/components/responses/ResponseBadRequest"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+    delete:
+      summary: Delete storage
+      description: |-
+        Delete storage.
+      operationId: deleteStorage
+      tags:
+        - Storage methods
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                path:
+                  type: string
+                  description: storage path
+                  example: "/dev/sda"
+                volume:
+                  type: string
+                  description: storage volume
+                  example: "1TB"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseOK"
+        "400":
+          $ref: "#/components/responses/ResponseBadRequest"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+    get:
+      summary: Get storage
+      description: |-
+        Get storage.
+      operationId: getStorageList
+      tags:
+        - Storage methods
+      parameters:
+        - name: system
+          in: query
+          description: whether the storage is system storage
+          required: false
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStorageListOK"
+
+  /cloud:
+    get:
+      summary: Get cloud storage
+      description: |-
+        Get cloud storage.
+      operationId: listStorages
+      tags:
+        - Cloud methods
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseListStoragesOK"
+    delete:
+      summary: Delete cloud storage
+      description: |-
+        Delete cloud storage.
+      operationId: umountStorage
+      tags:
+        - Cloud methods
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                mount_point:
+                  type: string
+                  description: cloud mount point
+                  example: "/mnt/sda1"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+        "400":
+          $ref: "#/components/responses/ResponseBadRequest"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
   /usb/usb-auto-mount:
     put:
       summary: Enable or disable USB auto-mounting
@@ -58,7 +299,7 @@ paths:
         - USB methods
       responses:
         "200":
-          $ref: "#/components/responses/SystemUSBAutoMountOK"
+          $ref: "#/components/responses/ResponseStringOK"
 
 components:
   securitySchemes:
@@ -74,18 +315,79 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/BaseResponse"
-    SystemUSBAutoMountOK:
-      description: OK
+    ResponseBadRequest:
+      description: Bad Request
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/BaseResponse"
-            type: object
-            properties:
-              state:
-                type: string
-                description: USB auto-mounting state
-                example: "true"
+    ResponseInternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+    ResponseStringOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/SuccessResponseString"
+    ReponseDiskListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - type: array
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Disk"
+    ResponseUSBListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - type: array
+                properties:
+                  data:
+                    $ref: "#/components/schemas/USBDriveStatus"
+    ResponseDiskSizeOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - type: object
+                properties:
+                  data:
+                    $ref: "#/components/schemas/DiskSize"
+    ResponseStorageListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - type: array
+                properties:
+                  data:
+                    $ref: "#/components/schemas/Storage"
+    ResponseListStoragesOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - type: array
+                properties:
+                  data:
+                    $ref: "#/components/schemas/MountPoint"
 
   schemas:
     BaseResponse:
@@ -95,3 +397,191 @@ components:
           description: message returned by server side if there is any
           type: string
           example: ""
+    SuccessResponseString:
+      allOf:
+        - $ref: "#/components/schemas/BaseResponse"
+        - properties:
+            data:
+              type: string
+              description: When the interface returns success, this field is the specific success information
+    Disk:
+      properties:
+        name:
+          description: disk name
+          type: string
+          example: "sda"
+        size:
+          description: disk size
+          type: number
+          example: 1000000000
+        model:
+          description: disk model
+          type: string
+          example: "Samsung SSD 860 EVO 1TB"
+        health:
+          description: disk health
+          type: string
+          example: "Good"
+        temperature:
+          description: disk temperature
+          type: integer
+          example: 30
+        disk_type:
+          description: disk type
+          type: string
+          example: "SSD"
+        need_format:
+          description: whether the disk needs to be formatted
+          type: boolean
+          example: false
+        serial:
+          description: disk serial number
+          type: string
+          example: "S3YJNB0K1234"
+        path:
+          description: disk path
+          type: string
+          example: "/dev/sda"
+        children_number:
+          description: number of children
+          type: integer
+          example: 1
+        supported:
+          description: whether the disk is supported
+          type: boolean
+          example: true
+        index:
+          description: disk index
+          type: integer
+          example: 0
+        avail:
+          description: disk available size
+          type: string
+          example: "1TB"
+    DiskSize:
+      properties:
+        path:
+          description: disk path
+          type: string
+          example: "/dev/sda"
+        free:
+          description: disk free size
+          type: number
+          example: 1000000000
+        used:
+          description: disk used size
+          type: number
+          example: 1000000000
+    USBDriveStatus:
+      properties:
+        name:
+          description: USB drive name
+          type: string
+          example: "sda"
+        size:
+          description: USB drive size
+          type: number
+          example: 1000000000
+        model:
+          description: USB drive model
+          type: string
+          example: "Samsung SSD 860 EVO 1TB"
+        avail:
+          description: USB drive available size
+          type: number
+          example: 1000000000
+        children:
+          description: USB drive children
+          type: array
+          items:
+            $ref: "#/components/schemas/USBChildren"
+    USBChildren:
+      properties:
+        name:
+          description: USB children name
+          type: string
+          example: "sda1"
+        size:
+          description: USB children size
+          type: number
+          example: 1000000000
+        avail:
+          description: USB children available size
+          type: number
+          example: 1000000000
+        mount_point:
+          description: USB children mount point
+          type: string
+          example: "/mnt/sda1"
+    Storage:
+      properties:
+        uuid:
+          description: storage uuid
+          type: string
+          example: "12345678-1234-1234-1234-123456789012"
+        mount_point:
+          description: storage mount point
+          type: string
+          example: "/mnt/sda1"
+        size:
+          description: storage size
+          type: number
+          example: 1000000000
+        avail:
+          description: storage available size
+          type: number
+          example: 1000000000
+        used:
+          description: storage used size
+          type: number
+          example: 1000000000
+        type:
+          description: storage type
+          type: string
+          example: "ext4"
+        path:
+          description: storage path
+          type: string
+          example: "/dev/sda1"
+        drive_name:
+          description: storage drive name
+          type: string
+          example: "sda"
+        label:
+          description: storage label
+          type: string
+          example: "sda1"
+        persisted_in:
+          description: storage persisted in
+          type: string
+          example: "none"
+        disk_type:
+          description: storage disk type
+          type: string
+          example: "SSD"
+        raid:
+          description: whether the storage is in RAID
+          type: boolean
+          example: false
+        raid_level:
+          description: RAID level
+          type: integer
+          example: 0
+    MountPoint:
+      properties:
+        mount_point:
+          description: mount point
+          type: string
+          example: "/mnt/sda1"
+        fs:
+          description: file system
+          type: string
+          example: "ext4"
+        icon:
+          description: icon
+          type: string
+          example: "icon"
+        name:
+          description: name
+          type: string
+          example: "sda1"
