@@ -103,6 +103,30 @@ paths:
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
 
+  /devices:
+    get:
+      summary: Get all devices
+      operationId: getAllDevices
+      responses:
+        "200":
+          $ref: "#/components/responses/DevicesOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+  /device/backup:
+    post:
+      summary: Run a device backup
+      operationId: runDeviceBackup
+      requestBody:
+        $ref: "#/components/requestBodies/DeviceBackupRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseOK"
+        "400":
+          $ref: "#/components/responses/ResponseBadRequest"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
 components:
   securitySchemes:
     access_token:
@@ -150,6 +174,12 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/FolderBackup"
+    DeviceBackupRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DeviceBackup"
 
   responses:
     ResponseOK:
@@ -240,7 +270,111 @@ components:
                     items:
                       $ref: "#/components/schemas/FolderBackup"
 
+    DevicesOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/DeviceInfo"
+
   schemas:
+    DeviceInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Device ID
+          example: "1234"
+        authorized:
+          type: boolean
+          description: Indicates if the device is authorized
+          example: true
+        serial_no:
+          type: string
+          description: Device serial number
+          example: "SN123456789"
+        name:
+          type: string
+          description: Device name
+          example: "My Phone"
+        connection:
+          type: string
+          description: Connection type, can be USB or IP
+          example: "USB"
+        speed:
+          type: integer
+          format: int64
+          description: Connection speed
+          example: 480000000
+        product_name:
+          type: string
+          description: Product name of the device
+          example: "iPhone 12"
+        brand:
+          type: string
+          description: Device brand
+          example: "Apple"
+        os:
+          type: string
+          description: Operating system of the device, can be ANDROID or IOS
+          example: "IOS"
+        version:
+          type: string
+          description: Version of the operating system
+          example: "14.4"
+        img_url:
+          type: string
+          description: URL of the device image
+          example: "https://example.com/device.jpg"
+        total:
+          type: integer
+          format: int64
+          description: Total storage of the device in bytes
+          example: 128000000000
+        data_available:
+          type: integer
+          format: int64
+          description: Available data storage in bytes
+          example: 64000000000
+        sys_available:
+          type: integer
+          format: int64
+          description: Available system storage in bytes
+          example: 8000000000
+        is_charging:
+          type: boolean
+          description: Whether the device is currently charging
+          example: true
+        battery_level:
+          type: string
+          description: Battery level of the device
+          example: "80%"
+        will_encrypt:
+          type: boolean
+          description: Indicates if the device will be encrypted
+          example: true
+        progress:
+          type: string
+          description: Progress of the ongoing operation
+          example: "50%"
+        last_time:
+          type: string
+          description: Timestamp of the last operation
+          example: "2023-09-20T12:34:56Z"
+        last_error:
+          type: string
+          description: Last error that occurred
+          example: "No space left on device"
+      required:
+        - id
+        - authorized
+
     BaseResponse:
       properties:
         message:
@@ -377,3 +511,18 @@ components:
           readOnly: true
           type: string
           example: "45212"
+
+    DeviceBackup:
+      required:
+        - id
+        - os
+      properties:
+        id:
+          type: string
+          example: "00008030-00140C56143040xx"
+        os:
+          type: string
+          example: "IOS"
+        con:
+          type: string
+          example: "USB"
