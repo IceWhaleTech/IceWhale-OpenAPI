@@ -114,7 +114,7 @@ paths:
           $ref: "#/components/responses/ResponseInternalServerError"
 
   /device/backup:
-    put:
+    post:
       summary: Run a device backup
       operationId: runDeviceBackup
       requestBody:
@@ -307,6 +307,11 @@ components:
           type: string
           description: Connection type, can be USB or IP
           example: "USB"
+        speed:
+          type: integer
+          format: int64
+          description: Connection speed
+          example: 480000000
         product_name:
           type: string
           description: Product name of the device
@@ -510,7 +515,14 @@ components:
     DeviceBackup:
       required:
         - id
+        - os
       properties:
         id:
           type: string
-          example: "client123"
+          example: "00008030-00140C56143040xx"
+        os:
+          type: string
+          example: "IOS"
+        con:
+          type: string
+          example: "USB"
