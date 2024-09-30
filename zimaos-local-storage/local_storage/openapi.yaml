@@ -112,6 +112,74 @@ paths:
           $ref: "#/components/responses/ResponseBadRequest"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+  /disk/sleep:
+    get:
+      description: |-
+        get how minutes to sleep a disk
+      operationId: getDiskSleepWaitTime
+      tags:
+        - Disk methods
+      responses:
+        "200":
+          $ref: "#/components/responses/GetDiskStandbyWaitTimeResponseOK"
+        "503":
+          $ref: "#/components/responses/ResponseServiceUnavailable"
+    put:
+      description: |-
+        set sleep disk time
+        the value is 0-251, 1-240 is n * 5, 241 - 251 is n * 30 minutes
+        0 means never sleep
+        1 means sleep after 5 s
+        2 means sleep after 10 s
+        12 means sleep after 1 minute
+        241 means sleep after 30 minutes
+        242 means sleep after 1 hour
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - level
+              properties:
+                level:
+                  type: integer
+                  description: |-
+                    the time of how time is free to sleep
+      operationId: setDiskSleepWaitTime
+      tags:
+        - Disk methods
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseOKRequest"
+        "400":
+          $ref: "#/components/responses/ResponseBadRequest"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+  
+  /disk/sleep/status:
+    get:
+      description: |-
+        get disk sleep status
+      operationId: getDiskStandbyStatus
+      tags:
+        - Disk methods
+      parameters:
+        - name: device_path
+          in: query
+          description: |-
+            Filter the results by path
+          schema:
+            type: string
+            example: "/dev/sda"
+      responses:
+        "200":
+          $ref: "#/components/responses/GetDiskStandbyResponseOK"
+        "503":
+          $ref: "#/components/responses/ResponseServiceUnavailable"
+
+        
   /storage:
     get:
       summary: Get storages
@@ -553,7 +621,36 @@ components:
                     items:
                       $ref: "#/components/schemas/Disk"
 
-
+    GetDiskStandbyResponseOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - type: object
+                required:
+                  - standby
+                properties:
+                  standby:
+                    type: boolean
+                    example: true
+    GetDiskStandbyWaitTimeResponseOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            readOnly: true
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - type: object
+                required:
+                  - level
+                properties:
+                  level:
+                    type: integer
+                    example: 10
     GetRaidsResponseOK:
       description: OK
       content:
@@ -1240,4 +1337,3 @@ components:
           type: object
           description: extensions
           example: "mounted"
-        
