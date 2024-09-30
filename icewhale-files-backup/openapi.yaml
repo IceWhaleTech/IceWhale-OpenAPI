@@ -289,16 +289,12 @@ components:
       properties:
         id:
           type: string
-          description: Device ID
-          example: "1234"
+          description: Device ID(serial number)
+          example: "SN123456789"
         authorized:
           type: boolean
           description: Indicates if the device is authorized
           example: true
-        serial_no:
-          type: string
-          description: Device serial number
-          example: "SN123456789"
         name:
           type: string
           description: Device name
