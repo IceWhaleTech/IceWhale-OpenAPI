@@ -727,6 +727,9 @@ components:
           $ref: "#/components/schemas/domain_vcpu"
         domain_interface:
           $ref: "#/components/schemas/domain_interface_list"
+        # 这里应该是可以允许多个tpm的，但是从业务上来说，一个虚拟机只有一个tpm
+        domain_tpm:
+          $ref: "#/components/schemas/domain_tpm"
         source_file:
           $ref: "#/components/schemas/domain_disk_source_file"
         target_path:
@@ -850,6 +853,61 @@ components:
             xml: "enable,attr,omitempty"
       x-oapi-codegen-extra-tags:
         xml: "bootmenu"
+
+    domain_tpm:
+      required:
+        - model
+      properties:
+        _:
+          x-go-name: XMLName
+          x-go-type: xml.Name
+          x-oapi-codegen-extra-tags:
+            json: "-"
+            xml: "tpm"
+        model:
+          type: string
+          example: tpm-crb
+          x-oapi-codegen-extra-tags:
+            xml: "model,attr,omitempty"
+        backend:
+          $ref: "#/components/schemas/domain_tpm_backend"
+    
+    domain_tpm_backend:
+      required:
+        - type
+      properties:
+        type:
+          type: string
+          enum:
+            - passthrough
+            - emulator
+          x-oapi-codegen-extra-tags:
+            xml: "type,attr"
+        version:
+          type: string
+          x-oapi-codegen-extra-tags:
+            xml: "version,attr,omitempty"
+
+        device:
+          $ref: "#/components/schemas/domain_tpm_backend_device"
+
+      x-oapi-codegen-extra-tags:
+        xml: "backend"
+
+
+    domain_tpm_backend_device:
+      required:
+        - path
+      properties:
+        path:
+          type: string
+          example: /dev/tpm0
+          x-oapi-codegen-extra-tags:
+            xml: "path,attr"
+      x-oapi-codegen-extra-tags:
+        xml: "device,omitempty"
+
+
 
     domain_validation_errors:
       readOnly: true
@@ -1209,6 +1267,13 @@ components:
             $ref: "#/components/schemas/domain_graphic"
           x-oapi-codegen-extra-tags:
             xml: "graphics"
+          
+        tpms:
+          type: array
+          items:
+            $ref: "#/components/schemas/domain_tpm"
+          x-oapi-codegen-extra-tags:
+            xml: "tpm"
 
       x-oapi-codegen-extra-tags:
         xml: "devices"
@@ -1219,7 +1284,7 @@ components:
         $ref: "#/components/schemas/domain_disk"
       x-oapi-codegen-extra-tags:
         xml: "disk"
-
+    
     domain_disk:
       required:
         - device
