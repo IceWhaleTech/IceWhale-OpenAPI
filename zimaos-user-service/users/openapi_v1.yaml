@@ -552,7 +552,7 @@ components:
           schema:
             type: object
             properties:
-              usernames:
+              data:
                 type: array
                 items:
                   type: string
