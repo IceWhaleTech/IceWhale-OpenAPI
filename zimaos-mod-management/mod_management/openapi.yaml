@@ -40,6 +40,17 @@ paths:
           $ref: "#/components/responses/module_list_ok"
         "500":
           $ref: "#/components/responses/response_internal_server_error"
+    post:
+      summary: Refresh module
+      operationId: refresh_module
+      tags:
+        - Module methods
+      responses:
+        "200":
+          $ref: "#/components/responses/response_ok"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
+
   /modules/{name}/status:
     get:
       summary: 获取模块状态
