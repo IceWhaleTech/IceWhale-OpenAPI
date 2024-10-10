@@ -333,6 +333,11 @@ components:
           format: int64
           description: Total storage of the device in bytes
           example: 128000000000
+        used:
+          type: integer
+          format: int64
+          description: Used storage of the device in bytes
+          example: 128000000000
         data_available:
           type: integer
           format: int64
