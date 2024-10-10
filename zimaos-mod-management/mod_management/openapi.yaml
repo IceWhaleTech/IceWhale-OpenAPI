@@ -40,6 +40,81 @@ paths:
           $ref: "#/components/responses/module_list_ok"
         "500":
           $ref: "#/components/responses/response_internal_server_error"
+  /modules/{name}/status:
+    get:
+      summary: 获取模块状态
+      operationId: module_status
+      tags:
+        - Module methods
+      parameters:
+        - $ref: "#/components/parameters/name"
+      responses:
+        "200":
+          $ref: "#/components/responses/module_status_ok"
+    put:
+      summary: 启动或停止模块
+      operationId: module_start_stop
+      tags:
+        - Module methods
+      parameters:
+        - $ref: "#/components/parameters/name"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - action
+              properties:
+                action:
+                  type: string
+                  enum: [start, stop]
+                  example: "start"
+      responses:
+        "200":
+          $ref: "#/components/responses/module_start_stop_ok"
+        "400":
+          $ref: "#/components/responses/response_bad_request"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
+        
+  /management/modules:
+    get:
+      summary: Get the list of installable modules
+      operationId: installable_module_list
+      tags:
+        - Module methods
+      responses:
+        "200":
+          $ref: "#/components/responses/installable_module_list_ok"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
+    post:
+      summary: Install a module
+      operationId: module_install
+      tags:
+        - Module methods
+      requestBody:
+        $ref: "#/components/requestBodies/request_module_install"
+      responses:
+        "200":
+          $ref: "#/components/responses/module_install_ok"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
+    delete:
+      summary: Uninstall a module
+      operationId: module_uninstall
+      tags:
+        - Module methods
+      requestBody:
+        $ref: "#/components/requestBodies/request_module_uninstall"
+      responses:
+        "200":
+          $ref: "#/components/responses/module_uninstall_ok"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
+    
 components:
   securitySchemes:
     access_token:
@@ -54,7 +129,21 @@ components:
       required: true
       schema:
         type: string
-        example: "847d7fde"
+        example: "zimaos_terminal"
+
+  requestBodies:
+    request_module_install:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/module_id"
+    request_module_uninstall:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/module_id"
 
   responses:
     response_ok:
@@ -117,6 +206,62 @@ components:
                       $ref: "#/components/schemas/module"
       x-go-name: ModuleListOK
 
+    installable_module_list_ok:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/base_response"
+              - properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/remote_module"
+      x-go-name: InstallableModuleListOK
+
+    module_install_ok:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/base_response"
+          example:
+            message: "OK"
+
+    module_uninstall_ok:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/base_response"
+          example:
+            message: "OK"
+
+    module_start_stop_ok:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/base_response"
+          example:
+            message: "OK"
+
+    module_status_ok:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/base_response"
+              - properties:
+                  data:
+                    type: object
+                    properties:
+                      status:
+                        $ref: "#/components/schemas/module_status"
+          example:
+            message: "OK"
 
   schemas:
     base_response: # Every response should inherit from BaseResponse
@@ -146,6 +291,19 @@ components:
           items:
             $ref: "#/components/schemas/module_service"
 
+    remote_module:
+      required:
+        - name
+        - title
+        - repo
+      properties:
+        name:
+          type: string
+        title:
+          type: string
+        repo:
+          type: string
+          
     module_ui:
       required:
         - entry
@@ -230,3 +388,14 @@ components:
           readOnly: true
           type: string
           example: "zimaos-chat"
+
+    module_id:
+      required:
+        - name
+      properties:
+        name:
+          type: string
+
+    module_status:
+      type: string
+      enum: [running, stopped]
