@@ -364,6 +364,8 @@ components:
           type: string
           description: Progress of the ongoing operation
           example: "50%"
+        state:
+          $ref: "#/components/schemas/BackupState"
         last_time:
           type: string
           description: Timestamp of the last operation
@@ -527,3 +529,11 @@ components:
         con:
           type: string
           example: "USB"
+
+    BackupState:
+      type: string
+      enum:
+        - "connected"
+        - "authorized"
+        - "confirming"
+        - "backuping"
