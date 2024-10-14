@@ -125,7 +125,21 @@ paths:
           $ref: "#/components/responses/module_uninstall_ok"
         "500":
           $ref: "#/components/responses/response_internal_server_error"
-    
+  
+  /web/management/modules:
+    post:
+      summary: Install a module in async
+      operationId: module_install_async
+      tags:
+        - Module methods
+      requestBody:
+        $ref: "#/components/requestBodies/request_module_install"
+      responses:
+        "200":
+          $ref: "#/components/responses/module_install_ok"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
+
 components:
   securitySchemes:
     access_token:
