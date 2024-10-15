@@ -366,6 +366,10 @@ components:
           example: "50%"
         state:
           $ref: "#/components/schemas/BackupState"
+        start_time:
+          type: string
+          description: Timestamp of the last operation
+          example: "2023-09-20T12:34:56Z"
         last_time:
           type: string
           description: Timestamp of the last operation
