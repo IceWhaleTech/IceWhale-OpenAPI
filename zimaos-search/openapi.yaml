@@ -1,0 +1,128 @@
+openapi: 3.1.0
+
+info:
+  title: ZimaOS Search API
+  version: v2
+
+servers:
+  - url: /v2/search
+
+paths:
+  /ping: # The URL path of the API will be /v2/search/ping
+    get:
+      summary: Ping the API
+      operationId: ping
+      responses:
+        "200": # For simplicity, we only define the 200 response. In real world, you should define all possible responses, such as 4xx, 5xx, etc.
+          $ref: "#/components/responses/PongOK"
+
+  /search:
+    get:
+      summary: Search documents
+      description: Search for documents using specific keywords and get relevant results.
+      operationId: search
+      parameters:
+        - in: query
+          name: keywords
+          schema:
+            type: string
+          description: Search term to query the indexed documents.
+        - in: query
+          name: dir
+          schema:
+            type: string
+          description: Directory to search in.
+        - in: query
+          name: count
+          schema:
+            type: integer
+          description: Number of search results to return.
+      responses:
+        '200':
+          $ref: "#/components/responses/SearchOK"
+        '400':
+          description: Invalid request, query missing or malformed.
+        '500':
+          description: Server error.
+
+components:
+  responses:
+    PongOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse" # Inherit from BaseResponse
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/Pong" # The `data` property contains the actual `Pong` we want to return
+    SearchOK:
+      description: A list of search results.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              took:
+                type: integer
+                description: Time taken for the search in milliseconds.
+              timed_out:
+                type: boolean
+                description: Whether the search timed out or not.
+              hits:
+                type: object
+                properties:
+                  total:
+                    type: integer
+                    description: Total number of matching results.
+                  hits:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          description: Unique ID of the document.
+                        _score:
+                          type: number
+                          description: Relevance score of the document.
+                        _source:
+                          type: object
+                          description: The source data of the document.
+                          properties:
+                            path:
+                              type: string
+                              description: File path of the document.
+                            gid:
+                              type: integer
+                              description: Group ID associated with the file.
+                        highlight:
+                          type: object
+                          description: Highlighted search matches in the document.
+                          properties:
+                            name:
+                              type: array
+                              items:
+                                type: string
+                              description: Highlighted matches in the document name.
+                            content:
+                              type: array
+                              items:
+                                type: string
+                              description: Highlighted matches in the document content.
+
+  schemas:
+    BaseResponse: # Every response should inherit from BaseResponse
+      properties:
+        message:
+          description: message returned by server side if there is any
+          type: string
+
+    Pong:
+      type: string
+      example: Pong
+
+      openapi: 3.0.0
+      
+
