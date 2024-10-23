@@ -317,10 +317,10 @@ components:
             $ref: "#/components/schemas/module_service"
 
     remote_module:
+      description: repo and url must have at least one
       required:
         - name
         - title
-        - repo
       properties:
         name:
           type: string
@@ -328,7 +328,7 @@ components:
           type: string
         repo:
           type: string
-          
+
     module_ui:
       required:
         - entry
