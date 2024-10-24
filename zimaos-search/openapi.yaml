@@ -8,8 +8,6 @@ info:
 
 servers:
   - url: /v2/search
-security:
-  - access_token: []
 
 paths:
   /ping: # The URL path of the API will be /v2/search/ping
