@@ -2,7 +2,7 @@ openapi: 3.0.3
 
 info:
   title: CasaOS Local Storage API
-  version: v1
+  version: v1.0.0
   description: |-
     <picture>
         <source media="(prefers-color-scheme: dark)" srcset="https://raw.githubusercontent.com/IceWhaleTech/logo/main/casaos/casaos_banner_dark_night_800px.png">
@@ -18,6 +18,7 @@ info:
 
 servers:
   - url: /v1
+    description: Local Storage API
 
 tags:
   - name: USB methods
@@ -340,10 +341,11 @@ components:
           schema:
             allOf:
               - $ref: "#/components/schemas/BaseResponse"
-              - type: array
                 properties:
                   data:
-                    $ref: "#/components/schemas/Disk"
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Disk"
     ResponseUSBListOK:
       description: OK
       content:
@@ -351,10 +353,11 @@ components:
           schema:
             allOf:
               - $ref: "#/components/schemas/BaseResponse"
-              - type: array
                 properties:
                   data:
-                    $ref: "#/components/schemas/USBDriveStatus"
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/USBDriveStatus"
     ResponseDiskSizeOK:
       description: OK
       content:
@@ -362,10 +365,11 @@ components:
           schema:
             allOf:
               - $ref: "#/components/schemas/BaseResponse"
-              - type: object
                 properties:
                   data:
-                    $ref: "#/components/schemas/DiskSize"
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/DiskSize"
     ResponseStorageListOK:
       description: OK
       content:
@@ -373,10 +377,11 @@ components:
           schema:
             allOf:
               - $ref: "#/components/schemas/BaseResponse"
-              - type: array
                 properties:
                   data:
-                    $ref: "#/components/schemas/Storage"
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Storage"
     ResponseListStoragesOK:
       description: OK
       content:
@@ -384,10 +389,11 @@ components:
           schema:
             allOf:
               - $ref: "#/components/schemas/BaseResponse"
-              - type: array
                 properties:
                   data:
-                    $ref: "#/components/schemas/MountPoint"
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/MountPoint"
 
   schemas:
     BaseResponse:
