@@ -18,26 +18,37 @@ paths:
         "200": # For simplicity, we only define the 200 response. In real world, you should define all possible responses, such as 4xx, 5xx, etc.
           $ref: "#/components/responses/PongOK"
 
-  /search: # The URL path of the API will be /v2/search/search
+  /: # The URL path of the API will be /v2/search/
     get:
       summary: Search documents
       description: Search for documents using specific keywords and get relevant results.
       operationId: search
       parameters:
         - in: query
-          name: keywords
+          name: keyword
           schema:
             type: string
-          description: Search term to query the indexed documents.
+            example: "test"
+          description: Search keyword to query the indexed documents.
         - in: query
-          name: dir
+          name: scope
           schema:
             type: string
-          description: Directory to search in.
+            example: "file,app"
+            default: file
+          description: Search scope to query the indexed documents.
+        - in: query
+          name: opt
+          schema:
+            type: string
+            example: "dir:/media/ZimaOS-HD&&size>1024&&type:doc&&mtime>1730168689"
+          description: Advanced search options.
         - in: query
           name: count
           schema:
             type: integer
+            default: 10
+            example: 100
           description: Number of search results to return.
       responses:
         '200':
@@ -66,19 +77,64 @@ components:
           schema:
             type: object
             properties:
+              code:
+                type: integer
+                description: Response code of the request.
               took:
                 type: integer
                 description: Time taken for the search in milliseconds.
               timed_out:
                 type: boolean
                 description: Whether the search timed out or not.
-              hits:
+              message:
                 type: object
                 properties:
                   total:
                     type: integer
                     description: Total number of matching results.
-                  hits:
+                  file_hits:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        _id:
+                          type: string
+                          description: Unique ID of the document.
+                        _score:
+                          type: number
+                          example: 1567
+                          description: Relevance score of the document.
+                        _source:
+                          type: object
+                          description: The source data of the document.
+                          properties:
+                            name:
+                              type: string
+                              example: "filename_test.go"
+                              description: Matched document name.
+                            hl_name:
+                              type: string
+                              example: "filename_<b>test</b>.go"
+                              description: Highlighted matches in the document name.
+                            hl_content:
+                              type: array
+                              items:
+                                type: string
+                              example: ["file <b>test</b>", "<b>test</b> here", " first <b>test</b>"]
+                              description: Highlighted matched snippets in the document content.
+                            dir:
+                              type: string
+                              example: "/media/ZimaOS-HD/test"
+                              description: File path of the document.
+                            size:
+                              type: integer
+                              example: 12345
+                              description: File size.
+                            mtime:
+                              type: integer
+                              example: 1730168689
+                              description: Modified time of file.
+                  app_hits:
                     type: array
                     items:
                       type: object
@@ -93,26 +149,20 @@ components:
                           type: object
                           description: The source data of the document.
                           properties:
-                            path:
-                              type: string
-                              description: File path of the document.
-                            gid:
-                              type: integer
-                              description: Group ID associated with the file.
-                        highlight:
-                          type: object
-                          description: Highlighted search matches in the document.
-                          properties:
                             name:
-                              type: array
-                              items:
-                                type: string
+                              type: string
+                              example: "Open <b>Web</b>UI"
                               description: Highlighted matches in the document name.
-                            content:
+                            description:
                               type: array
                               items:
                                 type: string
+                              example: ["file <b>web</b>", "<b>web</b> here", " first <b>web</b>"]
                               description: Highlighted matches in the document content.
+                            mtime:
+                              type: integer
+                              example: 1730168689
+                              description: Modified time of app.
 
   schemas:
     BaseResponse: # Every response should inherit from BaseResponse
