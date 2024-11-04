@@ -28,6 +28,10 @@ tags:
     description: |-
       methods for web interface (INTERNAL USE ONLY)
 
+  - name: Image methods
+    description: |-
+      methods for managing system images
+
   - name: Host Info
     description: |-
       <SchemaDefinition schemaRef="#/components/schemas/host_info" />
@@ -394,6 +398,89 @@ paths:
           $ref: "#/components/responses/response_not_found"
         "500":
           $ref: "#/components/responses/response_internal_server_error"
+  
+  /osim/download/{id}:
+    get:
+      summary: Get the status of a download task
+      operationId: getDownloadTaskStatus
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      tags:
+        - Image methods
+      responses:
+        "200":
+          $ref: "#/components/responses/download_task_status_ok"
+
+  /osim/download:
+    get:
+      summary: Get the status of all download task
+      operationId: getAllDownloadTask
+      tags:
+        - Image methods
+      responses:
+        "200":
+          $ref: "#/components/responses/download_task_list_ok"  
+    post:
+      summary: Download a file from http url or image id
+      operationId: createDownloadTask
+      tags:
+        - Image methods
+      requestBody:
+        $ref: "#/components/requestBodies/request_file_download"
+      responses:
+        "200":
+          $ref: "#/components/responses/create_download_task_ok"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
+
+  /osim/image/path:
+    get:
+      summary: Get an downloaded image info, query by id or url. if not exist, return 404.
+      operationId: getDownloadedImagePath
+      tags:
+        - Image methods
+      parameters:
+        - name: id
+          in: query
+          schema:
+            type: string
+        - name: url
+          in: query
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/response_system_image_path_ok"
+        "400":
+          $ref: "#/components/responses/response_bad_request"
+
+  /osim/images: 
+    get:
+      summary: Get list of images
+      operationId: getImageList
+      tags:
+        - Image methods
+      responses:
+        "200":
+          $ref: "#/components/responses/system_image_list_ok"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
+  
+  /osim/images/featured: 
+    get:
+      summary: Get list of featured images
+      operationId: getFeaturedImageList
+      tags:
+        - Image methods
+      responses:
+        "200":
+          $ref: "#/components/responses/system_image_list_ok"
+        "500":
+          $ref: "#/components/responses/response_internal_server_error"
 
 components:
   securitySchemes:
@@ -458,6 +545,18 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/domain_name"
+
+    request_file_download:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              image_id:
+                type: string
+              http_url:
+                type: string
 
   responses:
     response_ok:
@@ -665,6 +764,66 @@ components:
                   data:
                     $ref: "#/components/schemas/domain_name"
       x-go-name: DomainNameOK
+
+    system_image_list_ok:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/base_response"
+              - properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/image"
+    response_system_image_path_ok:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/base_response"
+              - properties:
+                  data:
+                    type: string 
+                    example: "/DATA/Downloads/ISO/windows11.iso"
+
+    create_download_task_ok:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/base_response"
+              - properties:
+                  id:
+                    type: string
+                    example: "8a483db9-430c-4303-bf27-8777a88094c9"
+
+    download_task_status_ok:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/base_response"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/download_task"
+    
+    download_task_list_ok:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/base_response"
+              - properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/download_task"
 
   schemas:
     base_response: # Every response should inherit from BaseResponse
@@ -1715,3 +1874,119 @@ components:
               $ref: "#/components/schemas/storage_volume_size"
             capacity: # yes I know this property does not belong here, but frontend developer asks for this for easier coding.
               $ref: "#/components/schemas/storage_volume_size"
+    
+    download_task:
+      type: object
+      required:
+        - id
+        - status
+        - percent
+        - total_size
+        - downloaded_size
+        - url
+        - target_path
+      properties:
+        id:
+          type: string
+        status:
+          type: string
+          enum:
+            - pending
+            - downloading
+            - completed
+            - failed
+            - paused
+        percent:
+          type: integer
+          example: 50
+        total_size:
+          type: integer
+          example: 1024
+          format: int64
+        downloaded_size:
+          type: integer
+          example: 512
+          format: int64
+        url:
+          type: string
+          example: https://drive.massgrave.dev/en-us_windows_11_consumer_editions_version_23h2_updated_sep_2024_x64_dvd_edcefbe4.iso
+        target_path:
+          type: string
+          example: /DATA/ZVM/win10.iso
+
+    system_category:
+      type: object
+      required:
+        - title
+        - icon
+      properties:
+        title:
+          type: string
+          example: Linux
+        icon:
+          type: string
+          example: https://www.casaos.io/images/linux.png
+        systems:
+          type: array
+          items:
+            $ref: "#/components/schemas/image"
+          
+    image:
+      type: object
+      required:
+        - id
+        - family
+        - os
+        - version
+        - edition
+        - releaseDate
+        - arch
+        - size
+        - url
+        - hash
+      properties:
+        id:
+          type: string
+        family:
+          type: string
+          example: Linux
+        icon:
+          type: string
+          example: windows
+        os:
+          type: string
+          example: Ubuntu
+        version:
+          type: string
+          example: 22.04
+        edition:
+          type: string
+          example: LTS
+        arch:
+          type: string
+          example: amd64
+        build:
+          type: string
+          example: 20240924
+        langCode:
+          type: string
+          example: en-us
+        releaseDate:
+          type: integer
+          example: 1708032
+        size:
+          type: integer
+          example: 1024
+          format: int64
+        hash:
+          type: string
+          example: sha256:1234567890abcdef
+        url:
+          type: string
+          example: https://drive.massgrave.dev/en-us_ubuntu_22.04.3_amd64_dvd_20240924.iso
+        status:
+          type: string
+          enum:
+            - noexist
+            - downloading
+            - complete
