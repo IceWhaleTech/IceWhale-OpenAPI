@@ -414,6 +414,20 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/download_task_status_ok"
+    delete:
+      summary: Cancel a download task
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      operationId: cancelDownloadTask
+      tags:
+        - Image methods
+      responses:
+        "200":
+          $ref: "#/components/responses/response_ok"
 
   /osim/download:
     get:
@@ -556,6 +570,18 @@ components:
               image_id:
                 type: string
               http_url:
+                type: string
+
+    request_cancel_download_task:
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              http_url:
+                type: string
+              image_id:
                 type: string
 
   responses:
