@@ -2016,3 +2016,6 @@ components:
             - noexist
             - downloading
             - complete
+        task_id:
+          type: string
+          description: only  when status is downloading. the field present
