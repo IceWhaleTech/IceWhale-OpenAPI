@@ -428,6 +428,10 @@ components:
           description: disk health
           type: string
           example: "Good"
+        power_on_hours:
+          description: power on times
+          type: integer
+          example: 7818
         temperature:
           description: disk temperature
           type: integer
