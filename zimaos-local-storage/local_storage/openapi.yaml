@@ -1059,6 +1059,20 @@ components:
         model:
           type: string
           example: "aaaa"
+        manufacturer:
+          type: string
+          example:
+            - "WD"
+            - "SEAGATE"
+            - "HGST"
+            - "TOSHIBA"
+            - "FUJITSU"
+            - "MAXTOR"
+            - "APPLE"
+            - "SAMSUNG"
+            - "SYNOLOGY"
+            - "OTHER"
+            - "SSD"
         type:
           type: string
           example: "aaaa"
@@ -1167,6 +1181,20 @@ components:
         model:
           type: string
           example: "aaaa"
+        manufacturer:
+          type: string
+          example:
+            - "WD"
+            - "SEAGATE"
+            - "HGST"
+            - "TOSHIBA"
+            - "FUJITSU"
+            - "MAXTOR"
+            - "APPLE"
+            - "SAMSUNG"
+            - "SYNOLOGY"
+            - "OTHER"
+            - "SSD"
         health:
           type: string
           example: "healthy"

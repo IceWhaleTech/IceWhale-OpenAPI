@@ -424,6 +424,20 @@ components:
           description: disk model
           type: string
           example: "Samsung SSD 860 EVO 1TB"
+        manufacturer:
+          type: string
+          example:
+            - "WD"
+            - "SEAGATE"
+            - "HGST"
+            - "TOSHIBA"
+            - "FUJITSU"
+            - "MAXTOR"
+            - "APPLE"
+            - "SAMSUNG"
+            - "SYNOLOGY"
+            - "OTHER"
+            - "SSD"
         health:
           description: disk health
           type: string
