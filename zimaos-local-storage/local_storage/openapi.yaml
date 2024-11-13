@@ -1042,6 +1042,10 @@ components:
           description: power on times
           type: integer
           example: 7818
+        percentage_used:
+          description: estimate of the percentage of NVM subsystem life used based on the actual usage
+          type: integer
+          example: 1
         faulty:
           type: boolean
           description: |-
@@ -1205,6 +1209,10 @@ components:
           description: power on times
           type: integer
           example: 7818
+        percentage_used:
+          description: estimate of the percentage of NVM subsystem life used based on the actual usage
+          type: integer
+          example: 1
         type:
           $ref: "#/components/schemas/DiskType"
         need_format:
@@ -1299,6 +1307,20 @@ components:
         drive_name:
           type: string
           example: "aaaa"
+        manufacturer:
+          type: string
+          example:
+            - "WD"
+            - "SEAGATE"
+            - "HGST"
+            - "TOSHIBA"
+            - "FUJITSU"
+            - "MAXTOR"
+            - "APPLE"
+            - "SAMSUNG"
+            - "SYNOLOGY"
+            - "OTHER"
+            - "SSD"
         name:
           type: string
           example: "aaaa"
@@ -1320,6 +1342,10 @@ components:
           description: power on times
           type: integer
           example: 7818
+        percentage_used:
+          description: estimate of the percentage of NVM subsystem life used based on the actual usage
+          type: integer
+          example: 1
 
     DiskType:
       type: string

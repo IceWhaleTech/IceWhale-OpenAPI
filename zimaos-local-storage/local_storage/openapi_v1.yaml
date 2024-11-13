@@ -446,6 +446,10 @@ components:
           description: power on times
           type: integer
           example: 7818
+        percentage_used:
+          description: estimate of the percentage of NVM subsystem life used based on the actual usage
+          type: integer
+          example: 1
         temperature:
           description: disk temperature
           type: integer
