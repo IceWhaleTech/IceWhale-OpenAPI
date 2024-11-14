@@ -424,7 +424,7 @@ components:
           description: disk model
           type: string
           example: "Samsung SSD 860 EVO 1TB"
-        manufacturer:
+        vendor:
           type: string
           example:
             - "WD"

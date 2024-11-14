@@ -1063,7 +1063,7 @@ components:
         model:
           type: string
           example: "aaaa"
-        manufacturer:
+        vendor:
           type: string
           example:
             - "WD"
@@ -1185,7 +1185,7 @@ components:
         model:
           type: string
           example: "aaaa"
-        manufacturer:
+        vendor:
           type: string
           example:
             - "WD"
@@ -1307,7 +1307,7 @@ components:
         drive_name:
           type: string
           example: "aaaa"
-        manufacturer:
+        vendor:
           type: string
           example:
             - "WD"
