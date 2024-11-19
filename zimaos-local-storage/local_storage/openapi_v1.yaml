@@ -396,6 +396,15 @@ components:
                       $ref: "#/components/schemas/MountPoint"
 
   schemas:
+    DiskType:
+      type: string
+      enum:
+        - "HDD"
+        - "SSD"
+        - "USB"
+        - "NVME"
+        - "MMC"
+      example: "HDD"
     BaseResponse:
       properties:
         message:
