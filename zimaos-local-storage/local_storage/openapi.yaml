@@ -1138,7 +1138,7 @@ components:
         path:
           type: string
           example: "/dev/md0"
-    Chilren:
+    Children:
       type: object
       properties:
         name:
@@ -1153,7 +1153,13 @@ components:
         storage_name:
           type: string
           example: "aaaa"
+        avail:
+          type: integer
+          example: 2222222222
         size:
+          type: integer
+          example: 2222222222
+        used:
           type: integer
           example: 2222222222
         supported:
@@ -1213,8 +1219,12 @@ components:
           description: estimate of the percentage of NVM subsystem life used based on the actual usage
           type: integer
           example: 1
-        type:
+        disk_type:
           $ref: "#/components/schemas/DiskType"
+        fs_type:
+          description: fs type
+          type: string
+          example: "ext4"
         need_format:
           type: boolean
           example: false
@@ -1242,10 +1252,14 @@ components:
         children:
           type: array
           items:
-            $ref: "#/components/schemas/Chilren"
+            $ref: "#/components/schemas/Children"
         rota:
           type: boolean
           example: false
+        avail:
+          description: disk available size
+          type: string
+          example: "1TB"
         
 
     Partition:
@@ -1298,9 +1312,9 @@ components:
         used:
           type: string
           example: "2222222222"
-        type:
+        fs_type:
           type: string
-          example: "aaaa"
+          example: "ext4"
         path:
           type: string
           example: "/dev/sdb"

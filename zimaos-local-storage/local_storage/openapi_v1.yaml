@@ -455,9 +455,11 @@ components:
           type: integer
           example: 30
         disk_type:
-          description: disk type
+          $ref: "#/components/schemas/DiskType"
+        fs_type:
+          description: fs type
           type: string
-          example: "SSD"
+          example: "ext4"
         need_format:
           description: whether the disk needs to be formatted
           type: boolean
@@ -563,7 +565,7 @@ components:
           description: storage used size
           type: number
           example: 1000000000
-        type:
+        fs_type:
           description: storage type
           type: string
           example: "ext4"
@@ -584,9 +586,7 @@ components:
           type: string
           example: "none"
         disk_type:
-          description: storage disk type
-          type: string
-          example: "SSD"
+          $ref: "#/components/schemas/DiskType"
         raid:
           description: whether the storage is in RAID
           type: boolean
