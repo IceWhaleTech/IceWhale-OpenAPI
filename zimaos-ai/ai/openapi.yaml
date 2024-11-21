@@ -1,0 +1,285 @@
+openapi: 3.1.0
+info:
+  title: ZimaOS AI OpenAPI
+  version: 1.0.0
+paths:
+  /v1/ai/status:
+    get:
+      tags:
+      - management
+      summary: Get Status
+      operationId: status
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/StatusReponse'
+  /v1/ai/ocr:
+    post:
+      tags:
+      - ai
+      summary: ocr image
+      operationId: ocr
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OCRRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIReponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/ai/summary:
+    post:
+      tags:
+      - ai
+      summary: Summary
+      operationId: summary_file
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SummaryRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIReponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/ai/subtitle:
+    post:
+      tags:
+      - ai
+      summary: Subtitle
+      operationId: subtitle
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SubtitleRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIReponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/ai/enable/{function_name}:
+    post:
+      tags:
+      - management
+      summary: Enable Function
+      operationId: enable_function
+      parameters:
+      - name: function_name
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Function Name
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToggleFunctionReponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/ai/disable/{function_name}:
+    post:
+      tags:
+      - management
+      summary: Disable Function
+      operationId: disable_function
+      parameters:
+      - name: function_name
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Function Name
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToggleFunctionReponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/ai/log:
+    get:
+      tags:
+      - management
+      summary: Get Logs
+      operationId: log
+      parameters:
+      - name: lines
+        in: query
+        required: false
+        schema:
+          anyOf:
+          - type: integer
+          - type: 'null'
+          default: 100
+          title: Lines
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema: {}
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+components:
+  schemas:
+    AIReponse:
+      properties:
+        result:
+          type: string
+          title: Result
+      type: object
+      required:
+      - result
+      title: AIReponse
+    HTTPValidationError:
+      properties:
+        detail:
+          items:
+            $ref: '#/components/schemas/ValidationError'
+          type: array
+          title: Detail
+      type: object
+      title: HTTPValidationError
+    OCRRequest:
+      properties:
+        file_path:
+          type: string
+          title: File Path
+        prompt:
+          type: string
+          title: Prompt
+          default: "\u628A\u56FE\u7247\u4E2D\u7684\u5185\u5BB9\u8F6C\u6362\u6210\u6587\
+            \u672C\uFF0C\u4F7F\u7528\u539F\u6587\u7684\u5185\u5BB9"
+      type: object
+      required:
+      - file_path
+      title: OCRRequest
+    StatusReponse:
+      properties:
+        ocr:
+          type: boolean
+          title: Ocr
+        summary:
+          type: boolean
+          title: Summary
+        subtitle:
+          type: boolean
+          title: Subtitle
+      type: object
+      required:
+      - ocr
+      - summary
+      - subtitle
+      title: StatusReponse
+    SubtitleRequest:
+      properties:
+        file_path:
+          type: string
+          title: File Path
+        subtitle_path:
+          type: string
+          title: Subtitle Path
+      type: object
+      required:
+      - file_path
+      - subtitle_path
+      title: SubtitleRequest
+    SummaryRequest:
+      properties:
+        file_path:
+          type: string
+          title: File Path
+        prompt:
+          type: string
+          title: Prompt
+          default: summary the following content.
+      type: object
+      required:
+      - file_path
+      title: SummaryRequest
+    ToggleFunctionReponse:
+      properties:
+        success:
+          type: boolean
+          title: Success
+      type: object
+      required:
+      - success
+      title: ToggleFunctionReponse
+    ValidationError:
+      properties:
+        loc:
+          items:
+            anyOf:
+            - type: string
+            - type: integer
+          type: array
+          title: Location
+        msg:
+          type: string
+          title: Message
+        type:
+          type: string
+          title: Error Type
+      type: object
+      required:
+      - loc
+      - msg
+      - type
+      title: ValidationError
+tags:
+- name: ai
+  description: all ai operation
+- name: management
+  description: management model
