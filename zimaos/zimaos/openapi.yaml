@@ -606,7 +606,7 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/ServiceStatus"
-        
+
     GetSSHStatusOK:
       description: OK
       content:
@@ -617,7 +617,6 @@ components:
               - properties:
                   data:
                     $ref: "#/components/schemas/SSHStatus"
-            
 
   requestBodies:
     DeviceInfoBody:
@@ -758,6 +757,13 @@ components:
         index:
           type: integer
           example: -1
+        connect_type:
+          type: string
+          enum:
+            - LAN
+            - Thunderbolt
+            - WLAN
+            - Unknown
 
     DeviceInfo:
       required:
