@@ -759,11 +759,6 @@ components:
           example: -1
         connect_type:
           type: string
-          enum:
-            - LAN
-            - Thunderbolt
-            - WLAN
-            - Unknown
 
     DeviceInfo:
       required:
