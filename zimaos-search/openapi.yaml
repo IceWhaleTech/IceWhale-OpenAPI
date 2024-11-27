@@ -53,9 +53,11 @@ paths:
           '200':
             $ref: "#/components/responses/SearchOK"
           '400':
-            description: Invalid request, query missing or malformed.
+            $ref: "#/components/responses/ResponseClientError"
+          '404':
+            $ref: "#/components/responses/ResponseNotFoundError"
           '500':
-            description: Server error.
+            $ref: "#/components/responses/ResponseInternalServerError"
 
 components:
   responses:
@@ -74,68 +76,36 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            properties:
-              code:
-                type: integer
-                description: Response code of the request.
-              took:
-                type: integer
-                description: Time taken for the search in milliseconds.
-              timed_out:
-                type: boolean
-                description: Whether the search timed out or not.
-              message:
-                type: object
-                properties:
-                  cursor:
-                    type: string
-                    description: Response cursor for infinite scroll next request.
-                  total:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse" # Inherit from BaseResponse
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/SearchResult"
+                  took:
                     type: integer
-                    description: Total number of matching results.
-                  hits:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        _id:
-                          type: string
-                          description: Unique ID of the document.
-                        _score:
-                          type: number
-                          example: 1567
-                          description: Relevance score of the document.
-                        _source:
-                          type: object
-                          description: The source data of the document.
-                          properties:
-                            name:
-                              type: string
-                              example: "filename_test.go"
-                              description: Matched document name.
-                            hl_name:
-                              type: string
-                              example: "filename_<b>test</b>.go"
-                              description: Highlighted matches in the document name.
-                            hl_content:
-                              type: array
-                              items:
-                                type: string
-                              example: ["file <b>test</b>", "<b>test</b> here", " first <b>test</b>"]
-                              description: Highlighted matched snippets in the document content.
-                            dir:
-                              type: string
-                              example: "/media/ZimaOS-HD/test"
-                              description: File path of the document.
-                            size:
-                              type: integer
-                              example: 12345
-                              description: File size.
-                            mtime:
-                              type: integer
-                              example: 1730168689
-                              description: Modified time of file.
+                    description: Time taken for the search in milliseconds.
+                  timed_out:
+                    type: boolean
+                    description: Whether the search timed out or not.
+
+    ResponseClientError:
+      description: Client Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+    ResponseInternalServerError:
+      description: Internal Server Error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
+    ResponseNotFoundError:
+      description: Not found error
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BaseResponse"
 
   schemas:
     BaseResponse: # Every response should inherit from BaseResponse
@@ -147,3 +117,58 @@ components:
     Pong:
       type: string
       example: Pong
+    SearchResult:
+      type: object
+      properties:
+        cursor:
+          type: string
+          description: Response cursor for infinite scroll next request.
+        total:
+          type: integer
+          description: Total number of matching results.
+        hits:
+          type: array
+          items:
+            $ref: "#/components/schemas/HitsObject"
+    HitsObject:
+      type: object
+      properties:
+        _id:
+          type: integer
+          description: Unique ID of the document.
+        _score:
+          type: integer
+          example: 1567
+          description: Relevance score of the document.
+        _source:
+          $ref: "#/components/schemas/HitsObjectSource"
+          description: The source data of the document.
+    HitsObjectSource:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "filename_test.go"
+          description: Matched document name.
+        hl_name:
+          type: string
+          example: "filename_<b>test</b>.go"
+          description: Highlighted matches in the document name.
+        hl_content:
+          type: array
+          items:
+            type: string
+          example: ["file <b>test</b>", "<b>test</b> here", " first <b>test</b>"]
+          description: Highlighted matched snippets in the document content.
+        dir:
+          type: string
+          example: "/media/ZimaOS-HD/test"
+          description: File path of the document.
+        size:
+          type: integer
+          example: 12345
+          description: File size.
+        mtime:
+          type: integer
+          example: 1730168689
+          description: Modified time of file.
