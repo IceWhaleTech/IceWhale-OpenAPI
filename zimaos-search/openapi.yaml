@@ -167,8 +167,10 @@ components:
         size:
           type: integer
           example: 12345
+          format: int64
           description: File size.
         mtime:
           type: integer
           example: 1730168689
+          format: int64
           description: Modified time of file.
