@@ -169,6 +169,10 @@ components:
           example: 12345
           format: int64
           description: File size.
+        is_dir:
+          type: boolean
+          example: false
+          description: Is directory or not.
         mtime:
           type: integer
           example: 1730168689
