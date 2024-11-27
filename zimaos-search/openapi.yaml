@@ -19,11 +19,11 @@ paths:
           $ref: "#/components/responses/PongOK"
 
   /file: # The URL path of the API will be /v2/search/file
-    get:
+    post:
       summary: Search files
       description: Search for files using specific keywords and get relevant results.
       operationId: searchFile
-      parameters:
+      application/json:
         - in: query
           name: keyword
           schema:
