@@ -31,13 +31,6 @@ paths:
             example: "test"
           description: Search keyword to query the indexed documents.
         - in: query
-          name: scope
-          schema:
-            type: string
-            example: "file,app"
-            default: file
-          description: Search scope to query the indexed documents.
-        - in: query
           name: opt
           schema:
             type: string
