@@ -18,11 +18,11 @@ paths:
         "200": # For simplicity, we only define the 200 response. In real world, you should define all possible responses, such as 4xx, 5xx, etc.
           $ref: "#/components/responses/PongOK"
 
-  /: # The URL path of the API will be /v2/search/
+  /file: # The URL path of the API will be /v2/search/file
     get:
-      summary: Search documents
-      description: Search for documents using specific keywords and get relevant results.
-      operationId: search
+      summary: Search files
+      description: Search for files using specific keywords and get relevant results.
+      operationId: searchFile
       parameters:
         - in: query
           name: keyword
