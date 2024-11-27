@@ -37,6 +37,12 @@ paths:
             example: "dir:/media/ZimaOS-HD&&size>1024&&type:doc&&mtime>1730168689"
           description: Advanced search options.
         - in: query
+          name: cursor
+          schema:
+            type: string
+            example: "last_resp_cursor"
+          description: Infinite scroll cursor
+        - in: query
           name: count
           schema:
             type: integer
@@ -82,10 +88,13 @@ components:
               message:
                 type: object
                 properties:
+                  cursor:
+                    type: string
+                    description: Response cursor for infinite scroll next request.
                   total:
                     type: integer
                     description: Total number of matching results.
-                  file_hits:
+                  hits:
                     type: array
                     items:
                       type: object
@@ -127,35 +136,6 @@ components:
                               type: integer
                               example: 1730168689
                               description: Modified time of file.
-                  app_hits:
-                    type: array
-                    items:
-                      type: object
-                      properties:
-                        _id:
-                          type: string
-                          description: Unique ID of the document.
-                        _score:
-                          type: number
-                          description: Relevance score of the document.
-                        _source:
-                          type: object
-                          description: The source data of the document.
-                          properties:
-                            name:
-                              type: string
-                              example: "Open <b>Web</b>UI"
-                              description: Highlighted matches in the document name.
-                            description:
-                              type: array
-                              items:
-                                type: string
-                              example: ["file <b>web</b>", "<b>web</b> here", " first <b>web</b>"]
-                              description: Highlighted matches in the document content.
-                            mtime:
-                              type: integer
-                              example: 1730168689
-                              description: Modified time of app.
 
   schemas:
     BaseResponse: # Every response should inherit from BaseResponse
