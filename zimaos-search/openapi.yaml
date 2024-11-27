@@ -32,23 +32,23 @@ paths:
                 - keyword
               type: object
               properties:
-              keyword:
-                type: string
-                example: "test"
-                description: Search keyword to query the indexed documents.
-              opt:
-                type: string
-                example: "dir:/media/ZimaOS-HD&&size>1024&&type:doc&&mtime>1730168689"
-                description: Advanced search options.
-              cursor:
-                type: string
-                example: "last_resp_cursor"
-                description: Infinite scroll cursor
-              count:
-                type: integer
-                default: 10
-                example: 100
-                description: Number of search results to return.
+                keyword:
+                  type: string
+                  example: "test"
+                  description: Search keyword to query the indexed documents.
+                opt:
+                  type: string
+                  example: "dir:/media/ZimaOS-HD&&size>1024&&type:doc&&mtime>1730168689"
+                  description: Advanced search options.
+                cursor:
+                  type: string
+                  example: "last_resp_cursor"
+                  description: Infinite scroll cursor
+                count:
+                  type: integer
+                  default: 10
+                  example: 100
+                  description: Number of search results to return.
       responses:
           '200':
             $ref: "#/components/responses/SearchOK"
