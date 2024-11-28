@@ -36,9 +36,13 @@ paths:
                   type: string
                   example: "test"
                   description: Search keyword to query the indexed documents.
+                dir:
+                  type: string
+                  example: "/media/HDD-Storage"
+                  description: Search dir path.
                 opt:
                   type: string
-                  example: "dir:/media/ZimaOS-HD&&size>1024&&type:doc&&mtime>1730168689"
+                  example: "size>1024&&type:doc&&mtime>1730168689"
                   description: Advanced search options.
                 cursor:
                   type: string
@@ -155,10 +159,8 @@ components:
           example: "filename_<b>test</b>.go"
           description: Highlighted matches in the document name.
         hl_content:
-          type: array
-          items:
-            type: string
-          example: ["file <b>test</b>", "<b>test</b> here", " first <b>test</b>"]
+          type: string
+          example: "file <b>test</b> ... <b>test</b> here ... first <b>test</b>"
           description: Highlighted matched snippets in the document content.
         dir:
           type: string
