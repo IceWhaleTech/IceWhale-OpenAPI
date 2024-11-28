@@ -149,16 +149,6 @@ paths:
       - management
       summary: Get Logs
       operationId: log
-      parameters:
-      - name: lines
-        in: query
-        required: false
-        schema:
-          anyOf:
-          - type: integer
-          - type: 'null'
-          default: 100
-          title: Lines
       responses:
         '200':
           description: Successful Response
@@ -166,12 +156,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LogReponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
     AIReponse:
