@@ -16,6 +16,56 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/StatusReponse'
+  /v1/ai/tag:
+    post:
+      tags:
+      - ai
+      summary: tag image
+      operationId: tag
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OCRRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TagReponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/ai/generate:
+    post:
+      tags:
+      - ai
+      summary: generate content
+      operationId: generate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIReponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
   /v1/ai/ocr:
     post:
       tags:
@@ -167,6 +217,19 @@ components:
       required:
       - result
       title: AIReponse
+    GenerateRequest:
+      properties:
+        content:
+          type: string
+          title: Content
+        prompt:
+          type: string
+          title: Prompt
+          default: continue the following content.
+      type: object
+      required:
+      - content
+      title: GenerateRequest
     HTTPValidationError:
       properties:
         detail:
@@ -212,11 +275,19 @@ components:
         subtitle:
           type: boolean
           title: Subtitle
+        tag:
+          type: boolean
+          title: Tag
+        generate:
+          type: boolean
+          title: Generate
       type: object
       required:
       - ocr
       - summary
       - subtitle
+      - tag
+      - generate
       title: StatusReponse
     SubtitleRequest:
       properties:
@@ -244,6 +315,17 @@ components:
       required:
       - file_path
       title: SummaryRequest
+    TagReponse:
+      properties:
+        tags:
+          items:
+            type: string
+          type: array
+          title: Tags
+      type: object
+      required:
+      - tags
+      title: TagReponse
     ToggleFunctionReponse:
       properties:
         success:
