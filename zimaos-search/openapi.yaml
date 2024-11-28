@@ -175,6 +175,10 @@ components:
           type: boolean
           example: false
           description: Is directory or not.
+        is_ai:
+          type: boolean
+          example: false
+          description: Matched by AI.
         mtime:
           type: integer
           example: 1730168689
