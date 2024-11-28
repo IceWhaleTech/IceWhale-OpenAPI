@@ -164,7 +164,8 @@ paths:
           description: Successful Response
           content:
             application/json:
-              schema: {}
+              schema:
+                $ref: '#/components/schemas/LogReponse'
         '422':
           description: Validation Error
           content:
@@ -191,6 +192,17 @@ components:
           title: Detail
       type: object
       title: HTTPValidationError
+    LogReponse:
+      properties:
+        logs:
+          items:
+            type: string
+          type: array
+          title: Logs
+      type: object
+      required:
+      - logs
+      title: LogReponse
     OCRRequest:
       properties:
         file_path:
