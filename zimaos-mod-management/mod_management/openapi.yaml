@@ -328,6 +328,8 @@ components:
           type: string
         repo:
           type: string
+        url:
+          type: string
 
     module_ui:
       required:
