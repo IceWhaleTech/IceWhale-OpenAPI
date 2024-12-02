@@ -504,9 +504,9 @@ components:
                 description: Refresh token of the user
                 example: "yJhbGciOiJFUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNhc2FvcyIsImlkIjoxLCJpc3MiOiJjYXNhb3MiLCJleHAiOjE3MTY4ODUwODgsIm5iZiI6MTcxNjg3NDI4OCwiaWF0IjoxNzE2ODc0Mjg4fQ.0B5_RHmxCg04SAmb5CuIlfHiA0jebWq3wf6iQnWmg0ENqaGGcpcr0AZfujHh3lYRLhpTiN2yuRKZqDomtkviWA"
               expires_at:
-                type: string
+                type: integer
                 description: Expire time of the token
-                example: "2023-04-06T07:59:59.000Z"
+                example: "1616885088"
     ResponseVerificationFailure:
       description: Verification Failure
       content:
