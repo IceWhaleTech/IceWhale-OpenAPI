@@ -1414,6 +1414,26 @@ components:
             - "cloud"
             - "smb"
         extensions:
-          type: object
-          description: extensions
-          example: "mounted"
+          $ref: "#/components/schemas/StorageExtension"
+    StorageExtension:
+      type: object
+      description: extensions
+      properties:
+        size:
+          type: integer
+          format: int64
+          example: 2222222222
+        used:
+          type: integer
+          format: int64
+          example: 2222222222
+        health:
+          type: boolean
+          example: true
+        shortage:
+          type: boolean
+          example: true
+          descript: 这个代表raid-5缺1盘以上，raid1还是啥坏了，这个是之前埋的坑搞不干净，orca建议我依然用shortage
+        damaged:
+          type: boolean
+          example: true
