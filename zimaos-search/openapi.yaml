@@ -166,6 +166,19 @@ components:
           type: string
           example: "/media/ZimaOS-HD/test"
           description: File path of the document.
+        type:
+          type: string
+          enum:
+            - dir
+            - doc
+            - img
+            - txt
+            - pdf
+            - video
+            - audio
+            - archive
+            - other
+          description: File type.
         size:
           type: integer
           example: 12345
