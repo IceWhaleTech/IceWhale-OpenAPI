@@ -311,6 +311,44 @@ paths:
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
 
+  /network/settings:
+    put:
+      tags:
+        - Network methods
+      summary: Set network interface ip
+      description: |-
+        Set network interface ip.
+      operationId: setNetworkInterfaceIP
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NetworkManagerData"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+    get:
+      tags:
+        - Network methods
+      summary: Get network interface settings
+      description: |-
+        Get network interface settings.
+      operationId: getNetworkInterfaceSettings
+      parameters:
+        - name: interface_name
+          in: query
+          description: interface name
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/GetNetworkInterfaceSettingsOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
   /device/info:
     get:
       tags:
@@ -618,6 +656,17 @@ components:
                   data:
                     $ref: "#/components/schemas/SSHStatus"
 
+    GetNetworkInterfaceSettingsOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/NetworkManagerData"
+
   requestBodies:
     DeviceInfoBody:
       required: true
@@ -757,6 +806,9 @@ components:
         index:
           type: integer
           example: -1
+        method:
+          type: string
+          example: "dhcp"
         connect_type:
           type: string
 
@@ -954,3 +1006,43 @@ components:
             - enabled
             - disabled
           example: "enable"
+
+    NetworkManagerData:
+      required:
+        - interface_name
+      properties:
+        interface_name:
+          type: string
+          example: "eth0"
+        ipv4:
+          $ref: "#/components/schemas/NetworkManagerSettings"
+        ipv6:
+          $ref: "#/components/schemas/NetworkManagerSettings"
+
+    NetworkManagerSettings:
+      required:
+        - ip
+      properties:
+        method:
+          type: string
+          enum:
+            - DHCP
+            - Manual
+            - Close
+          example: "dhcp"
+        ip:
+          type: string
+          example: ""
+        subnet_mask:
+          type: string
+          example: ""
+        gateway_address:
+          type: string
+          example: ""
+          default: ""
+        dns:
+          type: array
+          items:
+            type: string
+          example: ["8.8.8.8", "1.1.1.1"]
+          default: []
