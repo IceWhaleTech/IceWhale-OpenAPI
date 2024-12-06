@@ -442,6 +442,9 @@ components:
         ocr:
           type: boolean
           title: Ocr
+        image:
+          type: boolean
+          title: Image
         summary:
           type: boolean
           title: Summary
@@ -457,6 +460,7 @@ components:
       type: object
       required:
       - ocr
+      - image
       - summary
       - subtitle
       - tag
