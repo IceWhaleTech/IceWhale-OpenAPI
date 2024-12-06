@@ -206,6 +206,118 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LogReponse'
+  /v1/ai/api-limit/status:
+    get:
+      tags:
+      - management
+      summary: Get Api Limit Status
+      operationId: get_api_limit_status_v1_ai_api_limit_status_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APILimitStatusResponse'
+    post:
+      tags:
+      - management
+      summary: Set Api Limit Status
+      operationId: set_api_limit_status_v1_ai_api_limit_status_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/APILimitStatusRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APILimitSuccessResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/ai/api-limit/set:
+    post:
+      tags:
+      - management
+      summary: Set Api Limit
+      operationId: set_api_limit_v1_ai_api_limit_set_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/APILimitRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APILimitSuccessResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/ai/api-limit/update:
+    post:
+      tags:
+      - management
+      summary: Update Api Limit
+      operationId: update_api_limit_v1_ai_api_limit_update_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/APILimitRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APILimitSuccessResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v1/ai/api-limit/time-range:
+    post:
+      tags:
+      - management
+      summary: Set Allowed Time Range
+      operationId: set_allowed_time_range_v1_ai_api_limit_time_range_post
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TimeRangeRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APILimitSuccessResponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
     AIReponse:
@@ -217,6 +329,42 @@ components:
       required:
       - result
       title: AIReponse
+    APILimitRequest:
+      properties:
+        limit:
+          type: integer
+          title: Limit
+      type: object
+      required:
+      - limit
+      title: APILimitRequest
+    APILimitStatusRequest:
+      properties:
+        status:
+          type: string
+          title: Status
+      type: object
+      required:
+      - status
+      title: APILimitStatusRequest
+    APILimitStatusResponse:
+      properties:
+        status:
+          type: string
+          title: Status
+      type: object
+      required:
+      - status
+      title: APILimitStatusResponse
+    APILimitSuccessResponse:
+      properties:
+        success:
+          type: boolean
+          title: Success
+      type: object
+      required:
+      - success
+      title: APILimitSuccessResponse
     GenerateRequest:
       properties:
         content:
@@ -326,6 +474,19 @@ components:
       required:
       - tags
       title: TagReponse
+    TimeRangeRequest:
+      properties:
+        start_time:
+          type: string
+          title: Start Time
+        end_time:
+          type: string
+          title: End Time
+      type: object
+      required:
+      - start_time
+      - end_time
+      title: TimeRangeRequest
     ToggleFunctionReponse:
       properties:
         success:
