@@ -95,8 +95,8 @@ paths:
     post:
       tags:
       - ai
-      summary: image
-      operationId: image
+      summary: handle image
+      operationId: handle_image
       requestBody:
         content:
           application/json:
