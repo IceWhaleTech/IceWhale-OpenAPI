@@ -187,6 +187,28 @@ paths:
           description: Internal server error
           $ref: "#/components/responses/ResponseInternalServerError"
 
+  /check-init:
+    get:
+      summary: Check scene initialization status
+      description: Check if a specific scene is being initialized for the first time
+      operationId: checkSceneInit
+      tags:
+        - user
+      parameters:
+        - name: scene
+          in: query
+          description: Scene name to check initialization status
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseCheckSceneInitOK"
+        "400":
+          $ref: "#/components/responses/BadResponse"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
 components:
   securitySchemes:
     access_token:
@@ -281,6 +303,19 @@ components:
                     type: array
                     items:
                       $ref: "#/components/schemas/SambaUser"
+
+    ResponseCheckSceneInitOK:
+      description: Scene initialization status
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    type: object
+                    $ref: "#/components/schemas/CheckSceneInit"
+
   schemas:
     BaseResponse:
       type: object
@@ -364,4 +399,15 @@ components:
         username:
           type: string
           description: Username of the samba user
+          example: "casaos"
+    CheckSceneInit:
+      type: object
+      properties:
+        isFirstTime:
+          type: boolean
+          description: Whether the system has been initialized
+          example: true
+        scene:
+          type: string
+          description: Scene name to check initialization status
           example: "casaos"
