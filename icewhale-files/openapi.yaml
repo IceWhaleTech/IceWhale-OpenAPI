@@ -129,7 +129,6 @@ paths:
             enum:
               - "desc"
               - "asc"
-
       responses:
         "200":
           $ref: "#/components/responses/GetFilesOK"
@@ -184,18 +183,10 @@ paths:
     delete:
       tags:
         - File
-      summary: Delete the file
-      description: Delete the file
+      description: Delete a file permanently
       operationId: deleteFiles
       requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: array
-              items:
-                type: string
-                example: "/DATA/test.log"
+        $ref: "#/components/requestBodies/FileListRequest"
       responses:
         "200":
           $ref: "#/components/responses/ResponseArrayOK"
@@ -205,6 +196,20 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+  
+  /file/trash:
+    delete:
+      tags:
+        - File
+      summary: Remove File to Trash
+      description: Remove File to Trash
+      operationId: moveFilesToTrash
+      requestBody:
+        $ref: "#/components/requestBodies/FileListRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseFileListOperationOK"
+
   /file/video/generate/image:
     post:
       tags:
@@ -1371,7 +1376,6 @@ paths:
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
     put:
-      summary: Stop a share
       tags:
         - ShareViaLink
       description: Stop a share
@@ -1392,13 +1396,88 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+  /trash:
+    get:
+      description: Get all list in Trash
+      tags:
+        - Trash
+      parameters:
+        - name: filter
+          in: query
+          description: Target storage name
+          example: "operable"
+          required: false
+          schema:
+            type: string
+            enum:
+              - all
+              - operable
+      operationId: getTrashFileList
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseTrashOK"
+    
+    delete:
+      requestBody:
+        $ref: "#/components/requestBodies/FileListRequest"
+      description: Delete a file or folder in Trash. means delete a file forever
+      tags:
+        - Trash
+      operationId: deleteTrashFile
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseFileListOperationOK"
+    
+    post:
+      requestBody:
+        $ref: "#/components/requestBodies/FileListRequest"
+      description: Restore a file or folder in Trash
+      tags:
+        - Trash
+      operationId: restoreTrashFile
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseFileListOperationOK"
+
+  /trash/empty:
+    post:
+      tags:
+        - Trash
+      description: Delete All file in trash
+      operationId: emptyTrash
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseOK"
+
+  /trash/stats:
+    get:
+      description: Get trash Stats Data
+      tags:
+        - Trash
+      operationId: getTrashStats
+      responses:
+        "200":
+          $ref: "#/components/responses/GetTrashStatsOK"
+        
 components:
   securitySchemes:
     access_token:
       type: apiKey
       in: header
       name: Authorization
+  
   requestBodies:
+    FileListRequest:
+      description: File list, used in Delete files
+      required: true
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              type: string
+              example: "/DATA/test.log"
+
     PutFile:
       description: Create file
       content:
@@ -1706,6 +1785,40 @@ components:
             type: array
             items:
               $ref: "#/components/schemas/ShareLinkJob"
+    
+    ResponseTrashOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/TrashFile"
+
+    ResponseFileListOperationOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/FileListOperationResult"
+
+    GetTrashStatsOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/StorageTrashStats"
+
   schemas:
     SuccessResponse:
       allOf:
@@ -1760,6 +1873,23 @@ components:
               items:
                 type: string
                 example: "/test"
+    FileOperationResult:
+      required:
+        - path
+        - status
+      properties:
+        path:
+          type: string
+          example: "/media/ZimaOS-HD/DATA/abc.mp4"
+        status:
+          type: string
+          enum:
+            - success
+            - failed
+        errMsg:
+          type: string
+          example: "file not found"
+
     BaseResponse:
       properties:
         message:
@@ -1815,16 +1945,7 @@ components:
           description: file type
           example: 0
         extensions:
-          anyOf:
-            - type: string
-            - type: number
-            - type: integer
-            - type: boolean
-            - type: array
-              items: {}
-            - type: object
-          description: file extensions
-          example: "mounted"
+          $ref: "#/components/schemas/FileExtension"
     FileListByCompression:
       properties:
         content:
@@ -2380,3 +2501,95 @@ components:
         - share_status
         - info_hash
         - metadata
+
+    TrashFile:
+      type: object
+      required:
+        - name
+        - is_dir
+        - size
+        - raw_path
+        - path
+        - deleted_at
+      properties:
+        name:
+          type: string
+          example: "abc.mp4"
+        is_dir:
+          type: boolean
+          example: false
+        size:
+          type: integer
+          example: 1234
+          format: int64
+        raw_path:
+          type: string
+          example: "/media/ZimaOS-HD/Downloads/Media/Japanese/abc.mp4"
+        path:
+          type: string
+          example: "/media/ZimaOS-HD/.trash/abc_1734076004_7194.mp4"
+        deleted_at:
+          type: integer
+          example: 1682403656
+          format: int64
+        extensions:
+          $ref: "#/components/schemas/FileExtension"
+
+    StorageTrashStats:
+      type: object
+      required:
+        - total_size
+      properties:
+        storage_name:
+          type: string
+          example: "Safe-Storage"
+        total_size:
+          type: integer
+          format: int64
+
+    FileExtension:
+      type: object
+      properties:
+        mounted:
+          description: 这个目录是否是挂载的，比如是smb呀什么的
+          type: boolean
+          example: true
+        thumbnail:
+          type: string
+        shared:
+          type: boolean
+        share_id:
+          type: integer
+        pin:
+          type: boolean
+        backup:
+          type: boolean
+        trash_raw_disk_not_exist:
+          description: 回收站专属，该文件的原盘是否在zimacube里面
+          type: boolean
+          example: true
+        trash_raw_disk_readonly:
+          type: boolean
+          example: true
+          description: 回收站专属，该文件的原存储是否变成只读了，比如raid缺盘
+        trash_raw_disk_damaged:
+          type: boolean
+          example: true
+          description: 回收站专属，该文件的原存储是否变成坏了，比如raid缺盘比较多
+
+    FileListOperationResult:
+      type: object
+      required:
+        - result
+        - data
+      properties:
+        result:
+          type: string
+          enum:
+            - success
+            - failed
+            - partial_success
+        data:
+          type: array
+          items:
+            $ref: "#/components/schemas/FileOperationResult"
