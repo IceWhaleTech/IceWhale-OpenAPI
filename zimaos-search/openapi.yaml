@@ -141,7 +141,8 @@ components:
           type: integer
           description: Unique ID of the document.
         _score:
-          type: integer
+          type: number
+          format: float
           example: 1567
           description: Relevance score of the document.
         _source:
