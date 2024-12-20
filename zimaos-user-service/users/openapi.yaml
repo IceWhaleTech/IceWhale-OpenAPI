@@ -21,12 +21,15 @@ tags:
     description: Event related operations
   - name: samba
     description: Samba related operations
+  - name: user
+    description: User related operations
 
 x-tagGroups:
   - name: Methods
     tags:
       - Event methods
       - Samba methods
+      - User methods
   - name: Schemas
     tags:
       - Property
@@ -193,7 +196,7 @@ paths:
       description: Check if a specific scene is being initialized for the first time
       operationId: checkSceneInit
       tags:
-        - user
+        - User methods
       parameters:
         - name: scene
           in: query
@@ -313,7 +316,6 @@ components:
               - $ref: "#/components/schemas/BaseResponse"
               - properties:
                   data:
-                    type: object
                     $ref: "#/components/schemas/CheckSceneInit"
 
   schemas:
@@ -402,6 +404,9 @@ components:
           example: "casaos"
     CheckSceneInit:
       type: object
+      required:
+        - "isFirstTime"
+        - "scene"
       properties:
         isFirstTime:
           type: boolean
