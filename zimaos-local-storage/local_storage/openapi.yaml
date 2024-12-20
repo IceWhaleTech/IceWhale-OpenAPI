@@ -1407,12 +1407,13 @@ components:
         type:
           type: string
           enum:
-            - "raid"
-            - "system"
+            - "SYSTEM"
+            - "RAID0"
+            - "RAID1"
+            - "RAID5"
+            - "HDD"
+            - "SSD"
             - "USB"
-            - "disk"
-            - "cloud"
-            - "smb"
         extensions:
           $ref: "#/components/schemas/StorageExtension"
     StorageExtension:
