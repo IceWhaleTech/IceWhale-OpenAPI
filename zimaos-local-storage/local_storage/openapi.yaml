@@ -1418,7 +1418,6 @@ components:
           $ref: "#/components/schemas/StorageExtension"
     StorageExtension:
       type: object
-      description: extensions
       properties:
         size:
           type: integer
