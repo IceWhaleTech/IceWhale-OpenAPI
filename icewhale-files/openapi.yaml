@@ -1452,6 +1452,17 @@ paths:
   /trash/stats:
     get:
       description: Get trash Stats Data
+      parameters:
+        - name: filter
+          in: query
+          description: Target storage name
+          example: "operable"
+          required: false
+          schema:
+            type: string
+            enum:
+              - all
+              - operable
       tags:
         - Trash
       operationId: getTrashStats
