@@ -63,6 +63,21 @@ paths:
           '500':
             $ref: "#/components/responses/ResponseInternalServerError"
 
+  /stats:
+    get:
+    summary: Get search stats
+    description: Get search stats for the search API.
+    operationId: getStats
+    responses:
+        '200':
+          $ref: "#/components/responses/StatsOK"
+        '400':
+          $ref: "#/components/responses/ResponseClientError"
+        '404':
+          $ref: "#/components/responses/ResponseNotFoundError"
+        '500':
+          $ref: "#/components/responses/ResponseInternalServerError"
+
 components:
   responses:
     PongOK:
@@ -91,6 +106,16 @@ components:
                   timed_out:
                     type: boolean
                     description: Whether the search timed out or not.
+    StatsOK:
+      description: A list of search results.
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse" # Inherit from BaseResponse
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/StatsResult"
 
     ResponseClientError:
       description: Client Error
@@ -198,3 +223,17 @@ components:
           example: 1730168689
           format: int64
           description: Modified time of file.
+    StatsResult:
+      type: object
+      properties:
+        support_ai:
+          type: boolean
+          description: Support AI search or not.
+        status:
+          type: string
+          enum:
+            - initializing
+            - indexing
+            - ok
+            - error
+          description: Current status of the search engine.
