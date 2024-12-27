@@ -65,18 +65,18 @@ paths:
 
   /stats:
     get:
-    summary: Get search stats
-    description: Get search stats for the search API.
-    operationId: getStats
-    responses:
-        '200':
-          $ref: "#/components/responses/StatsOK"
-        '400':
-          $ref: "#/components/responses/ResponseClientError"
-        '404':
-          $ref: "#/components/responses/ResponseNotFoundError"
-        '500':
-          $ref: "#/components/responses/ResponseInternalServerError"
+      summary: Get search stats
+      description: Get search stats for the search API.
+      operationId: getStats
+      responses:
+          '200':
+            $ref: "#/components/responses/StatsOK"
+          '400':
+            $ref: "#/components/responses/ResponseClientError"
+          '404':
+            $ref: "#/components/responses/ResponseNotFoundError"
+          '500':
+            $ref: "#/components/responses/ResponseInternalServerError"
 
 components:
   responses:
