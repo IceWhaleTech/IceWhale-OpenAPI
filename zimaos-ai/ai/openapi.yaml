@@ -231,6 +231,19 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/LogReponse'
+  /v1/ai/api/status:
+    get:
+      tags:
+      - management
+      summary: Get Api Status
+      operationId: getApiStatus
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/APIStatusResponse'
   /v1/ai/api-limit/status:
     get:
       tags:
@@ -339,6 +352,15 @@ components:
       required:
       - success
       title: APILimitSuccessResponse
+    APIStatusResponse:
+      properties:
+        allow_api_call:
+          type: boolean
+          title: Allow Api Call
+      type: object
+      required:
+      - allow_api_call
+      title: APIStatusResponse
     GenerateRequest:
       properties:
         content:
