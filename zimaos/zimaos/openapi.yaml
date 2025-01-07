@@ -92,6 +92,10 @@ tags:
     description: |-
       (TODO)
 
+  - name: DLNA methods
+    description: |-
+      (TODO)
+
 x-tagGroups:
   - name: Methods
     tags:
@@ -105,6 +109,7 @@ x-tagGroups:
       - ZeroTier methods
       - Seventh methods
       - SSH methods
+      - DLNA methods
 
   - name: Schemas
     tags:
@@ -522,6 +527,79 @@ paths:
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
 
+  /dlna:
+    get:
+      tags:
+        - DLNA methods
+      summary: Get DLNA service status
+      description: |-
+        Get DLNA service status.
+      operationId: getDLNAStatus
+      responses:
+        "200":
+          $ref: "#/components/responses/GetDLNAStatusOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+    put:
+      tags:
+        - DLNA methods
+      summary: Enable or disable DLNA service
+      description: |-
+        Enable or disable DLNA service.
+      operationId: setDLNAStatus
+      parameters:
+        - name: status
+          in: query
+          description: dlna status
+          required: true
+          schema:
+            type: string
+            enum:
+              - enable
+              - disable
+            example: "enable"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+  /dlna/config:
+    get:
+      tags:
+        - DLNA methods
+      summary: Get DLNA custom configuration
+      description: |-
+        Get DLNA custom configuration.
+      operationId: getDLNACustomConfig
+      responses:
+        "200":
+          $ref: "#/components/responses/GetDLNAConfigOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+    put:
+      tags:
+        - DLNA methods
+      summary: Update DLNA custom configuration
+      description: |-
+        Update DLNA custom configuration.
+      operationId: setDLNACustomConfig
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/DLNACustomConfig"
+      responses:
+        "200":
+          description: DLNA configuration updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BaseResponse"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
 components:
   securitySchemes:
     access_token:
@@ -666,6 +744,28 @@ components:
               - properties:
                   data:
                     $ref: "#/components/schemas/NetworkManagerData"
+
+    GetDLNAStatusOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/DLNAStatus"
+
+    GetDLNAConfigOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/DLNACustomConfig"
 
   requestBodies:
     DeviceInfoBody:
@@ -1046,3 +1146,29 @@ components:
             type: string
           example: ["8.8.8.8", "1.1.1.1"]
           default: []
+
+    DLNAStatus:
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum:
+            - enabled
+            - disabled
+          example: "enable"
+
+    DLNACustomConfig:
+      type: object
+      required:
+        - friendly_name
+        - media_dir
+      properties:
+        friendly_name:
+          type: string
+          example: "casaos"
+        media_dir:
+          type: array
+          items:
+            type: string
+            example: "/home/media"
