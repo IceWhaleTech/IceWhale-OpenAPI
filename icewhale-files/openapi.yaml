@@ -2179,6 +2179,10 @@ components:
           type: integer
           example: 1
           deprecated: true
+        tm:
+          type: boolean
+          example: true
+          description: is time machine share folder
         permission:
           type: array
           items:
