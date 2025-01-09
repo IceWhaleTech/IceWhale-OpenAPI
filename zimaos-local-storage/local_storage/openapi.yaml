@@ -1023,10 +1023,23 @@ components:
           example: 1
         status:
           type: string
+          deprecated: true
           enum:
             - "recover"
             - "idle"
             - "reshape"
+        raid_status:
+          type: string
+          enum:
+            - "ok"
+            - "degraded"
+            - "rebuilding"
+            - "reshape"
+            - "recovering"
+            - "fail"
+            - "urge"
+            - "inactive"
+          example: "degraded"
         dev_size:
           type: integer
           description: |-
