@@ -23,10 +23,6 @@ tags:
   - name: Mount methods
     description: |-
       Low-level API
-
-  - name: Merge methods
-    description: |-
-      High-level API
   
   - name: Raid methods
     description: |-
@@ -38,10 +34,6 @@ tags:
     description: |-
       Storage API
 
-  - name: Merge
-    description: |-
-      <SchemaDefinition schemaRef="#/components/schemas/Merge" />
-
   - name: Mount
     description: |-
       <SchemaDefinition schemaRef="#/components/schemas/Mount" />
@@ -49,12 +41,10 @@ tags:
 x-tagGroups:
   - name: Mount
     tags:
-      - Merge methods
       - Mount methods
 
   - name: Schemas
     tags:
-      - Merge
       - Mount
 
 security:
@@ -357,77 +347,6 @@ paths:
         "503":
           $ref: "#/components/responses/ResponseServiceUnavailable"
 
-  /merge:
-    get:
-      summary: Get merges
-      description: |-
-        (TODO)
-      operationId: getMerges
-      tags:
-        - Merge methods
-      parameters:
-        - name: mount_point
-          in: query
-          description: |-
-            Filter the results by mount point
-          schema:
-            type: string
-            example: "/DATA"
-      responses:
-        "200":
-          $ref: "#/components/responses/GetMergesResponseOK"
-        "503":
-          $ref: "#/components/responses/ResponseServiceUnavailable"
-
-    post:
-      summary: Set a merge
-      description: |-
-        (TODO)
-      operationId: setMerge
-      tags:
-        - Merge methods
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Merge"
-      responses:
-        "200":
-          $ref: "#/components/responses/SetMergeResponseOK"
-        "503":
-          $ref: "#/components/responses/ResponseServiceUnavailable"
-  /merge/init:
-    get:
-      summary: Get merge initialization status
-      description: |-
-        (TODO)
-      operationId: getMergeInitStatus
-      tags:
-        - Merge methods
-      responses:
-        "200":
-          $ref: "#/components/responses/GetMergeInitStatusResponseOK"
-        "503":
-          $ref: "#/components/responses/ResponseServiceUnavailable"
-    post:
-      summary: Initialize a merge
-      description: |-
-        (TODO)
-      operationId: initMerge
-      tags:
-        - Merge methods
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/MountPoint"
-      responses:
-        "200":
-          $ref: "#/components/responses/InitMergeResponseOK"
-        "503":
-          $ref: "#/components/responses/ResponseServiceUnavailable"
   /mount:
     get:
       summary: Get mounted volumes
@@ -692,57 +611,6 @@ components:
             allOf:
               - $ref: "#/components/schemas/Raid"
 
-    GetMergesResponseOK:
-      description: OK
-      content:
-        application/json:
-          schema:
-            readOnly: true
-            allOf:
-              - $ref: "#/components/schemas/BaseResponse"
-              - type: object
-                properties:
-                  data:
-                    type: array
-                    items:
-                      $ref: "#/components/schemas/Merge"
-
-    SetMergeResponseOK:
-      description: OK
-      content:
-        application/json:
-          schema:
-            readOnly: true
-            allOf:
-              - $ref: "#/components/schemas/BaseResponse"
-              - type: object
-                properties:
-                  data:
-                    $ref: "#/components/schemas/Merge"
-    GetMergeInitStatusResponseOK:
-      description: OK
-      content:
-        application/json:
-          schema:
-            readOnly: true
-            allOf:
-              - $ref: "#/components/schemas/BaseResponse"
-              - type: object
-                properties:
-                  data:
-                    $ref: "#/components/schemas/MergeStatus"
-    InitMergeResponseOK:
-      description: OK
-      content:
-        application/json:
-          schema:
-            readOnly: true
-            allOf:
-              - $ref: "#/components/schemas/BaseResponse"
-              - type: object
-                properties:
-                  data:
-                    $ref: "#/components/schemas/MergeStatus"
     GetMountsResponseOK:
       description: OK
       content:
@@ -884,44 +752,6 @@ components:
         mount_point:
           type: string
           example: "/DATA"
-    MergeStatus:
-      type: string
-      enum:
-        - "initialized"
-        - "uninitialized"
-        - "error"
-      default: "initialized state"
-      example: "initialized"
-    Merge:
-      type: object
-      required:
-        - mount_point
-      properties:
-        id:
-          type: integer
-          readOnly: true
-        fstype:
-          type: string
-          default: "fuse.mergerfs"
-        mount_point:
-          type: string
-          example: "/DATA"
-        source_base_path:
-          type: string
-          example: "/var/lib/casaos/files"
-        source_volume_uuids:
-          type: array
-          items:
-            type: string
-            example: 5c682e86-cec3-4761-9350-8e1a0c2d1ae9
-        created_at:
-          type: string
-          readOnly: true
-          format: date-time
-        updated_at:
-          type: string
-          readOnly: true
-          format: date-time
 
     Mount:
       type: object
@@ -1039,6 +869,7 @@ components:
             - "fail"
             - "urge"
             - "inactive"
+            - "creating"
           example: "degraded"
         dev_size:
           type: integer
@@ -1061,8 +892,11 @@ components:
           example: 1
         faulty:
           type: boolean
-          description: |-
-            Whether the disk is faulty in RAID
+          description: Whether the disk is faulty in RAID
+          example: false
+        missing:
+          type: boolean
+          description: Whether the disk is missding in RAID
           example: false
         path:
           type: string
