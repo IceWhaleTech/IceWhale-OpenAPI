@@ -55,6 +55,9 @@ tags:
   - name: ShareViaLink
     description: |-
       Share via link API
+  - name: Task
+    description: |-
+      Task API
 
 security:
   - access_token: []
@@ -201,8 +204,7 @@ paths:
     delete:
       tags:
         - File
-      summary: Remove File to Trash
-      description: Remove File to Trash
+      description: Move files to trash
       operationId: moveFilesToTrash
       requestBody:
         $ref: "#/components/requestBodies/FileListRequest"
@@ -717,8 +719,10 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+  
   /task/{id}:
     put:
+      deprecated: true
       summary: Modify operate task
       tags:
         - File
@@ -759,6 +763,7 @@ paths:
           $ref: "#/components/responses/ResponseInternalServerError"
     delete:
       summary: Delete operate task
+      deprecated: true
       tags:
         - File
         - Folder
@@ -798,6 +803,7 @@ paths:
 
     post:
       summary: create a task
+      deprecated: true
       tags:
         - File
         - Folder
@@ -816,6 +822,118 @@ paths:
           $ref: "#/components/responses/ResponseClientError"
         "404":
           $ref: "#/components/responses/ResponseNotFoundError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+  
+  /task/retry:
+    post:
+      summary: Retry task
+      tags:
+        - Task
+      description: Retry task
+      requestBody:
+        $ref: "#/components/requestBodies/TaskOperateRequest"
+      operationId: retryTask
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+
+  /task/copy:
+    post:
+      summary: Copy file or folder
+      tags:
+        - Task
+      description: Copy file or folder
+      operationId: copyFileOrFolder
+      requestBody:
+        $ref: "#/components/requestBodies/FileOperateRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/CreateTaskOK"
+
+  /task/cut:
+    post:
+      summary: Cut file or folder
+      tags:
+        - Task
+      description: Cut file or folder
+      operationId: cutFileOrFolder
+      requestBody:
+        $ref: "#/components/requestBodies/FileOperateRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/CreateTaskOK"
+  
+  /task/duplicate:
+    post:
+      summary: Duplicate file or folder
+      tags:
+        - Task
+      description: Duplicate file or folder
+      operationId: duplicateFileOrFolder
+      requestBody:
+        $ref: "#/components/requestBodies/DuplicateRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/CreateTaskOK" 
+  
+  /task/decompress:
+    post:
+      summary: Decompress file
+      tags:
+        - Task
+      description: Decompress file
+      operationId: decompressFile
+      requestBody:
+        $ref: "#/components/requestBodies/DecompressRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+  
+  /tasks:
+    get:
+      operationId: getTaskList
+      description: get task list by filter(visible). status(pending, running, success, failed) is wip
+      tags:
+        - Task
+      parameters:
+        - name: visible
+          in: query
+          description: filter task by visible
+          required: false
+          example: true
+          schema:
+            type: boolean
+        - name: order
+          in: query
+          description: order by task status
+          required: false
+          schema:
+            type: string
+            enum:
+              - create_time
+              - finish_time
+              - business_logic
+      responses:
+        "200":
+          $ref: "#/components/responses/GetTaskListOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+    delete:
+      tags:
+        - Task
+      description: cancel some task
+      operationId: cancelAndHideTask
+      requestBody:
+        $ref: "#/components/requestBodies/TaskOperateRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
 
@@ -1476,7 +1594,14 @@ components:
       type: apiKey
       in: header
       name: Authorization
-  
+  parameters:
+    TaskID:
+      name: id
+      in: path
+      description: task id
+      required: true
+      schema:
+        type: string
   requestBodies:
     FileListRequest:
       description: File list, used in Delete files
@@ -1535,7 +1660,40 @@ components:
               - host
               - username
               - password
+    
+    FileOperateRequest:
+      description: File operate request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/FileOperateProps"
+    DuplicateRequest:
+      description: Duplicate request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DuplicateProps"
+    DecompressRequest:
+      description: Decompress request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/DecompressProps"
 
+    TaskOperateRequest:
+      description: Task operate request
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - task_list
+            properties:
+              task_list:
+                type: array
+                items:
+                  type: integer
+                  format: uint
   responses:
     ResponseOK:
       description: OK
@@ -1555,14 +1713,7 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/SuccessResponseInteger"
-    GetTaskListOK:
-      description: OK
-      content:
-        application/json:
-          schema:
-            type: array
-            items:
-              $ref: "#/components/schemas/FileTaskModelResult"
+    
     ResponseArrayOK:
       description: OK
       content:
@@ -1830,6 +1981,30 @@ components:
                     items:
                       $ref: "#/components/schemas/StorageTrashStats"
 
+    CreateTaskOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/Task"
+    
+    GetTaskListOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/SuccessResponse"
+              - properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/Task"
+
   schemas:
     SuccessResponse:
       allOf:
@@ -2015,6 +2190,7 @@ components:
           description: processed file num
           example: 1024
 
+    # TODO 回头把用不到的这些都删掉
     FileTaskModel:
       properties:
         item:
@@ -2517,6 +2693,91 @@ components:
         - info_hash
         - metadata
 
+    Task:
+      type: object
+      required:
+        - id
+        - type
+        - status
+        - props
+        - visible
+        - user_id
+        - created_utc
+        - finished_utc
+      properties:
+        id:
+          type: integer
+          format: uint
+          example: "1"
+        type:
+          type: string
+          $ref: "#/components/schemas/TaskType"
+        status:
+          type: string
+          $ref: "#/components/schemas/TaskStatus"
+        props:
+          oneOf:
+            - $ref: "#/components/schemas/FileOperateProps"
+            - $ref: "#/components/schemas/DecompressProps"
+            - $ref: "#/components/schemas/DuplicateProps"
+        err_msg:
+          type: string
+          example: "测试错误"
+        user_id:
+          type: integer
+          example: 1
+        visible:
+          type: boolean
+          example: true
+        created_utc:
+          type: integer
+          example: 1682403656
+          format: int64
+        finished_utc:
+          type: integer
+          example: 1682403656
+          format: int64
+
+        progress:
+          type: integer
+          example: 50
+        total_item:
+          type: integer
+          example: 100
+        processed_item:
+          type: integer
+          example: 50
+        total_size:
+          type: integer
+          example: 1024
+          format: int64
+        processed_size:
+          type: integer
+          example: 1024
+          format: int64
+        speed:
+          type: integer
+          example: 1024
+          format: int64
+        
+    TaskType:
+      type: string
+      enum:
+        - "copy"
+        - "move"
+        - "duplicate"
+        - "decompress"
+    
+    TaskStatus:
+      type: string
+      enum:
+        - "pending"
+        - "calculating"
+        - "running"
+        - "cancelled"
+        - "success"
+        - "failed"
+
     TrashFile:
       type: object
       required:
@@ -2608,3 +2869,64 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/FileOperationResult"
+
+    TaskUserSelect:
+      type: string
+      enum:
+        - overwrite
+        - rename
+        - skip
+
+    FileOperateProps:
+      type: object
+      required:
+        - src
+        - dst
+        - user_select
+      properties:
+        src:
+          type: array
+          items:
+            type: string
+          example: ["/media/ZimaOS-HD/Downloads/1.zip","/media/ZimaOS-HD/Downloads/2.zip"]
+        dst:
+          type: string
+          example: "/media/ZimaOS-HD"
+        user_select:
+          $ref: "#/components/schemas/TaskUserSelect"
+
+    DuplicateProps:
+      type: object
+      required:
+        - src
+        - dst
+      properties:
+        src:
+          type: array
+          items:
+            type: string
+        dst:
+          type: string
+          description: the des path not work. No matter what directory you specify, it will be dup to the same directory as src. This dst is just for the convenience of front-end rendering.
+          example: "/media/ZimaOS-HD"
+  
+    DecompressProps:
+      type: object
+      required:
+        - src
+        - dst
+        - user_select
+      properties:
+        src:
+          type: array
+          description: the compressed file path. Note! only single is allowed in array.
+          items:
+            type: string
+          example: ["/media/ZimaOS-HD/Downloads/a.zip"]
+        dst:
+          type: string
+          example: "/media/ZimaOS-HD/Downloads/"
+        user_select:
+          $ref: "#/components/schemas/TaskUserSelect"
+        password:
+          type: string
