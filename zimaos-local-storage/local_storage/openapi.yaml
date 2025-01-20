@@ -864,6 +864,7 @@ components:
             - "ok"
             - "degraded"
             - "rebuilding"
+            - "resyncing"
             - "reshape"
             - "recovering"
             - "fail"
