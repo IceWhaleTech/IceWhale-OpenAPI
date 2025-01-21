@@ -928,6 +928,9 @@ components:
         type:
           type: string
           example: "aaaa"
+          deprecated: true
+        disk_type:
+          $ref: "#/components/schemas/DiskType"
 
 
 
