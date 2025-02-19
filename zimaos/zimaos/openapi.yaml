@@ -527,6 +527,19 @@ paths:
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
 
+  /tty/btop:
+    post:
+      tags:
+        - Btop methods
+      description: |-
+        Start a btop in ttyd. and return a port
+      operationId: startBtopAndReturnPort
+      responses:
+        "200":
+          $ref: "#/components/responses/StartTTYOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
   /dlna:
     get:
       tags:
@@ -767,6 +780,17 @@ components:
                   data:
                     $ref: "#/components/schemas/DLNACustomConfig"
 
+    StartTTYOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/TTY"
+            
   requestBodies:
     DeviceInfoBody:
       required: true
@@ -1172,3 +1196,11 @@ components:
           items:
             type: string
             example: "/home/media"
+
+    TTY:
+      required:
+        - port
+      properties:
+        port:
+          type: integer
+          example: 30
