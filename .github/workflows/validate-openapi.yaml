@@ -1,0 +1,31 @@
+name: Validate OpenAPI
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  validate-openapi:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Install OpenAPI CLI
+        run: npm install -g @redocly/openapi-cli
+
+      - name: Validate OpenAPI files
+        run: |
+          for file in $(find . -name '*.yaml' -o -name '*.yml' -o -name '*.json'); do
+            echo "Validating $file"
+            openapi validate $file
+          done
