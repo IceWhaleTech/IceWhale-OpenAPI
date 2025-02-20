@@ -284,6 +284,13 @@ paths:
           schema:
             type: string
             example: "/dev/md0"
+        - name: all
+          in: query
+          description: |-
+            Filter the results by raid
+          schema:
+            type: string
+            example: "true"
       responses:
         "200":
           $ref: "#/components/responses/GetRaidsResponseOK"
