@@ -230,7 +230,7 @@ components:
           - "restart"
           - "off"
     path:
-      name: "name"
+      name: "path"
       in: path
       description: Notify name
       required: true
