@@ -295,6 +295,40 @@ components:
           description: message returned by server side if there is any
           type: string
 
+    module_hook:
+      type: object
+      required:
+        - preInstall
+        - postInstall
+        - preUninstall
+        - postUninstall
+        - preUpdate
+        - postUpdate
+      properties:
+        preInstall:
+          type: array
+          items:
+            type: string
+        postInstall:
+          type: array
+          items:
+            type: string
+        preUninstall:
+          type: array
+          items:
+            type: string
+        postUninstall:
+          type: array
+          items:
+            type: string
+        preUpdate:
+          type: array
+          items:
+            type: string
+        postUpdate:
+          type: array
+          items:
+            type: string
     module:
       required:
         - name
@@ -304,6 +338,15 @@ components:
           readOnly: true
           type: string
           example: "zimaos-chat"
+        hook:
+          readOnly: true
+          allOf:
+            - $ref: "#/components/schemas/module_hook"
+          x-go-name: Hook
+        version:
+          readOnly: true
+          type: string
+          example: "1.0.0"
         ui:
           readOnly: true
           allOf:
