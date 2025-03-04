@@ -199,7 +199,7 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-  
+
   /file/trash:
     delete:
       tags:
@@ -467,6 +467,9 @@ paths:
                 path:
                   type: string
                   example: "/DATA"
+                modTime:
+                  type: string
+                  example: "1682403656"
                 file:
                   type: string
                   format: binary
@@ -719,7 +722,7 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-  
+
   /task/{id}:
     put:
       deprecated: true
@@ -824,7 +827,7 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-  
+
   /task/retry:
     post:
       summary: Retry task
@@ -863,7 +866,7 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/CreateTaskOK"
-  
+
   /task/duplicate:
     post:
       summary: Duplicate file or folder
@@ -875,8 +878,8 @@ paths:
         $ref: "#/components/requestBodies/DuplicateRequest"
       responses:
         "200":
-          $ref: "#/components/responses/CreateTaskOK" 
-  
+          $ref: "#/components/responses/CreateTaskOK"
+
   /task/decompress:
     post:
       summary: Decompress file
@@ -889,7 +892,7 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/ResponseStringOK"
-  
+
   /tasks:
     get:
       operationId: getTaskList
@@ -1534,7 +1537,7 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/ResponseTrashOK"
-    
+
     delete:
       requestBody:
         $ref: "#/components/requestBodies/FileListRequest"
@@ -1545,7 +1548,7 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/ResponseFileListOperationOK"
-    
+
     post:
       requestBody:
         $ref: "#/components/requestBodies/FileListRequest"
@@ -1587,7 +1590,7 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/GetTrashStatsOK"
-        
+
 components:
   securitySchemes:
     access_token:
@@ -1660,7 +1663,7 @@ components:
               - host
               - username
               - password
-    
+
     FileOperateRequest:
       description: File operate request
       content:
@@ -1713,7 +1716,7 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/SuccessResponseInteger"
-    
+
     ResponseArrayOK:
       description: OK
       content:
@@ -1947,7 +1950,7 @@ components:
             type: array
             items:
               $ref: "#/components/schemas/ShareLinkJob"
-    
+
     ResponseTrashOK:
       description: OK
       content:
@@ -1991,7 +1994,7 @@ components:
               - properties:
                   data:
                     $ref: "#/components/schemas/Task"
-    
+
     GetTaskListOK:
       description: OK
       content:
@@ -2759,7 +2762,7 @@ components:
           type: integer
           example: 1024
           format: int64
-        
+
     TaskType:
       type: string
       enum:
@@ -2767,7 +2770,7 @@ components:
         - "move"
         - "duplicate"
         - "decompress"
-    
+
     TaskStatus:
       type: string
       enum:
@@ -2888,7 +2891,11 @@ components:
           type: array
           items:
             type: string
-          example: ["/media/ZimaOS-HD/Downloads/1.zip","/media/ZimaOS-HD/Downloads/2.zip"]
+          example:
+            [
+              "/media/ZimaOS-HD/Downloads/1.zip",
+              "/media/ZimaOS-HD/Downloads/2.zip",
+            ]
         dst:
           type: string
           example: "/media/ZimaOS-HD"
@@ -2909,7 +2916,7 @@ components:
           type: string
           description: the des path not work. No matter what directory you specify, it will be dup to the same directory as src. This dst is just for the convenience of front-end rendering.
           example: "/media/ZimaOS-HD"
-  
+
     DecompressProps:
       type: object
       required:
