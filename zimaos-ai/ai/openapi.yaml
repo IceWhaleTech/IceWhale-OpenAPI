@@ -329,6 +329,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ModelReponse'
+  
   /v2/ai/download/{model_name}:
     post:
       summary: Download Model
@@ -353,6 +354,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+
   /v2/ai/enable/{model_name}:
     post:
       tags:
@@ -379,6 +381,7 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  
   /v2/ai/disable/{model_name}:
     post:
       tags:
