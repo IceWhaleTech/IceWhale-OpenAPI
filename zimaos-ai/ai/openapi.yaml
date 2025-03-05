@@ -1,6 +1,7 @@
 openapi: 3.1.0
 info:
   title: ZimaOS AI OpenAPI
+  description: ZimaOS AI OpenAPI
   version: 1.0.0
 paths:
   /v1/ai/status:
@@ -306,6 +307,104 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /v2/ai/function:
+    get:
+      summary: List Function
+      operationId: list_function_v2_ai_function_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FunctionReponse'
+  /v2/ai/model:
+    get:
+      summary: List Model
+      operationId: list_model_v2_ai_model_get
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ModelReponse'
+  /v2/ai/download/{model_name}:
+    post:
+      summary: Download Model
+      operationId: download_model_v2_ai_download__model_name__post
+      parameters:
+      - name: model_name
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Model Name
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DownloadReponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v2/ai/enable/{model_name}:
+    post:
+      tags:
+      - management
+      summary: Enable Model
+      operationId: enable_model
+      parameters:
+      - name: model_name
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Model Name
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToggleFunctionReponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
+  /v2/ai/disable/{model_name}:
+    post:
+      tags:
+      - management
+      summary: Disable Model
+      operationId: disable_model
+      parameters:
+      - name: model_name
+        in: path
+        required: true
+        schema:
+          type: string
+          title: Model Name
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ToggleFunctionReponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
     AIReponse:
@@ -322,6 +421,7 @@ components:
         status:
           type: string
           title: Status
+          example: open
       type: object
       required:
       - status
@@ -331,12 +431,15 @@ components:
         status:
           type: string
           title: Status
+          example: open
         allowed_start_time:
           type: string
           title: Allowed Start Time
+          example: 00:00
         allowed_end_time:
           type: string
           title: Allowed End Time
+          example: '23:59'
       type: object
       required:
       - status
@@ -348,6 +451,7 @@ components:
         success:
           type: boolean
           title: Success
+          example: true
       type: object
       required:
       - success
@@ -357,10 +461,59 @@ components:
         allow_api_call:
           type: boolean
           title: Allow Api Call
+          example: true
       type: object
       required:
       - allow_api_call
       title: APIStatusResponse
+    DownloadReponse:
+      properties:
+        success:
+          type: boolean
+          title: Success
+          example: true
+        message:
+          type: string
+          title: Message
+          example: start download model
+      type: object
+      required:
+      - success
+      - message
+      title: DownloadReponse
+    Function:
+      properties:
+        name:
+          type: string
+          title: Name
+          example: ocr
+        models:
+          items:
+            type: string
+          type: array
+          title: Models
+          example:
+          - minicpm
+      type: object
+      required:
+      - name
+      - models
+      title: Function
+    FunctionReponse:
+      properties:
+        function:
+          items:
+            $ref: '#/components/schemas/Function'
+          type: array
+          title: Function
+          example:
+          - models:
+            - minicpm
+            name: ocr
+      type: object
+      required:
+      - function
+      title: FunctionReponse
     GenerateRequest:
       properties:
         content:
@@ -373,7 +526,7 @@ components:
         source:
           type: string
           title: Source
-          default: search
+          default: unknown
       type: object
       required:
       - content
@@ -398,6 +551,46 @@ components:
       required:
       - logs
       title: LogReponse
+    Model:
+      properties:
+        name:
+          type: string
+          title: Name
+          example: minicpm
+        functions:
+          items:
+            type: string
+          type: array
+          title: Functions
+          example:
+          - ocr
+          - image
+        status:
+          $ref: '#/components/schemas/StatusEnum'
+          example: available
+      type: object
+      required:
+      - name
+      - functions
+      - status
+      title: Model
+    ModelReponse:
+      properties:
+        model:
+          items:
+            $ref: '#/components/schemas/Model'
+          type: array
+          title: Model
+          example:
+          - functions:
+            - ocr
+            - image
+            name: minicpm
+            status: available
+      type: object
+      required:
+      - model
+      title: ModelReponse
     OCRRequest:
       properties:
         file_path:
@@ -406,16 +599,23 @@ components:
         prompt:
           type: string
           title: Prompt
-          default: "\u628A\u56FE\u7247\u4E2D\u7684\u5185\u5BB9\u8F6C\u6362\u6210\u6587\
-            \u672C\uFF0C\u4F7F\u7528\u539F\u6587\u7684\u5185\u5BB9"
+          default: only return the text in the image
         source:
           type: string
           title: Source
-          default: search
+          default: unknown
       type: object
       required:
       - file_path
       title: OCRRequest
+    StatusEnum:
+      type: string
+      enum:
+      - not_downloaded
+      - downloading
+      - available
+      - running
+      title: StatusEnum
     StatusReponse:
       properties:
         ocr:
@@ -424,26 +624,14 @@ components:
         image:
           type: boolean
           title: Image
-        summary:
-          type: boolean
-          title: Summary
         subtitle:
           type: boolean
           title: Subtitle
-        tag:
-          type: boolean
-          title: Tag
-        generate:
-          type: boolean
-          title: Generate
       type: object
       required:
       - ocr
       - image
-      - summary
       - subtitle
-      - tag
-      - generate
       title: StatusReponse
     SubtitleRequest:
       properties:
@@ -456,7 +644,7 @@ components:
         source:
           type: string
           title: Source
-          default: search
+          default: unknown
       type: object
       required:
       - file_path
@@ -474,7 +662,7 @@ components:
         source:
           type: string
           title: Source
-          default: search
+          default: unknown
       type: object
       required:
       - file_path
@@ -495,9 +683,11 @@ components:
         start_time:
           type: string
           title: Start Time
+          example: 00:00
         end_time:
           type: string
           title: End Time
+          example: '23:59'
       type: object
       required:
       - start_time
@@ -508,6 +698,7 @@ components:
         success:
           type: boolean
           title: Success
+          example: true
       type: object
       required:
       - success
