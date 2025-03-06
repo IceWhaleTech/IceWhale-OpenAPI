@@ -519,6 +519,15 @@ components:
           type: string
           example: "45212"
 
+        v2:
+          type: boolean
+          default: false
+          description: |
+            whether to use v2 API for folder backup
+
+            > - If set to `true`, will use v2 API for folder backup.
+            > - If set to `false`, will use v1 API for folder backup.
+
     DeviceBackup:
       required:
         - id
