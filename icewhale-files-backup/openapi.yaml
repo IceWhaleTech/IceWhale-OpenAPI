@@ -528,6 +528,10 @@ components:
             > - If set to `true`, will use v2 API for folder backup.
             > - If set to `false`, will use v1 API for folder backup.
 
+        filters:
+          type: string
+          example: ^\..*|Thumbs.db|desktop.ini|.tmp$
+
     DeviceBackup:
       required:
         - id
