@@ -891,8 +891,8 @@ paths:
         $ref: "#/components/requestBodies/DecompressRequest"
       responses:
         "200":
-          $ref: "#/components/responses/ResponseStringOK"
-
+          $ref: "#/components/responses/CreateTaskOK"
+  
   /tasks:
     get:
       operationId: getTaskList
