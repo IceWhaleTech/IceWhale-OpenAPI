@@ -255,6 +255,13 @@ paths:
       description: |-
         Get a list of all storage, or a single storage by path.
       operationId: getAllStorages
+      parameters:
+        - name: all
+          in: query
+          description: including creating raid
+          schema:
+            type: string
+            example: "true"
       tags:
         - Storage methods 
       responses:
@@ -267,7 +274,6 @@ paths:
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
 
-
   /raid:
     get:
       summary: Get raids
@@ -279,8 +285,7 @@ paths:
       parameters:
         - name: path
           in: query
-          description: |-
-            Filter the results by raid
+          description: including creating raid
           schema:
             type: string
             example: "/dev/md0"
