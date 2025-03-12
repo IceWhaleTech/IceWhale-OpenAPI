@@ -260,8 +260,8 @@ paths:
           in: query
           description: including creating raid
           schema:
-            type: string
-            example: "true"
+            type: boolean
+            example: true
       tags:
         - Storage methods 
       responses:
@@ -294,8 +294,8 @@ paths:
           description: |-
             Filter the results by raid
           schema:
-            type: string
-            example: "true"
+            type: boolean
+            example: true
       responses:
         "200":
           $ref: "#/components/responses/GetRaidsResponseOK"
