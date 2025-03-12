@@ -95,6 +95,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/ClientIDParam"
         - $ref: "#/components/parameters/ClientFolderPathParam"
+        - $ref: "#/components/parameters/CleanUpBackupParam"
       responses:
         "200":
           $ref: "#/components/responses/ResponseOK"
@@ -150,6 +151,19 @@ components:
       schema:
         type: string
         example: C:\Users\icewhale\Downloads
+
+    CleanUpBackupParam:
+      name: cleanup_backup
+      in: query
+      description: |
+        whether to clean up the backup files on the server side
+
+        > - If set to `true`, will clean up the backup files on the server side.
+        > - If set to `false`, will not clean up the backup files on the server side.
+      schema:
+        type: boolean
+        example: true
+        default: true
 
     SuccessParam:
       name: success
