@@ -309,8 +309,10 @@ paths:
                 $ref: '#/components/schemas/HTTPValidationError'
   /v2/ai/function:
     get:
+      tags:
+      - management
       summary: List Function
-      operationId: list_function_v2_ai_function_get
+      operationId: list_function
       responses:
         '200':
           description: Successful Response
@@ -320,8 +322,10 @@ paths:
                 $ref: '#/components/schemas/FunctionReponse'
   /v2/ai/model:
     get:
+      tags:
+      - management
       summary: List Model
-      operationId: list_model_v2_ai_model_get
+      operationId: list_model
       responses:
         '200':
           description: Successful Response
@@ -329,18 +333,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ModelReponse'
-  
-  /v2/ai/download/{model_name}:
+  /v2/ai/download:
     post:
+      tags:
+      - management
       summary: Download Model
-      operationId: download_model_v2_ai_download__model_name__post
-      parameters:
-      - name: model_name
-        in: path
+      operationId: download_model
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DownloadModelRequest'
         required: true
-        schema:
-          type: string
-          title: Model Name
       responses:
         '200':
           description: Successful Response
@@ -354,7 +358,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
-
   /v2/ai/enable/{model_name}:
     post:
       tags:
@@ -381,7 +384,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
-  
   /v2/ai/disable/{model_name}:
     post:
       tags:
@@ -469,6 +471,16 @@ components:
       required:
       - allow_api_call
       title: APIStatusResponse
+    DownloadModelRequest:
+      properties:
+        model_name:
+          type: string
+          title: Model Name
+          example: minicpm
+      type: object
+      required:
+      - model_name
+      title: DownloadModelRequest
     DownloadReponse:
       properties:
         success:
@@ -497,6 +509,7 @@ components:
           title: Models
           example:
           - minicpm
+          - minicpm_q8
       type: object
       required:
       - name
@@ -512,6 +525,7 @@ components:
           example:
           - models:
             - minicpm
+            - minicpm_q8
             name: ocr
       type: object
       required:
