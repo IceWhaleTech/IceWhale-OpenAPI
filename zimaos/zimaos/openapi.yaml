@@ -790,7 +790,7 @@ components:
               - properties:
                   data:
                     $ref: "#/components/schemas/TTY"
-            
+
   requestBodies:
     DeviceInfoBody:
       required: true
@@ -1187,6 +1187,7 @@ components:
       required:
         - friendly_name
         - media_dir
+        - port
       properties:
         friendly_name:
           type: string
@@ -1196,6 +1197,9 @@ components:
           items:
             type: string
             example: "/home/media"
+        port:
+          type: integer
+          example: 8200
 
     TTY:
       required:
