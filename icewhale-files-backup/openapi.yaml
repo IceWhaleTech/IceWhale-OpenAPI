@@ -546,6 +546,12 @@ components:
           type: string
           example: ^\..*|Thumbs.db|desktop.ini|.tmp$
 
+        create_time:
+          description: backup create time in milliseconds
+          type: integer
+          format: int64
+          example: 1681159361000
+
     DeviceBackup:
       required:
         - id
