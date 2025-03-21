@@ -358,19 +358,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
-  /v2/ai/enable/{model_name}:
+  /v2/ai/model/start:
     post:
       tags:
       - management
-      summary: Enable Model
-      operationId: enable_model
-      parameters:
-      - name: model_name
-        in: path
+      summary: Start Model
+      operationId: start_model
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModelRequest'
         required: true
-        schema:
-          type: string
-          title: Model Name
       responses:
         '200':
           description: Successful Response
@@ -384,19 +383,18 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
-  /v2/ai/disable/{model_name}:
+  /v2/ai/model/stop:
     post:
       tags:
       - management
-      summary: Disable Model
-      operationId: disable_model
-      parameters:
-      - name: model_name
-        in: path
+      summary: Stop Model
+      operationId: stop_model
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ModelRequest'
         required: true
-        schema:
-          type: string
-          title: Model Name
       responses:
         '200':
           description: Successful Response
@@ -510,10 +508,20 @@ components:
           example:
           - minicpm
           - minicpm_q8
+        file_allow_list:
+          items:
+            type: string
+          type: array
+          title: File Allow List
+          example:
+          - '*.jpg'
+          - '*.png'
+          - '*.jpeg'
       type: object
       required:
       - name
       - models
+      - file_allow_list
       title: Function
     FunctionReponse:
       properties:
@@ -523,7 +531,11 @@ components:
           type: array
           title: Function
           example:
-          - models:
+          - file_allow_list:
+            - '*.jpg'
+            - '*.png'
+            - '*.jpeg'
+            models:
             - minicpm
             - minicpm_q8
             name: ocr
@@ -608,6 +620,16 @@ components:
       required:
       - model
       title: ModelReponse
+    ModelRequest:
+      properties:
+        model_name:
+          type: string
+          title: Model Name
+          example: minicpm
+      type: object
+      required:
+      - model_name
+      title: ModelRequest
     OCRRequest:
       properties:
         file_path:
