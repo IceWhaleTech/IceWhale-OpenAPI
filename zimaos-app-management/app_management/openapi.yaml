@@ -321,7 +321,6 @@ paths:
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
 
-
   /apps/{id}:
     get:
       summary: Get app info from registered app stores
@@ -678,6 +677,22 @@ paths:
           $ref: "#/components/responses/PullImagesOK"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+  /web/compose/path:
+    post:
+      description: |
+        Check a path is used by a compose app or not.
+      operationId: checkPathListIsUsedByComposeApp
+      tags:
+        - Compose methods
+      requestBody:
+        $ref: "#/components/requestBodies/FilePathList"
+      responses:
+        "200":
+          $ref: "#/components/responses/CheckPathUsedOK"
+        "400":
+          $ref: "#/components/responses/ResponseBadRequest"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
 
   /web/appgrid:
     get:
@@ -892,6 +907,22 @@ components:
               - "restart"
               - "stop"
 
+    FilePathList:
+      description: Path of the compose app
+      required: true
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              path_list:
+                type: array
+                items:
+                  type: string
+                example: ["/var/www/html", "/var/www/html/index.html"]
+            required:
+              - path_list
+      
   responses:
     ResponseOK:
       description: OK
@@ -1206,6 +1237,18 @@ components:
                     type: array
                     items:
                       $ref: "#/components/schemas/WebAppGridItem"
+    
+    CheckPathUsedOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/DockerUsedPathUsage"
+                    
   schemas:
     BaseResponse:
       properties:
@@ -1221,6 +1264,21 @@ components:
           type: string
           readOnly: true
           example: "amd64"
+
+    DockerUsedPathUsage:
+      properties:
+        path:
+          type: string
+          example: "/var/www/html"
+        docker_container_name:
+          type: string
+          example: "syncthing"
+        compose_app_id:
+          type: string
+          example: "syncthing"
+        used:
+          type: boolean
+          example: true
 
     GlobalSetting:
       required:
