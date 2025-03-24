@@ -2010,6 +2010,8 @@ components:
         url:
           type: string
           example: https://drive.massgrave.dev/en-us_ubuntu_22.04.3_amd64_dvd_20240924.iso
+        default_configuration:
+          $ref: "#/components/schemas/virtual_machine_configuration"
         status:
           type: string
           enum:
@@ -2019,3 +2021,21 @@ components:
         task_id:
           type: string
           description: only  when status is downloading. the field present
+
+    virtual_machine_configuration:
+      type: object
+      properties:
+        cpu:
+          type: integer
+          example: 2
+        memory:
+          type: integer
+          example: 1024
+        disk_size:
+          type: integer
+          example: 1024
+        boot:
+          type: string
+          enum:
+            - efi
+            - bios
