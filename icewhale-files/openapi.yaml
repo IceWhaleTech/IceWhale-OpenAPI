@@ -199,7 +199,24 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-
+  
+  /file/stats:
+    # 这里用 post 是因为 get 请求的 url 长度有限制
+    post:
+      tags:
+        - File
+      description: Get file or folder stats
+      operationId: getFileOrFolderStats
+      requestBody:
+        $ref: "#/components/requestBodies/FileListRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/FileOrFolderStatsOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "404":
+          $ref: "#/components/responses/ResponseNotFoundError"
+  
   /file/trash:
     delete:
       tags:
@@ -893,6 +910,32 @@ paths:
         "200":
           $ref: "#/components/responses/CreateTaskOK"
   
+  /task/import:
+    post:
+      summary: Import file or folder to ZimaOS(copy)
+      tags:
+        - Task
+      description: Import file or folder to ZimaOS
+      operationId: importFileOrFolder
+      requestBody:
+        $ref: "#/components/requestBodies/FileOperateRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/CreateTaskOK"
+
+  /task/migrate:
+    post:
+      summary: Migrate file or folder from ZimaOS(move to)
+      tags:
+        - Task
+      description: Migrate file or folder to ZimaOS
+      operationId: migrateFileOrFolder
+      requestBody:
+        $ref: "#/components/requestBodies/MigrationRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/CreateTaskOK"
+
   /tasks:
     get:
       operationId: getTaskList
@@ -1591,6 +1634,22 @@ paths:
         "200":
           $ref: "#/components/responses/GetTrashStatsOK"
 
+  /web/path/check:
+    post:
+      tags:
+        - Web
+      description: Check path is by used
+      operationId: checkPathIsByUsed
+      requestBody:
+        $ref: "#/components/requestBodies/FileListRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponsePathCheckOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
 components:
   securitySchemes:
     access_token:
@@ -1670,18 +1729,27 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/FileOperateProps"
+    
     DuplicateRequest:
       description: Duplicate request
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/DuplicateProps"
+      
     DecompressRequest:
       description: Decompress request
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/DecompressProps"
+
+    MigrationRequest:
+      description: Migration request
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/MigrationProps"
 
     TaskOperateRequest:
       description: Task operate request
@@ -2008,6 +2076,29 @@ components:
                     items:
                       $ref: "#/components/schemas/Task"
 
+    FileOrFolderStatsOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/FileOrFolderStat"
+    
+    ResponsePathCheckOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/PathUsedStat"
   schemas:
     SuccessResponse:
       allOf:
@@ -2723,6 +2814,7 @@ components:
             - $ref: "#/components/schemas/FileOperateProps"
             - $ref: "#/components/schemas/DecompressProps"
             - $ref: "#/components/schemas/DuplicateProps"
+            - $ref: "#/components/schemas/MigrationProps"
         err_msg:
           type: string
           example: "测试错误"
@@ -2770,6 +2862,8 @@ components:
         - "move"
         - "duplicate"
         - "decompress"
+        - "import"
+        - "migrate"
 
     TaskStatus:
       type: string
@@ -2902,6 +2996,33 @@ components:
         user_select:
           $ref: "#/components/schemas/TaskUserSelect"
 
+    MigrationProps:
+      type: object
+      required:
+        - src
+        - dst
+        - user_select
+        - retain_src_file
+      properties:
+        src:
+          type: array
+          items:
+            type: string
+          example:
+            [
+              "/media/ZimaOS-HD/Downloads/1.zip",
+              "/media/ZimaOS-HD/Downloads/2.zip",
+            ]
+        dst:
+          type: string
+          example: "/media/ZimaOS-HD"
+        user_select:
+          $ref: "#/components/schemas/TaskUserSelect"
+        retain_src_file:
+          type: boolean
+          example: true
+        
+
     DuplicateProps:
       type: object
       required:
@@ -2937,3 +3058,34 @@ components:
           $ref: "#/components/schemas/TaskUserSelect"
         password:
           type: string
+
+    FileOrFolderStat:
+      type: object
+      required:
+        - total_item
+        - total_size
+      properties:
+        total_item:
+          type: integer
+          example: 100
+        total_size:
+          type: integer
+          example: 1024
+          format: int64
+
+    PathUsedStat:
+      type: object
+      required:
+        - used
+      properties:
+        used:
+          type: boolean
+          example: true
+        path:
+          type: string
+          example: "/media/ZimaOS-HD/Downloads/1.zip"
+        reason:
+          type: string
+          enum:
+            - "share"
+            - "samba"
