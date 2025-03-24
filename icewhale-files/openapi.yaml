@@ -58,6 +58,9 @@ tags:
   - name: Task
     description: |-
       Task API
+  - name: Storage
+    description: |-
+      Storage API
 
 security:
   - access_token: []
@@ -909,6 +912,63 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/CreateTaskOK"
+
+  /file/storage/predelete:
+    post:
+      summary: Check if app data is located on a storage before stopping use
+      tags:
+        - Storage
+      description: Checks if app data is located on the storage that's about to be disabled or formatted
+      operationId: predeleteStorage
+      parameters:
+        - name: path
+          in: query
+          required: true
+          description: |-
+            Filter the delete by path
+          schema:
+            type: string
+            example: "/dev/sda"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponsePreDeleteStorageOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+  /file/storage:
+    delete:
+      summary: Delete a storage
+      description: |-
+        Delete a storage by path
+      operationId: deleteStorage
+      tags:
+        - Storage
+      parameters:
+        - name: path
+          in: query
+          required: true
+          description: |-
+            Filter the delete by path
+          schema:
+            type: string
+            example: "/dev/sda"
+        - name: force
+          in: query
+          required: true
+          description: |-
+            Force delete the storage
+          schema:
+            type: boolean
+            example: true
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
   
   /task/import:
     post:
@@ -2075,6 +2135,19 @@ components:
                     type: array
                     items:
                       $ref: "#/components/schemas/Task"
+   
+    ResponsePreDeleteStorageOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/MigrationType"
 
     FileOrFolderStatsOK:
       description: OK
@@ -2226,6 +2299,7 @@ components:
           example: 0
         extensions:
           $ref: "#/components/schemas/FileExtension"
+
     FileListByCompression:
       properties:
         content:
