@@ -3138,7 +3138,11 @@ components:
       required:
         - total_item
         - total_size
+        - is_dir
       properties:
+        is_dir:
+          type: boolean
+          example: true
         total_item:
           type: integer
           example: 100
