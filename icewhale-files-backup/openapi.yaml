@@ -552,6 +552,15 @@ components:
           format: int64
           example: 1681159361000
 
+        is_local:
+          type: boolean
+          default: false
+          description: |
+            whether the folder backup is local
+
+            > - If set to `true`, the folder backup is local.
+            > - If set to `false`, the folder backup is remote.
+
     DeviceBackup:
       required:
         - id
