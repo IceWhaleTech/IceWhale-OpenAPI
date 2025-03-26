@@ -23,7 +23,7 @@ tags:
   - name: Mount methods
     description: |-
       Low-level API
-  
+
   - name: Raid methods
     description: |-
       Raid API
@@ -51,7 +51,6 @@ security:
   - access_token: []
 
 paths:
-
   /disk:
     get:
       summary: Get disks
@@ -147,7 +146,7 @@ paths:
           $ref: "#/components/responses/ResponseBadRequest"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-  
+
   /disk/sleep/status:
     get:
       description: |-
@@ -169,7 +168,6 @@ paths:
         "503":
           $ref: "#/components/responses/ResponseServiceUnavailable"
 
-        
   /storage:
     get:
       summary: Get storages
@@ -192,7 +190,7 @@ paths:
             Filter the results by path
           schema:
             type: string
-            example: "/dev/sda"    
+            example: "/dev/sda"
       responses:
         "200":
           $ref: "#/components/responses/GetStorageResponseOK"
@@ -263,7 +261,7 @@ paths:
             type: boolean
             example: true
       tags:
-        - Storage methods 
+        - Storage methods
       responses:
         "200":
           $ref: "#/components/responses/GetStoragesOK"
@@ -300,8 +298,8 @@ paths:
         "200":
           $ref: "#/components/responses/GetRaidsResponseOK"
         "503":
-          $ref: "#/components/responses/ResponseServiceUnavailable" 
-    post: 
+          $ref: "#/components/responses/ResponseServiceUnavailable"
+    post:
       summary: create a raid
       description: |-
         Create a raid
@@ -515,7 +513,7 @@ components:
                     type: array
                     items:
                       $ref: "#/components/schemas/Storage"
-    
+
     GetStoragesOK:
       description: OK
       content:
@@ -944,8 +942,6 @@ components:
         disk_type:
           $ref: "#/components/schemas/DiskType"
 
-
-
     PutRaidBody:
       type: object
       properties:
@@ -963,7 +959,7 @@ components:
           items:
             type: string
             description: |-
-               Here's the disk number, so be careful.
+              Here's the disk number, so be careful.
             example: "/dev/sda"
 
     RaidBody:
@@ -978,7 +974,7 @@ components:
           items:
             type: string
             description: |-
-               Here's the disk number, so be careful.
+              Here's the disk number, so be careful.
             example: "1"
         raid_level:
           type: integer
@@ -1037,7 +1033,6 @@ components:
         raid_level:
           type: integer
           example: 1
-
 
     Disk:
       type: object
@@ -1123,7 +1118,9 @@ components:
           description: disk available size
           type: string
           example: "1TB"
-        
+        read_only:
+          type: boolean
+          example: false
 
     Partition:
       type: object
@@ -1223,6 +1220,9 @@ components:
           description: estimate of the percentage of NVM subsystem life used based on the actual usage
           type: integer
           example: 1
+        read_only:
+          type: boolean
+          example: false
 
     DiskType:
       type: string
