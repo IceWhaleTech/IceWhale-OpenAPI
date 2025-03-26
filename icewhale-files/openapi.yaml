@@ -58,6 +58,9 @@ tags:
   - name: Task
     description: |-
       Task API
+  - name: Service
+    description: |-
+      Service management
   - name: Storage
     description: |-
       Storage API
@@ -202,7 +205,7 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-  
+
   /file/stats:
     # 这里用 post 是因为 get 请求的 url 长度有限制
     post:
@@ -219,7 +222,7 @@ paths:
           $ref: "#/components/responses/ResponseClientError"
         "404":
           $ref: "#/components/responses/ResponseNotFoundError"
-  
+
   /file/trash:
     delete:
       tags:
@@ -273,7 +276,6 @@ paths:
           $ref: "#/components/responses/ResponseNotFoundError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-
   /file/compression:
     post:
       tags:
@@ -594,6 +596,47 @@ paths:
           $ref: "#/components/responses/ResponseClientError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+
+  /file/search:
+    # disable or enable search
+    get:
+      tags:
+        - File
+      summary: Get search status
+      description: Get the current status of the search service
+      operationId: getSearchStatus
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseSearchStatusOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+    put:
+      tags:
+        - File
+      summary: Set search status
+      description: Set the status of the search service
+      operationId: setSearchStatus
+      parameters:
+        - name: status
+          in: query
+          description: ssh status
+          required: true
+          schema:
+            type: string
+            enum:
+              - enable
+              - disable
+            example: "enable"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseStringOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
   /filedrop/ws:
     get:
       tags:
@@ -969,7 +1012,7 @@ paths:
           $ref: "#/components/responses/ResponseClientError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-  
+
   /task/import:
     post:
       summary: Import file or folder to ZimaOS(copy)
@@ -1027,7 +1070,6 @@ paths:
           $ref: "#/components/responses/ResponseClientError"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
-
     delete:
       tags:
         - Task
@@ -1157,6 +1199,96 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/ResponseShareListOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "404":
+          $ref: "#/components/responses/ResponseNotFoundError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
+  /share/samba:
+    get:
+      summary: Get Samba service status
+      tags:
+        - Share
+      description: Get the current status of the Samba service (enabled/disabled)
+      operationId: getSambaServiceStatus
+      responses:
+        "200":
+          $ref: "#/components/responses/GetSambaStatusOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+    put:
+      summary: Set Samba service status
+      tags:
+        - Share
+      description: Enable or disable the Samba service
+      operationId: setSambaServiceStatus
+      parameters:
+        - name: status
+          in: query
+          description: samba status
+          required: true
+          schema:
+            type: string
+            enum:
+              - enable
+              - disable
+            example: "enable"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+  /share/samba/features:
+    get:
+      summary: Get status of a single Samba feature
+      tags:
+        - Share
+      description: Get the current status of a specific Samba feature
+      operationId: getSambaFeatureStatus
+      parameters:
+        - name: feature
+          in: query
+          description: Name of the Samba feature to check
+          required: true
+          schema:
+            $ref: "#/components/schemas/SambaFeatures"
+      responses:
+        "200":
+          $ref: "#/components/responses/GetSambaFeatureStatusOK"
+        "400":
+          $ref: "#/components/responses/ResponseClientError"
+        "404":
+          $ref: "#/components/responses/ResponseNotFoundError"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+    put:
+      summary: Configure multiple Samba features
+      tags:
+        - Share
+      description: Enable or disable multiple Samba features in a single request
+      operationId: setSambaFeatures
+      parameters:
+        - name: feature
+          in: query
+          description: List of Samba features to enable or disable
+          required: true
+          schema:
+            $ref: "#/components/schemas/SambaFeatures"
+        - name: status
+          in: query
+          description: Whether to enable the Samba features
+          required: true
+          schema:
+            type: boolean
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseOK"
         "400":
           $ref: "#/components/responses/ResponseClientError"
         "404":
@@ -1789,14 +1921,14 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/FileOperateProps"
-    
+
     DuplicateRequest:
       description: Duplicate request
       content:
         application/json:
           schema:
             $ref: "#/components/schemas/DuplicateProps"
-      
+
     DecompressRequest:
       description: Decompress request
       content:
@@ -1825,6 +1957,7 @@ components:
                 items:
                   type: integer
                   format: uint
+
   responses:
     ResponseOK:
       description: OK
@@ -2135,7 +2268,7 @@ components:
                     type: array
                     items:
                       $ref: "#/components/schemas/Task"
-   
+
     ResponsePreDeleteStorageOK:
       description: OK
       content:
@@ -2161,7 +2294,7 @@ components:
                     type: array
                     items:
                       $ref: "#/components/schemas/FileOrFolderStat"
-    
+
     ResponsePathCheckOK:
       description: OK
       content:
@@ -2172,6 +2305,55 @@ components:
               - properties:
                   data:
                     $ref: "#/components/schemas/PathUsedStat"
+
+    GetSambaStatusOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/SambaStatus"
+
+    GetSambaFeaturesOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    type: object
+                    additionalProperties:
+                      type: boolean
+                    example:
+                      samba1: true
+                      multichannel: false
+                      spotlight: true
+
+    ResponseSearchStatusOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/SearchStatus"
+    GetSambaFeatureStatusOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/SambaFeatureStatus"
   schemas:
     SuccessResponse:
       allOf:
@@ -3095,7 +3277,6 @@ components:
         retain_src_file:
           type: boolean
           example: true
-        
 
     DuplicateProps:
       type: object
@@ -3132,6 +3313,46 @@ components:
           $ref: "#/components/schemas/TaskUserSelect"
         password:
           type: string
+
+    SambaFeatures:
+      type: string
+      enum:
+        - samba1
+        - multichannel
+        - spotlight
+
+    SambaStatus:
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum:
+            - enabled
+            - disabled
+          example: "enabled"
+
+    SearchStatus:
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum:
+            - enabled
+            - disabled
+          example: "enabled"
+
+    SambaFeatureStatus:
+      required:
+        - status
+      properties:
+        status:
+          type: string
+          enum:
+            - enabled
+            - disabled
+          example: "enabled"
 
     FileOrFolderStat:
       type: object
