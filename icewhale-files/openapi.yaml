@@ -3388,3 +3388,12 @@ components:
           enum:
             - "share"
             - "samba"
+            - "pin"
+            - "application"
+            - "user_data"
+          x-enum-varnames:
+            - "share"
+            - "samba"
+            - "pin"
+            - "application"
+            - "TypeUserData"
