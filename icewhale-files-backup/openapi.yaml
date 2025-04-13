@@ -50,6 +50,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/ClientIDParam"
         - $ref: "#/components/parameters/ClientFolderPathParam"
+        - $ref: "#/components/parameters/BackupFolderPathParam"
       responses:
         "200":
           $ref: "#/components/responses/FolderBackupsOK"
@@ -80,6 +81,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/ClientIDParam"
         - $ref: "#/components/parameters/ClientFolderPathParam"
+        - $ref: "#/components/parameters/BackupFolderPathParam"
         - $ref: "#/components/parameters/SuccessParam"
       responses:
         "200":
@@ -95,6 +97,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/ClientIDParam"
         - $ref: "#/components/parameters/ClientFolderPathParam"
+        - $ref: "#/components/parameters/BackupFolderPathParam"
         - $ref: "#/components/parameters/CleanUpBackupParam"
       responses:
         "200":
@@ -151,6 +154,14 @@ components:
       schema:
         type: string
         example: C:\Users\icewhale\Downloads
+
+    BackupFolderPathParam:
+      name: backup_folder_path
+      in: query
+      description: path of the folder from server side to be backed up
+      schema:
+        type: string
+        example: /media/ZimaOS-HD/Backup
 
     CleanUpBackupParam:
       name: cleanup_backup
