@@ -408,6 +408,31 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
+  /v2/ai/ai/generate:
+    get:
+      tags:
+      - ai
+      summary: Generate With Image
+      operationId: ai_generate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/GenerateWithImageRequest'
+        required: true
+      responses:
+        '200':
+          description: Successful Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AIReponse'
+        '422':
+          description: Validation Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HTTPValidationError'
 components:
   schemas:
     AIReponse:
@@ -560,6 +585,26 @@ components:
       required:
       - content
       title: GenerateRequest
+    GenerateWithImageRequest:
+      properties:
+        file_path:
+          type: string
+          title: File Path
+          example: image.jpg
+        model_name:
+          type: string
+          title: Model Name
+          example: minicpm
+        prompt:
+          type: string
+          title: Prompt
+          example: generate a beautiful image
+      type: object
+      required:
+      - file_path
+      - model_name
+      - prompt
+      title: GenerateWithImageRequest
     HTTPValidationError:
       properties:
         detail:
