@@ -42,31 +42,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
-  /v1/ai/generate:
-    post:
-      tags:
-      - ai
-      summary: generate content
-      operationId: generate
-      requestBody:
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/GenerateRequest'
-        required: true
-      responses:
-        '200':
-          description: Successful Response
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/AIReponse'
-        '422':
-          description: Validation Error
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/HTTPValidationError'
   /v1/ai/ocr:
     post:
       tags:
@@ -408,12 +383,12 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/HTTPValidationError'
-  /v2/ai/ai/generate:
-    get:
+  /v2/ai/generate:
+    post:
       tags:
       - ai
-      summary: Generate With Image
-      operationId: ai_generate
+      summary: Generate
+      operationId: generate
       requestBody:
         content:
           application/json:
@@ -568,23 +543,6 @@ components:
       required:
       - function
       title: FunctionReponse
-    GenerateRequest:
-      properties:
-        content:
-          type: string
-          title: Content
-        prompt:
-          type: string
-          title: Prompt
-          default: continue the following content.
-        source:
-          type: string
-          title: Source
-          default: unknown
-      type: object
-      required:
-      - content
-      title: GenerateRequest
     GenerateWithImageRequest:
       properties:
         file_path:
@@ -642,11 +600,30 @@ components:
         status:
           $ref: '#/components/schemas/StatusEnum'
           example: available
+        allow_file_type:
+          items:
+            type: string
+          type: array
+          title: Allow File Type
+          example:
+          - '*.jpg'
+          - '*.png'
+          - '*.jpeg'
+        prompt_example_list:
+          items:
+            $ref: '#/components/schemas/PromptExample'
+          type: array
+          title: Prompt Example List
+          example:
+          - prompt: only return the text in the image.
+            title: ocr
       type: object
       required:
       - name
       - functions
       - status
+      - allow_file_type
+      - prompt_example_list
       title: Model
     ModelReponse:
       properties:
@@ -656,10 +633,17 @@ components:
           type: array
           title: Model
           example:
-          - functions:
+          - allow_file_type:
+            - '*.jpg'
+            - '*.png'
+            - '*.jpeg'
+            functions:
             - ocr
             - image
             name: minicpm
+            prompt_example_list:
+            - generate a beautiful image
+            - generate a beautiful image
             status: available
       type: object
       required:
@@ -692,6 +676,21 @@ components:
       required:
       - file_path
       title: OCRRequest
+    PromptExample:
+      properties:
+        title:
+          type: string
+          title: Title
+          example: ocr
+        prompt:
+          type: string
+          title: Prompt
+          example: only return the text in the image.
+      type: object
+      required:
+      - title
+      - prompt
+      title: PromptExample
     StatusEnum:
       type: string
       enum:
