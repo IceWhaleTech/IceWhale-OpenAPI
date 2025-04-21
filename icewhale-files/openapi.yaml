@@ -64,6 +64,9 @@ tags:
   - name: Storage
     description: |-
       Storage API
+  - name: MediaInfo
+    description: |-
+      MediaInfo API
 
 security:
   - access_token: []
@@ -1813,6 +1816,20 @@ paths:
         "200":
           $ref: "#/components/responses/GetTrashStatsOK"
 
+  /mediainfo:
+    post:
+      tags:
+        - MediaInfo
+      description: Get media info
+      operationId: getMediaInfo
+      requestBody:
+        $ref: "#/components/requestBodies/FileListRequest"
+      responses:
+        "200":
+          $ref: "#/components/responses/GetMediaInfoOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
   /web/path/check:
     post:
       tags:
@@ -2341,6 +2358,17 @@ components:
               - properties:
                   data:
                     $ref: "#/components/schemas/SambaFeatureStatus"
+
+    GetMediaInfoOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/MediaInfo"
   schemas:
     SuccessResponse:
       allOf:
@@ -3384,3 +3412,38 @@ components:
             - "pin"
             - "application"
             - "TypeUserData"
+
+    MediaInfo:
+      type: object
+      properties:
+        name:
+          type: string
+          example: "test"
+        type:
+          type: string
+          example: "file" # or "folder" or "MP4" or "PNG"
+        items:
+          type: integer
+          example: 100
+        subfolder:
+          type: integer
+          example: 100
+        size:
+          type: integer
+          example: 1024
+          format: int64
+        path:
+          type: string
+          example: "/media/ZimaOS-HD/Downloads/1.zip"
+        ctime:
+          type: integer
+          example: 1682403656
+          format: int64
+        mtime:
+          type: integer
+          example: 1682403656
+          format: int64
+        atime:
+          type: integer
+          example: 1682403656
+          format: int64
