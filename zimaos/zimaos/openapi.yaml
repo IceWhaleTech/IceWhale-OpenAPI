@@ -110,6 +110,7 @@ x-tagGroups:
       - Seventh methods
       - SSH methods
       - DLNA methods
+      - System methods
 
   - name: Schemas
     tags:
@@ -126,6 +127,7 @@ x-tagGroups:
       - ZeroTier Info
       - Seventh
       - SSH
+      - System
 
 security:
   - access_token: []
@@ -382,6 +384,27 @@ paths:
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
 
+  /device/image:
+    get:
+      tags:
+        - Device methods
+      summary: Get device image
+      description: |-
+        Get device image.
+      operationId: getDeviceImage
+      parameters:
+        - name: model
+          in: query
+          description: device model
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          $ref: "#/components/responses/GetDeviceImageOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
   /gpu:
     get:
       tags:
@@ -613,6 +636,38 @@ paths:
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
 
+  /scheduledoff:
+    get:
+      tags:
+        - System methods
+      summary: Get scheduled off
+      description: |-
+        Get scheduled off.
+      operationId: getScheduledOff
+      responses:
+        "200":
+          $ref: "#/components/responses/GetScheduledOffOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+    put:
+      tags:
+        - System methods
+      summary: Set scheduled off
+      description: |-
+        Set scheduled off.
+      operationId: setScheduledOff
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ScheduledOff"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+
 components:
   securitySchemes:
     access_token:
@@ -704,6 +759,13 @@ components:
           schema:
             $ref: "#/components/schemas/DeviceInfo"
 
+    GetDeviceImageOK:
+      description: OK
+      content:
+        image/png:
+          schema:
+            $ref: "#/components/schemas/DeviceImage"
+
     GetConnectStatusOK:
       description: OK
       content:
@@ -790,6 +852,17 @@ components:
               - properties:
                   data:
                     $ref: "#/components/schemas/TTY"
+
+    GetScheduledOffOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/ScheduledOff"
 
   requestBodies:
     DeviceInfoBody:
@@ -955,6 +1028,15 @@ components:
         hash:
           type: string
           example: "sidnfnik39djv9wije9ijovij"
+        device_image_path:
+          type: string
+          example: "/assets/board.png"
+
+    DeviceImage:
+      properties:
+        path:
+          type: string
+          example: "/assets/board.png"
 
     GPUInfo:
       required:
@@ -1208,3 +1290,30 @@ components:
         port:
           type: integer
           example: 30
+
+    ScheduledOff:
+      type: object
+      required:
+        - hour
+        - minute
+        - weekdays
+      properties:
+        hour:
+          type: integer
+          example: 23
+        minute:
+          type: integer
+          example: 59
+        weekdays:
+          type: array
+          items:
+            type: string
+            example: "SUN,FRI"
+            enum:
+              - SUN
+              - MON
+              - TUE
+              - WED
+              - THU
+              - FRI
+              - SAT
