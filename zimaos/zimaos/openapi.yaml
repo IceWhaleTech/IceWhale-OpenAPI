@@ -1015,6 +1015,8 @@ components:
         - device_model
         - os_version
         - hash
+        - device_image_path
+        - can_control_powerled
       properties:
         device_name:
           type: string
@@ -1031,6 +1033,9 @@ components:
         device_image_path:
           type: string
           example: "/assets/board.png"
+        can_control_powerled:
+          type: boolean
+          example: true
 
     DeviceImage:
       properties:
