@@ -2946,6 +2946,7 @@ components:
             - "dropbox"
             - "onedrive"
             - "drive"
+            - "adrive"
         extensions:
           type: object
           description: extensions
