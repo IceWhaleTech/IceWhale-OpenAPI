@@ -399,6 +399,15 @@ paths:
           required: true
           schema:
             type: string
+        - name: type
+          in: query
+          description: device image type
+          required: true
+          schema:
+            type: string
+            enum:
+              - "web"
+              - "client"
       responses:
         "200":
           $ref: "#/components/responses/GetDeviceImageOK"
