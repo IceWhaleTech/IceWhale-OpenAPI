@@ -30,8 +30,6 @@ x-tagGroups:
     tags:
       - Health methods
 
-security:
-
 paths:
   /health/services:
     get:
@@ -192,8 +190,10 @@ components:
     DriveInfo:
       required:
         - device_name
+        - ip4
         - lan_ipv4
         - tb_ipv4
+        - device_model
       properties:
         lan_ipv4:
           type: array
@@ -239,3 +239,9 @@ components:
         request_ip:
           type: string
           example: "192.168.11.1"
+        device_image_path:
+          type: string
+          description: device image path
+        device_image:
+          type: string
+          description: device image base64 string
