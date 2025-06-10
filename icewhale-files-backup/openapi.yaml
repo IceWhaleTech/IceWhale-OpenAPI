@@ -8,6 +8,7 @@ info:
 
 servers:
   - url: /v2/files
+  - url: /v2/backup
 security:
   - access_token: []
 
@@ -116,6 +117,16 @@ paths:
           $ref: "#/components/responses/DevicesOK"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
+          
+  /v2/backup/devices:
+    get:
+      summary: Get all backup devices
+      operationId: getAllBackupDevices
+      responses:
+        "200":
+          $ref: "#/components/responses/BackupDevicesOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
 
   /device/backup:
     post:
@@ -128,6 +139,84 @@ paths:
           $ref: "#/components/responses/ResponseOK"
         "400":
           $ref: "#/components/responses/ResponseBadRequest"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+          
+  /v2/backup/tasks:
+    post:
+      summary: Create a new backup task
+      operationId: createBackupTask
+      requestBody:
+        $ref: "#/components/requestBodies/BackupTaskRequest"
+      responses:
+        "201":
+          $ref: "#/components/responses/BackupTaskCreatedOK"
+        "400":
+          $ref: "#/components/responses/ResponseBadRequest"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+    get:
+      summary: Get all backup tasks
+      operationId: getAllBackupTasks
+      responses:
+        "200":
+          $ref: "#/components/responses/BackupTasksOK"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+          
+  /v2/backup/tasks/{task_id}:
+    get:
+      summary: Get a backup task by ID
+      operationId: getBackupTaskById
+      parameters:
+        - $ref: "#/components/parameters/TaskIDParam"
+      responses:
+        "200":
+          $ref: "#/components/responses/BackupTaskOK"
+        "404":
+          $ref: "#/components/responses/ResponseNotFound"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+    delete:
+      summary: Delete a backup task
+      operationId: deleteBackupTask
+      parameters:
+        - $ref: "#/components/parameters/TaskIDParam"
+      responses:
+        "200":
+          $ref: "#/components/responses/ResponseOK"
+        "404":
+          $ref: "#/components/responses/ResponseNotFound"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+          
+  /v2/backup/tasks/{task_id}/subtasks:
+    post:
+      summary: Add a subtask to an existing backup task
+      operationId: addBackupSubtask
+      parameters:
+        - $ref: "#/components/parameters/TaskIDParam"
+      requestBody:
+        $ref: "#/components/requestBodies/BackupSubtaskRequest"
+      responses:
+        "201":
+          $ref: "#/components/responses/BackupSubtaskCreatedOK"
+        "400":
+          $ref: "#/components/responses/ResponseBadRequest"
+        "404":
+          $ref: "#/components/responses/ResponseNotFound"
+        "500":
+          $ref: "#/components/responses/ResponseInternalServerError"
+    get:
+      summary: Get all subtasks for a backup task
+      operationId: getBackupSubtasks
+      parameters:
+        - $ref: "#/components/parameters/TaskIDParam"
+      responses:
+        "200":
+          $ref: "#/components/responses/BackupSubtasksOK"
+        "404":
+          $ref: "#/components/responses/ResponseNotFound"
         "500":
           $ref: "#/components/responses/ResponseInternalServerError"
 
@@ -146,6 +235,16 @@ components:
       schema:
         $ref: "#/components/schemas/ClientID"
       x-go-name: ClientIDParam
+      
+    TaskIDParam:
+      name: task_id
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+      description: ID of the backup task
+      x-go-name: TaskIDParam
 
     ClientFolderPathParam:
       name: client_folder_path
@@ -205,6 +304,18 @@ components:
         application/json:
           schema:
             $ref: "#/components/schemas/DeviceBackup"
+    BackupTaskRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BackupTask"
+    BackupSubtaskRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/BackupSubtask"
 
   responses:
     ResponseOK:
@@ -307,6 +418,78 @@ components:
                     type: array
                     items:
                       $ref: "#/components/schemas/DeviceInfo"
+                      
+    BackupDevicesOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/BackupDeviceInfo"
+                      
+    BackupTaskCreatedOK:
+      description: Backup Task Created
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/BackupTask"
+                    
+    BackupTaskOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/BackupTask"
+                    
+    BackupTasksOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/BackupTask"
+                      
+    BackupSubtaskCreatedOK:
+      description: Backup Subtask Created
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    $ref: "#/components/schemas/BackupSubtask"
+                    
+    BackupSubtasksOK:
+      description: OK
+      content:
+        application/json:
+          schema:
+            allOf:
+              - $ref: "#/components/schemas/BaseResponse"
+              - properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/BackupSubtask"
 
   schemas:
     DeviceInfo:
@@ -594,3 +777,224 @@ components:
         - "authorized"
         - "confirming"
         - "backuping"
+        
+    DeviceType:
+      type: string
+      enum:
+        - "PC"
+        - "Phone"
+        - "Cloud"
+        - "USB"
+        - "LAN"
+        
+    BackupDeviceInfo:
+      type: object
+      required:
+        - id
+        - device_type
+      properties:
+        id:
+          type: integer
+          description: Unique identifier for the device
+          example: 1
+        device_id:
+          type: string
+          description: Unique identifier for the device
+          example: "device-123456"
+        device_type:
+          $ref: "#/components/schemas/DeviceType"
+        name:
+          type: string
+          description: Name of the device
+          example: 
+            - "John's Laptop"
+            - "john.doe@example.com"
+            - "SanDisk Ultra 64GB"
+            - "192.168.1.100"
+        device_subtype:
+          type: string
+          enum:
+            - "macOS"
+            - "Windows"
+            - "Android"
+            - "iOS"
+            - "Google Drive"
+            - "OneDrive"
+            - "Dropbox"
+            - "SMB"
+            - "WebDAV"
+          description: Additional device type information
+          example:
+            - "macOS"
+            - "Windows"
+            - "Android"
+            - "iOS"
+            - "Google Drive"
+            - "OneDrive"
+            - "Dropbox"
+            - "SMB"
+            - "WebDAV"
+        last_backup_time:
+          type: string
+          format: date-time
+          description: Last successful backup time
+          example: "2025-06-01T12:00:00Z"
+        backup_status:
+          type: string
+          description: Current backup status
+          example: "completed"
+        is_connecting:
+          type: boolean
+          description: Whether the device is currently connecting
+          example: true
+          
+    BackupScheduleType:
+      type: string
+      enum:
+        - "one_time"
+        - "scheduled"
+      description: Type of backup schedule
+      example: "scheduled"
+      
+    BackupTask:
+      type: object
+      required:
+        - source_device_id
+        - source_path
+        - target_device_id
+        - target_path
+        - schedule_type
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the backup task
+          example: "123e4567-e89b-12d3-a456-426614174000"
+          readOnly: true
+        name:
+          type: string
+          description: Name of the backup task
+          example: "Weekly Documents Backup"
+        source_device_id:
+          type: string
+          description: ID of the source device
+          example: "device-123456"
+        source_path:
+          type: string
+          description: Path on the source device to backup from
+          example: "C:\\Users\\username\\Documents"
+        target_device_id:
+          type: string
+          description: ID of the target device
+          example: "device-789012"
+        target_path:
+          type: string
+          description: Path on the target device to backup to
+          example: "/Backups/Documents"
+        schedule_type:
+          $ref: "#/components/schemas/BackupScheduleType"
+        schedule_config:
+          type: object
+          description: Configuration for scheduled backups
+          properties:
+            frequency:
+              type: string
+              enum: ["daily", "weekly", "monthly"]
+              example: "weekly"
+            day_of_week:
+              type: integer
+              minimum: 0
+              maximum: 6
+              description: Day of week (0 = Sunday, 6 = Saturday)
+              example: 1
+            day_of_month:
+              type: integer
+              minimum: 1
+              maximum: 31
+              description: Day of month
+              example: 15
+            time:
+              type: string
+              format: time
+              example: "02:00:00"
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+          example: "2025-06-10T10:15:30Z"
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+          example: "2025-06-10T10:15:30Z"
+          readOnly: true
+        last_run:
+          type: string
+          format: date-time
+          description: Last execution timestamp
+          example: "2025-06-10T10:15:30Z"
+          readOnly: true
+        next_run:
+          type: string
+          format: date-time
+          description: Next scheduled execution timestamp
+          example: "2025-06-17T02:00:00Z"
+          readOnly: true
+        status:
+          type: string
+          enum: ["pending", "running", "completed", "failed"]
+          description: Current status of the backup task
+          example: "completed"
+          readOnly: true
+          
+    BackupSubtask:
+      type: object
+      required:
+        - target_device_id
+        - target_path
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the backup subtask
+          example: "123e4567-e89b-12d3-a456-426614174001"
+          readOnly: true
+        task_id:
+          type: string
+          format: uuid
+          description: ID of the parent backup task
+          example: "123e4567-e89b-12d3-a456-426614174000"
+          readOnly: true
+        target_device_id:
+          type: string
+          description: ID of the additional target device
+          example: "device-345678"
+        target_path:
+          type: string
+          description: Path on the target device to backup to
+          example: "/media/external/Backups"
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+          example: "2025-06-10T10:20:30Z"
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+          example: "2025-06-10T10:20:30Z"
+          readOnly: true
+        last_run:
+          type: string
+          format: date-time
+          description: Last execution timestamp
+          example: "2025-06-10T10:20:30Z"
+          readOnly: true
+        status:
+          type: string
+          enum: ["pending", "running", "completed", "failed"]
+          description: Current status of the backup subtask
+          example: "completed"
+          readOnly: true
