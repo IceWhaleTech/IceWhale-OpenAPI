@@ -453,7 +453,7 @@ components:
               - properties:
                   data:
                     $ref: "#/components/schemas/BackupTask"
-                    
+
     BackupTasksOK:
       description: OK
       content:
@@ -847,7 +847,7 @@ components:
           type: boolean
           description: Whether the device is currently connecting
           example: true
-          
+
     BackupScheduleType:
       type: string
       enum:
@@ -867,7 +867,6 @@ components:
       properties:
         id:
           type: string
-          format: uuid
           description: Unique identifier for the backup task
           example: "123e4567-e89b-12d3-a456-426614174000"
           readOnly: true
