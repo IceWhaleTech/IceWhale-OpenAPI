@@ -855,6 +855,33 @@ components:
         - "scheduled"
       description: Type of backup schedule
       example: "scheduled"
+
+    BackupScheduleConfig:
+      type: object
+      required:
+        - frequency
+        - time
+      properties:
+        frequency:
+          type: string
+          enum: ["daily", "weekly", "monthly"]
+          example: "weekly"
+        day_of_week:
+          type: integer
+          minimum: 0
+          maximum: 6
+          description: Day of week (0 = Sunday, 6 = Saturday)
+          example: 1
+        day_of_month:
+          type: integer
+          minimum: 1
+          maximum: 31
+          description: Day of month
+          example: 15
+        time:
+          type: string
+          format: time
+          example: "02:00:00"
       
     BackupTask:
       type: object
@@ -866,9 +893,9 @@ components:
         - schedule_type
       properties:
         id:
-          type: string
+          type: integer
           description: Unique identifier for the backup task
-          example: "123e4567-e89b-12d3-a456-426614174000"
+          example: 1
           readOnly: true
         name:
           type: string
@@ -893,29 +920,7 @@ components:
         schedule_type:
           $ref: "#/components/schemas/BackupScheduleType"
         schedule_config:
-          type: object
-          description: Configuration for scheduled backups
-          properties:
-            frequency:
-              type: string
-              enum: ["daily", "weekly", "monthly"]
-              example: "weekly"
-            day_of_week:
-              type: integer
-              minimum: 0
-              maximum: 6
-              description: Day of week (0 = Sunday, 6 = Saturday)
-              example: 1
-            day_of_month:
-              type: integer
-              minimum: 1
-              maximum: 31
-              description: Day of month
-              example: 15
-            time:
-              type: string
-              format: time
-              example: "02:00:00"
+          $ref: "#/components/schemas/BackupScheduleConfig"
         created_at:
           type: string
           format: date-time
