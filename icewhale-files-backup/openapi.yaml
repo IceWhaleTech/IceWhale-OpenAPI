@@ -969,3 +969,15 @@ components:
           description: Current status of the backup subtask
           example: "completed"
           readOnly: true
+        created_at:
+          type: string
+          format: date-time
+          description: Creation timestamp
+          example: "2025-06-10T10:20:30Z"
+          readOnly: true
+        updated_at:
+          type: string
+          format: date-time
+          description: Last update timestamp
+          example: "2025-06-10T10:20:30Z"
+          readOnly: true
