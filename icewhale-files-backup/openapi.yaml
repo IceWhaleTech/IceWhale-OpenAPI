@@ -777,7 +777,7 @@ components:
         - "authorized"
         - "confirming"
         - "backuping"
-        
+
     DeviceType:
       type: string
       enum:
@@ -786,7 +786,7 @@ components:
         - "Cloud"
         - "USB"
         - "LAN"
-        
+
     BackupDeviceInfo:
       type: object
       required:
@@ -847,6 +847,10 @@ components:
           type: boolean
           description: Whether the device is currently connecting
           example: true
+        task_count:
+          type: integer
+          description: Total number of backup tasks associated with this device
+          example: 5
 
     BackupScheduleType:
       type: string
@@ -882,15 +886,26 @@ components:
           type: string
           format: time
           example: "02:00:00"
-      
+
+    BackupLocation:
+      type: object
+      required:
+        - device_id
+        - path
+      properties:
+        device_id:
+          type: string
+          description: ID of the device
+          example: "device-123456"
+        path:
+          type: string
+          description: Path on the device
+          example: "C:\\Users\\username\\Documents"
+
     BackupTask:
       type: object
       required:
-        - source_device_id
-        - source_path
-        - target_device_id
-        - target_path
-        - schedule_type
+        - source
       properties:
         id:
           type: integer
@@ -901,43 +916,36 @@ components:
           type: string
           description: Name of the backup task
           example: "Weekly Documents Backup"
-        source_device_id:
-          type: string
-          description: ID of the source device
-          example: "device-123456"
-        source_path:
-          type: string
-          description: Path on the source device to backup from
-          example: "C:\\Users\\username\\Documents"
-        target_device_id:
-          type: string
-          description: ID of the target device
-          example: "device-789012"
-        target_path:
-          type: string
-          description: Path on the target device to backup to
-          example: "/Backups/Documents"
-        schedule_type:
-          $ref: "#/components/schemas/BackupScheduleType"
-        schedule_config:
-          $ref: "#/components/schemas/BackupScheduleConfig"
-        created_at:
-          type: string
-          format: date-time
-          description: Creation timestamp
-          example: "2025-06-10T10:15:30Z"
+        source:
+          $ref: "#/components/schemas/BackupLocation"
+          description: Source location for the backup
+        subtasks:
+          type: array
+          description: List of subtasks associated with this backup task
+          items:
+            $ref: "#/components/schemas/BackupSubtask"
           readOnly: true
-        updated_at:
+
+    BackupSubtask:
+      type: object
+      required:
+        - target
+        - schedule_type
+        - schedule_config
+      properties:
+        id:
           type: string
-          format: date-time
-          description: Last update timestamp
-          example: "2025-06-10T10:15:30Z"
+          description: Unique identifier for the backup subtask
+          example: "123e4567-e89b-12d3-a456-426614174001"
           readOnly: true
+        target:
+          $ref: "#/components/schemas/BackupLocation"
+          description: Target location for the backup
         last_run:
           type: string
           format: date-time
           description: Last execution timestamp
-          example: "2025-06-10T10:15:30Z"
+          example: "2025-06-10T10:20:30Z"
           readOnly: true
         next_run:
           type: string
@@ -945,56 +953,15 @@ components:
           description: Next scheduled execution timestamp
           example: "2025-06-17T02:00:00Z"
           readOnly: true
-        status:
-          type: string
-          enum: ["pending", "running", "completed", "failed"]
-          description: Current status of the backup task
-          example: "completed"
+        schedule_type:
+          $ref: "#/components/schemas/BackupScheduleType"
+          description: Type of backup schedule
+          example: "scheduled"
           readOnly: true
-          
-    BackupSubtask:
-      type: object
-      required:
-        - target_device_id
-        - target_path
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: Unique identifier for the backup subtask
-          example: "123e4567-e89b-12d3-a456-426614174001"
-          readOnly: true
-        task_id:
-          type: string
-          format: uuid
-          description: ID of the parent backup task
-          example: "123e4567-e89b-12d3-a456-426614174000"
-          readOnly: true
-        target_device_id:
-          type: string
-          description: ID of the additional target device
-          example: "device-345678"
-        target_path:
-          type: string
-          description: Path on the target device to backup to
-          example: "/media/external/Backups"
-        created_at:
-          type: string
-          format: date-time
-          description: Creation timestamp
-          example: "2025-06-10T10:20:30Z"
-          readOnly: true
-        updated_at:
-          type: string
-          format: date-time
-          description: Last update timestamp
-          example: "2025-06-10T10:20:30Z"
-          readOnly: true
-        last_run:
-          type: string
-          format: date-time
-          description: Last execution timestamp
-          example: "2025-06-10T10:20:30Z"
+        schedule_config:
+          $ref: "#/components/schemas/BackupScheduleConfig"
+          description: Configuration for the backup schedule
+          example: { "frequency": "weekly", "time": "02:00:00" }
           readOnly: true
         status:
           type: string
