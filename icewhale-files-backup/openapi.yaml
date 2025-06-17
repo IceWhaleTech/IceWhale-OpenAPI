@@ -794,10 +794,6 @@ components:
         - device_type
       properties:
         id:
-          type: integer
-          description: Unique identifier for the device
-          example: 1
-        device_id:
           type: string
           description: Unique identifier for the device
           example: "device-123456"
@@ -835,12 +831,17 @@ components:
             - "SMB"
             - "WebDAV"
         last_backup_time:
-          type: string
-          format: date-time
+          type: integer
+          format: int64
           description: Last successful backup time
-          example: "2025-06-01T12:00:00Z"
+          example: 1681159361000
         backup_status:
           type: string
+          enum:
+            - "completed"
+            - "failed"
+            - "pending"
+            - "running"
           description: Current backup status
           example: "completed"
         is_connecting:
@@ -908,9 +909,9 @@ components:
         - source
       properties:
         id:
-          type: integer
+          type: string
           description: Unique identifier for the backup task
-          example: 1
+          example: "123e4567-e89b-12d3-a456-426614174001"
           readOnly: true
         name:
           type: string
@@ -931,7 +932,6 @@ components:
       required:
         - target
         - schedule_type
-        - schedule_config
       properties:
         id:
           type: string
